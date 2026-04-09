@@ -1,0 +1,116 @@
+<!-- <ngx-spinner size="medium" color="#21aa47" type="square-jelly-box" [fullScreen]="true">
+  <p style="color: #F39201;font-weight: 600;"> Loading... </p>
+</ngx-spinner> -->
+
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+
+
+<!-- <div class="overlay" *ngIf="searchLoad">
+  <div class="spinner"> Loading......!!!</div>
+</div> -->
+
+    <div class="container-fluid " >
+      <div class="row p-3"> 
+        <div class="text-end">
+          <button *ngIf="customer_list?.length" mat-raised-button class="mb-1 export-btn" (click)="downloadExport()" >Export</button>
+         </div>
+        <div class="col-sm-12 col-md-3 col-lg-3 customerbtn">
+          <div class="px-3">
+          <button type="button" class="btn  buttons ">
+            <span class="customer"> B2C Customers</span>
+            <span class="badge badge-light violet">{{totalCount}}</span>
+          </button>
+          
+          </div>
+         
+        </div>
+      
+      </div> 
+      <!-- <div class="row p-3">
+        <div class="col-md-3 col-sm-12">
+          <button type="button" class="btn  buttons" style="background-color:#fff;width:100%;">
+            <span class="courier_count">Courier</span>
+            <span class="badge Notification">{{totalCount}}</span>
+          </button>
+        </div>
+      </div> -->
+      <div class="row p-3">
+        <div class="col-12">
+          <mat-card class="m-0">
+            <mat-card-header class="p-0">
+              <div class="card-header p-3">
+                <div class="search-container">
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class=" d-flex">
+                        <div class=" searchone">
+                          <div class="input-group">
+                            <input type="search" placeholder="Search Customers"
+                              autocomplete="off" class="form-control" (input)="searchCustomer($event)">
+                            <div class="input-group-append"><button class="btn btnsearch" type="submit" value="search"
+                                style="background: #21AA47;padding: 0.38rem 0.65rem;border-radius: 0px 5px 5px 0px;">
+                                <i class="fas fa-search text-white"></i>
+                              </button>
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="">
+                <div class="row" *ngIf="customer_list?.length">
+
+                  <div class="col-sm-6 col-md-4 mb-3 " *ngFor="let items of customer_list; let i=index;">
+                    <mat-card class="m-0">
+                      <mat-card-content class="customerscard ">
+                        <div class=" ">
+                          <div class="my-1">
+                            <h4 class="heading">{{items.name}}</h4>
+                            <h4 class="heading">{{items.mobileNo}}</h4>
+                            <h4 class="heading">{{items.email}}</h4>
+                          </div>
+
+                          <button mat-raised-button color="primary" class="view" (click)="customersView(i)"> View
+                          </button>
+                          <br>
+
+                        </div>
+                      </mat-card-content>
+                    </mat-card>
+
+                  </div>
+                  <div>
+                    <mat-paginator  (page)="pageChange($event)" [pageSize]="limit" [pageIndex]="currentPage"
+                      aria-label="Select page" [length]="totalCount">
+                    </mat-paginator>
+                  </div>
+
+
+
+
+                </div>
+                <div *ngIf="!customer_list?.length">
+                  <div class="text-center">
+                    No Data Found
+                  </div>
+                </div>
+
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+
+      </div>
+
+    </div>
+
+
+  </div>
+</div>

@@ -1,0 +1,197 @@
+<div class="container-fluid mt-3">
+
+  <div class="d-flex justify-content-between mb-3">
+    <h4>Manage Vehicles</h4>
+
+    <button class="btn btn-primary"
+            (click)="AddModal(addtemplate); clear()">
+      <i class="fa fa-plus-circle me-2"></i> Add Vehicle
+    </button>
+  </div>
+
+  <div class="text-end mb-2">
+    <input type="text"
+           class="form-control w-25 d-inline-block"
+           placeholder="Search vehicle..."
+           (input)="searchVehicle($event)">
+  </div>
+
+  <!-- VEHICLE TABLE -->
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>   
+        <th>#</th>
+        <th>Name</th>
+      <th>Image</th>
+        <th>Base Price</th>
+        <th>Per KM</th>
+        <th>Base KM</th>
+        <th>Status</th>
+         <th>Weight (kg)</th>
+        <th>Length (cm)</th>
+        <th class="text-center">Actions</th>
+      </tr>
+    </thead>
+
+    <!-- <tbody>
+      <tr *ngFor="let v of vehicleList; let i = index">
+
+        <td>{{ i + 1 + (offset * limit) }}</td>
+        
+        <td>{{ v.name }}</td>
+        <td>{{ v.basePrice }}</td>
+        <td>{{ v.perkm }}</td>
+        <td>{{ v.basekm }}</td>
+
+        <td>
+          <span class="badge"
+                [ngClass]="v.status === 'active' ? 'bg-success' : 'bg-secondary'">
+            {{ v.status }}
+          </span>
+        </td>
+
+        <td class="text-center">
+          <i class="fa fa-edit text-primary me-2"
+             style="cursor:pointer"
+             (click)="AddModal(addtemplate); editVehicle(v)">
+          </i>
+
+          <i class="fa fa-trash text-danger"
+             style="cursor:pointer"
+             (click)="deleteVehicle(v)">
+          </i>
+        </td>
+
+      </tr>
+    </tbody> -->
+
+    <tbody>
+  <tr *ngFor="let v of vehicleList; let i = index">
+
+    <td>{{ i + 1 + (offset * limit) }}</td>
+    <td>{{ v.name }}</td>
+   <td>
+  <img *ngIf="v.imageUrl"
+       [src]="v.imageUrl"
+       (error)="v.imageUrl='assets/images/no-image.png'"
+       style="height:50px; width:50px; object-fit:cover; border-radius:6px;">
+</td>
+    <td>{{ v.basePrice }}</td>
+    <td>{{ v.perkm }}</td>
+    <td>{{ v.basekm }}</td>
+
+    <td>
+      <span class="badge"
+            [ngClass]="v.status === 'active' ? 'bg-success' : 'bg-secondary'">
+        {{ v.status }}
+      </span>
+    </td>
+
+     <td>{{ v.weightWarning || '-' }}</td>
+    <td>{{ v.lengthWarning || '-' }}</td>
+    <td class="text-center">
+      <i class="fa fa-edit text-primary me-2"
+         style="cursor:pointer"
+         (click)="AddModal(addtemplate); editVehicle(v)">
+      </i>
+
+      <i class="fa fa-trash text-danger"
+         style="cursor:pointer"
+         (click)="deleteVehicle(v)">
+      </i>
+    </td>
+
+  </tr>
+</tbody>
+
+  </table>
+
+  <mat-paginator [length]="totalCount"
+                 [pageSize]="limit"
+                 (page)="pageChange($event)">
+  </mat-paginator>
+
+</div>
+
+
+<!-- ADD / EDIT VEHICLE MODAL -->
+<ng-template #addtemplate>
+  <div class="modal-header">
+    <h5>{{ isedit ? 'Edit Vehicle' : 'Add Vehicle' }}</h5>
+    <button class="btn-close" (click)="cancel()"></button>
+  </div>
+
+  <div class="modal-body">
+    <form #f="ngForm">
+
+      <div class="row">
+
+        <div class="col-md-4">
+          <label>Vehicle Name</label>
+          <input class="form-control" [(ngModel)]="form.name" name="name" required>
+        </div>
+        <div class="col-md-4 mt-3">
+  <label>Vehicle Image</label>
+
+  <!-- PREVIEW -->
+  <div class="mb-2">
+    <img *ngIf="form.imageUrl"
+         [src]="form.imageUrl"
+         class="img-fluid"
+         style="height:100px; border-radius:8px;">
+  </div>
+
+  <!-- UPLOAD -->
+  <input type="file"
+         class="form-control"
+         accept="image/*"
+         (change)="onChange($event.target.files)">
+
+  <!-- REMOVE -->
+  <div *ngIf="form.imageUrl" class="mt-2">
+    <button class="btn btn-danger btn-sm" (click)="removeImage()">Remove</button>
+  </div>
+</div>
+
+        <div class="col-md-4">
+          <label>Base Price</label>
+          <input type="number" class="form-control" [(ngModel)]="form.basePrice" name="basePrice" required>
+        </div>
+
+        <div class="col-md-4">
+          <label>Per KM Price</label>
+          <input type="number" class="form-control" [(ngModel)]="form.perkm" name="perkm" required>
+        </div>
+
+        <div class="col-md-4 mt-3">
+          <label>Base KM</label>
+          <input type="number" class="form-control" [(ngModel)]="form.basekm" name="basekm" required>
+        </div>
+
+        <div class="col-md-4 mt-3">
+          <label>Status</label>
+          <select class="form-control" [(ngModel)]="form.status" name="status">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+      </div>
+       <div class="col-md-4 mt-3">
+          <label>Weight Limit (kg)</label>
+          <input type="number" class="form-control" [(ngModel)]="form.weightWarning" name="weightWarning" placeholder="e.g. 50" min="0" step="1">
+        </div>
+
+        <div class="col-md-4 mt-3">
+          <label>Length Limit (cm)</label>
+          <input type="number" class="form-control" [(ngModel)]="form.lengthWarning" name="lengthWarning" placeholder="e.g. 150" min="0" step="1">
+        </div>
+
+
+      <div class="mt-4 text-end">
+        <button class="btn btn-success" (click)="saveVehicle()">Save</button>
+      </div>
+
+    </form>
+  </div>
+</ng-template>

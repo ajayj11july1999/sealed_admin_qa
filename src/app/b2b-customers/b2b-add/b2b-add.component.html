@@ -1,0 +1,190 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="container-fluid mt-3 ">
+      <div class="row">
+        <div class="col-12 col-padding ">
+          <div class="card card-address ">
+            <div class="p-3 mobile-padding">
+              <div class="container mt-3">
+                <div class="top-header mb-3">
+                  <div>
+                    <h5>Add S2b Customers</h5>
+                  </div>
+                  <div>
+                  </div>
+
+                </div>
+
+                <div class="sub-form">
+                  <form name="form" #f="ngForm">
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>Name*</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <input matInput placeholder="Enter Name" [(ngModel)]="createForm.name" name="name" required
+                            #name="ngModel">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>Mobile*</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <input matInput placeholder="Enter Mobile" [(ngModel)]="createForm.mobileNo" name="mobileNo"
+                            required #mobileNo="ngModel">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>Email*</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <input type="email" matInput placeholder="Enter Email" [(ngModel)]="createForm.email"
+                            name="email" required #email="ngModel">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>Password*</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <input type="text" matInput placeholder="Enter Password" [(ngModel)]="createForm.password"
+                            name="password" required #password="ngModel">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>Name*</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <input matInput placeholder="Enter CompanyDetails"
+                            [(ngModel)]="createForm.address.companyName" name="companyName" required
+                            #companyName="ngModel">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>GST No.</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <input matInput placeholder="GST Number" [(ngModel)]="createForm .gstNo" name="gstNo"
+                            #gstNo="ngModel">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>Address *</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <input matInput placeholder="Company Address" [(ngModel)]="createForm.address.fulladdress"
+                            name="fulladdress" required #fulladdress="ngModel">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>Pincode*</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <input matInput placeholder="Enter Pincode" [(ngModel)]="createForm.address.postalCode"
+                            name="postalCode" required #postalCode="ngModel">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>City*</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <input matInput placeholder="Enter City" [(ngModel)]="createForm.address.city" name="city"
+                            required #city="ngModel">
+                        </mat-form-field>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>State*</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <input matInput placeholder="Enter State" [(ngModel)]="createForm.address.state" name="state"
+                            required #state="ngModel">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>Country*</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <input matInput placeholder="Enter Country" [(ngModel)]="createForm.address.country"
+                            name="country" required #country="ngModel">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>User Type*</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <mat-select placeholder="Select Usertype" [(ngModel)]="createForm.usertype" name="usertype"
+                            required #usertype="ngModel">
+                            <mat-option value="normaluser">User</mat-option>
+                            <mat-option value="masteragent">Admin</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>Status*</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <mat-select placeholder="Select Status" [(ngModel)]="createForm.status" name="status" required
+                            #status="ngModel">
+                            <mat-option [value]="true">Active</mat-option>
+                            <mat-option [value]="false">Inactive</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col" style="justify-content: center;
+                        display: flex;">
+                        <button mat-button mat-flat-button color="primary" (click)="create(f)">
+                          Add</button>
+                        <button mat-button (click)="cancel()">Cancel</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,356 @@
+<div fxLayout="row wrap">
+    <div fxFlex.gt-sm="100" fxFlex="100">
+        <div class="container-fluid p-3">
+            <div class="row ">
+                <div class="col-12 ">
+                    <mat-card class="m-0">
+                        <card-header>
+                            <div class="text-center">
+                                <h5>{{btnlabel}} Restaurant</h5>
+                            </div>
+
+                        </card-header>
+                        <form [formGroup]="restaurantForm" (ngSubmit)="onSubmit()">
+                            <mat-card-content>
+
+                                <div class="row">
+                                    <div class="col-lg-4 col-12">
+                                        <label>Restaurant Name</label><br>
+                                        <input class="form-control" placeholder="Enter the Restaurant Name"
+                                            formControlName="restaurantName">
+
+
+                                        <br>
+                                        <div *ngIf="submitted && f['restaurantName'].errors" class="invalid-feedback"
+                                            required>
+                                            <div style="font-size: 12px;"
+                                                *ngIf="f['restaurantName'].errors['required']">
+                                                Restaurant Name is required</div>
+                                        </div>
+
+
+
+
+                                    </div>
+
+                                    <div class="col-lg-4 col-12 ">
+
+
+
+                                        <label> Description</label>
+                                        <input class="form-control" placeholder="Description"
+                                            formControlName="description">
+
+                                        <div *ngIf="submitted && f['description'].errors" class="invalid-feedback"
+                                            required>
+                                            <div style="font-size: 10px;" *ngIf="f['description'].errors['required']">
+                                                Description is required</div>
+                                        </div>
+
+
+
+                                    </div>
+                                    <div class="col-lg-4 col-12 ">
+                                        <div class="mt-4">
+
+                                            <section class="example-section">
+
+                                                <mat-checkbox class="example-margin" formControlName="veg"
+                                                    (change)="onCheckboxChange($event,'veg')">Veg</mat-checkbox>
+                                                <mat-checkbox class="example-margin mx-3" formControlName="nonVeg"
+                                                    (change)="onCheckboxChange($event,'nonveg')">Non Veg</mat-checkbox>
+                                            </section>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-12 mt-2">
+                                        <div class="mt-2">
+
+                                            <label> Category</label>
+
+                                            <ng-select [items]="category" [clearable]="false" bindValue="id"
+                                                [searchable]="true" bindLabel="name" placeholder="Select deliveryman">
+                                            </ng-select>
+
+                                        </div>
+                                        <div *ngIf="submitted && f['ratings'].errors" class="invalid-feedback" required>
+                                            <div style="font-size: 10px;" *ngIf="f['ratings'].errors['required']">
+                                                Ratings is required</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-12 mt-2">
+                                        <div class="mt-2">
+
+                                            <label> Ratings</label>
+                                            <input class="form-control" placeholder="Give the Ratings"
+                                                formControlName="ratings">
+
+                                        </div>
+                                        <div *ngIf="submitted && f['ratings'].errors" class="invalid-feedback" required>
+                                            <div style="font-size: 10px;" *ngIf="f['ratings'].errors['required']">
+                                                Ratings is required</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-12 mt-2">
+                                        <div class="mt-2">
+
+                                            <label> Offer</label>
+                                            <input class="form-control" placeholder=" Enter the Restaurant Offer"
+                                                formControlName="resoffer">
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="">
+
+                                    <div class="row mt-4">
+                                        <div class="col-6">
+                                            <label> Start Time </label>
+                                            <input class="form-control" formControlName="startTime"
+                                                placeholder="Enter start time" [ngxTimepicker]="picker" #statInput>
+                                            <ngx-material-timepicker #picker></ngx-material-timepicker>
+
+                                        </div>
+                                        <div class="col-6">
+                                            <label> End Time </label>
+                                            <input class="form-control" formControlName="endTime"
+                                                placeholder="Enter end time" [ngxTimepicker]="picker1" #endInput>
+                                            <ngx-material-timepicker #picker1></ngx-material-timepicker>
+                                        </div>
+                                    </div>
+
+                                    <h5 class="mt-3">Address</h5>
+
+                                    <div class="row">
+
+                                        <div class="col-4 mt-2">
+
+                                            <label> Street </label>
+                                            <input class="form-control" placeholder="Enter Your Street"
+                                                formControlName="street">
+
+                                            <div *ngIf="submitted && f['street'].errors" class="invalid-feedback"
+                                                required>
+                                                <div style="font-size: 10px;" *ngIf="f['street'].errors['required']">
+                                                    Street is required</div>
+                                                <div style="font-size: 10px;" *ngIf="f['street'].errors['pattern']">
+                                                    Street Must Not Contain Numerics</div>
+                                            </div>
+                                        </div>
+
+
+
+                                        <div class="col-4 mt-2">
+
+
+                                            <label> City </label>
+                                            <input class="form-control" placeholder="Enter Your City"
+                                                formControlName="city">
+
+                                            <div *ngIf="submitted && f['city'].errors" class="invalid-feedback"
+                                                required>
+                                                <div style="font-size: 10px;" *ngIf="f['city'].errors['required']">
+                                                    City is required</div>
+                                                <div style="font-size: 10px;" *ngIf="f['city'].errors['pattern']">
+                                                    City Must Not Contain Numerics</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 mt-2">
+
+                                            <label> State </label>
+                                            <input class="form-control" placeholder="Enter Your State"
+                                                formControlName="state">
+
+                                            <div *ngIf="submitted && f['state'].errors" class="invalid-feedback"
+                                                required>
+                                                <div style="font-size: 10px;" *ngIf="f['state'].errors['required']">
+                                                    State is required</div>
+                                                <div style="font-size: 10px;" *ngIf="f['state'].errors['pattern']">
+                                                    State Must Not Contain Numerics</div>
+                                            </div>
+
+                                        </div>
+                                        <div class="col-4 mt-2">
+
+                                            <label> PinCode </label>
+                                            <input class="form-control" placeholder="postalCode"
+                                                formControlName="pincode"
+                                                oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                                maxlength="6">
+
+                                            <div *ngIf="submitted && f['pincode'].errors" class="invalid-feedback"
+                                                required>
+                                                <div style="font-size: 10px;" *ngIf="f['pincode'].errors['required']">
+                                                    pincode is required</div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-4 mt-2">
+
+                                            <label> Latitude </label>
+                                            <input class="form-control" placeholder="Latitude"
+                                                formControlName="latitude">
+
+                                            <div *ngIf="submitted && f['latitude'].errors" class="invalid-feedback"
+                                                required>
+                                                <div style="font-size: 10px;" *ngIf="f['latitude'].errors['required']">
+                                                    Latitude is required</div>
+                                                <div style="font-size: 10px;" *ngIf="f['latitude'].errors['pattern']">
+                                                    Latitude Must be in Proper Format</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 mt-2">
+
+                                            <label> Longitude </label>
+                                            <input class="form-control" placeholder="Longitude"
+                                                formControlName="longitude">
+
+                                            <div *ngIf="submitted && f['longitude'].errors" class="invalid-feedback"
+                                                required>
+                                                <div style="font-size: 10px;" *ngIf="f['longitude'].errors['required']">
+                                                    longitude is required</div>
+                                                <div style="font-size: 10px;" *ngIf="f['longitude'].errors['pattern']">
+                                                    Longitude Must be in Proper Format</div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+
+
+
+
+                                    <h5 class="mt-3">Contact Information</h5>
+                                    <div class="row ">
+
+                                        <div class="col-6 mt-2">
+
+                                            Contact Person 1
+                                            <input class="form-control" placeholder="Contact Person1"
+                                                formControlName="person1">
+                                            <div *ngIf="submitted && f['person1'].errors" class="invalid-feedback"
+                                                required>
+                                                <div style="font-size: 10px;" *ngIf="f['person1'].errors['required']">
+                                                    person Name is required</div>
+                                                <div style="font-size: 10px;" *ngIf="f['person1'].errors['pattern']">
+                                                    person Name Must be in Proper Format</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 mt-2">
+                                            <label>Contact Person 2</label>
+                                            <input class="form-control" placeholder="contact Person2"
+                                                formControlName="person2">
+                                            <div *ngIf="submitted && f['person2'].errors" class="invalid-feedback"
+                                                required>
+                                                <div style="font-size: 10px;" *ngIf="f['person2'].errors['required']">
+                                                    person Name is required</div>
+                                                <div style="font-size: 10px;" *ngIf="f['person2'].errors['pattern']">
+                                                    person Name Must be in Proper Format</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 mt-2">
+
+                                            <label> Contact Number</label>
+                                            <input class="form-control" placeholder="Number1"
+                                                formControlName="contactNumber1"
+                                                oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                                maxlength="10">
+
+                                            <div *ngIf="submitted && f['contactNumber1'].errors"
+                                                class="invalid-feedback" required>
+                                                <div style="font-size: 10px;"
+                                                    *ngIf="f['contactNumber1'].errors['required']">
+                                                    contactNumber is required</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 mt-2">
+
+                                            <label> Contact Number</label>
+
+                                            <input class="form-control" placeholder="Number2"
+                                                formControlName="contactNumber2"
+                                                oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                                maxlength="10">
+
+                                            <div *ngIf="submitted && f['contactNumber2'].errors"
+                                                class="invalid-feedback" required>
+                                                <div style="font-size: 10px;"
+                                                    *ngIf="f['contactNumber2'].errors['required']">
+                                                    contactNumber is required</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6 mt-3">
+                                            <div *ngIf="showimg">
+                                                <img class="img-fluid" style="width:100%;height: 120px;"
+                                                    src="assets/images/blank-profile.webp">
+                                            </div>
+
+                                            <div *ngIf="!showimg">
+                                                <img class="img-fluid" style="width:100%;height: 200px;" [src]="imgUrl">
+                                            </div>
+
+                                            <div class="text-center mt-3" (click)="uploadFile.click()">
+                                                <button mat-raised-button class="choose_btn btn-clr">Choose
+                                                    File</button>
+                                                <input id="fileInput" #uploadFile (change)="upload($event)" ngNoForm
+                                                    type='file' style="display:none" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="row mt-4">
+
+                                        <div class="col-lg-6 col-12 mt-3 d-flex justify-content-between">
+                                            <div>
+                                                Recommended
+                                            </div>
+                                            <div>
+                                                <mat-slide-toggle class="mx-3" [checked]="recom"
+                                                    (change)="activeChange($event)"></mat-slide-toggle>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+
+
+                            </mat-card-content>
+                        </form>
+                        <card-actions class="p-3">
+                            <div class="buttn-class mx-4">
+                                <button mat-raised-button class="btn-clr me-3" [disabled]="!imgUrl"
+                                    (click)="restaurantcreate()">{{label}}</button>
+
+                                <button mat-raised-button class="cancel-btn">Cancel</button>
+                            </div>
+
+                        </card-actions>
+
+
+
+                    </mat-card>
+
+
+
+
+
+
+
+
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

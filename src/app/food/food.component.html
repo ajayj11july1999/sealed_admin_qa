@@ -1,0 +1,100 @@
+    <div fxLayout="row wrap">
+      <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="overlay" *ngIf="searchLoad">
+      <div class="spinner"> Loading......!!!</div>
+    </div>
+    
+    
+    
+        <div class="container-fluid p-3"  *ngIf="!searchLoad">
+         
+          <div class="row p-3">
+            <mat-card class="m-0">
+              <mat-card-header class="">
+                <!-- <div class="cardheader ">
+                  <div class="search-container"> -->
+                    <div class="row">
+                      <div class=" col-lg-8 col-md-8 col-4 new-one" (click)="addFood()">
+                        <i class="fa fa-plus-circle me-2" aria-hidden="true"></i><span class="add-txt">Add
+                          Food</span>
+                      </div>
+                      <div class="col-lg-4 col-12">
+                        <div class=" d-flex">
+                          <div class=" searchone">
+                            <div class="input-group ">
+                              <input type="text" placeholder="Search Food" autocomplete="off" class="form-control"
+                                (input)="searchCustomer($event)">
+                              <div class="input-group-append">
+                                <button class="btn btnsearch" type="submit" value="search">
+                                  <i class="fas fa-search text-white"></i>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  <!-- </div>
+                </div> -->
+              </mat-card-header>
+              <mat-card-content >
+              
+                  <div class="row ">
+                    <div class="col-sm-6 col-md-6 col-lg-4 mb-5"  *ngFor="let item of Foodlist;let i=index;"  >
+                     
+                      
+                      <mat-card class=" m-0"    style=" border:1px !important;background-color: #F4F4F4;border-radius: 5px;box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25) !important;">
+                        <img mat-card-image width="300px" height="170px" src={{item?.image}}>
+        
+                        <mat-card-content class="innercard p-3">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <span><b>{{item?.name}}</b></span>
+                                </div>
+                                <div>
+                                    <i class='far fa-edit mx-2' style="cursor: pointer;" (click)="editFood(item)" ></i>
+                                  
+                                    <i class='fas fa-trash-alt' style="cursor: pointer;" (click)="deleteFood(item)"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="description" style="font-size: 12px;">{{item?.price}}</span>
+  
+                                
+                            </div>
+                        </mat-card-content>
+        
+                        <!-- <mat-card-footer align="center" style="display: block;">
+                            <button mat-raised-button class="view mb-3" (click)="viewFood(item)"> See More</button>
+                        </mat-card-footer> -->
+                     
+                    </mat-card>
+                     
+                    </div>
+                    <div>
+                      <mat-paginator (page)="pageChange($event)" [pageSize]="limit" aria-label="Select page"
+                        [length]="totalCount" [pageIndex]="currentPage">
+                      </mat-paginator>
+                    </div>
+    
+    
+    
+    
+    
+                  </div>
+                  <!-- <div class="row" *ngIf="!demoList?.length">
+                    <div class="text-center">
+                      No Record Found
+                    </div>
+                  </div> -->
+                
+              </mat-card-content>
+            </mat-card>
+    
+    
+    
+          </div>
+        </div>
+    
+      </div>
+    </div>

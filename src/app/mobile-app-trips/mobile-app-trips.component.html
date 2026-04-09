@@ -1,0 +1,265 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+
+
+    <div class="overlay" *ngIf="searchLoad">
+      <div class="spinner"> Loading......!!!</div>
+    </div>
+
+
+
+    <div class="conatiner-fluid p-3 mt-3" *ngIf="!searchLoad">
+      <div class="row">
+        <div class="col-6"></div>
+        <div class="col-4">
+          <form [formGroup]="DateFilterForm">
+
+            <div class="d-flex mb-3">
+              <div class="me-3">
+                <input type="date" class="form-control mt-1" formControlName='fromDate'>
+              </div>
+              <div class="me-3">
+                <input type="date" class="form-control mt-1" formControlName='toDate'>
+
+              </div>
+              <div class="d-flex">
+                <button mat-raised-button color="primary" class="mt-1 me-2" (click)="searchTrip()">Search </button>
+                <button mat-raised-button color="primary" class="mt-1" (click)="clear()">Cancel </button>
+              </div>
+            </div>
+          </form>
+
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12 col-12 left-card">
+          <mat-card class="b2b-card p-3">
+
+            <mat-card-title class="">
+              Active B2C Trips <span matBadge="{{activetotalCount}}" matBadgeOverlap="false"
+                class="demo-section active-badge"></span>
+            </mat-card-title>
+            <div *ngIf="Consumeractivetrip?.length">
+
+              <mat-card class="mt-3 card-view" *ngFor="let items of Consumeractivetrip">
+
+                <card-header class="card-head justify-content-between d-flex px-3">
+                  <div class="header-txt">
+                    Order Code: <span class="type">{{items?.orderCode}}</span>
+                  </div>
+                  <div class="header-txt type">
+                    {{items?.deliveryType}}
+                  </div>
+                </card-header>
+
+
+                <mat-card-content>
+                  <div align="end" class="txt-details">
+                    {{items?.selectedPackage}}
+                  </div>
+                  <div class="txt-details">
+                    Customer Name : <span class="type">{{items?.userDetails?.name}}</span>
+
+                  </div>
+                  <div class="txt-details">
+                    Time: {{items?.createdAt|date:'mediumTime'}}
+                  </div>
+                  <div class="txt-details">
+                    Date: {{items?.createdAt|date}}
+                  </div>
+                  <div class="txt-details ">
+                    payment method : <span class="type">{{items?.paymentDetails?.paymentMode}}</span>
+
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <!-- <div class="span-txt ">Status: <span class="Status">{{items?.orderStatus}}</span> -->
+
+                    <div *ngIf="items?.orderStatus=='orderPickedUped'" class="span-txt">Status: Order Pickuped
+                    </div>
+                    <div *ngIf="items?.orderStatus=='orderAssigned'" class="span-txt">Status: Order Assigned
+                    </div>
+                    <div *ngIf="items?.orderStatus=='orderInProgress'" class="span-txt">Status: Order InProgress
+                    </div>
+                    <div *ngIf="items?.orderStatus=='delivered'" class="span-txt">Status: Delivered
+                    </div>
+
+                    <button mat-raised-button class="more-btn" (click)="moredetails(items)">MORE DETAILS</button>
+                  </div>
+
+                </mat-card-content>
+
+              </mat-card>
+            </div>
+            <div *ngIf="!Consumeractivetrip?.length">
+              <div class="text-center">
+                <span>No Active B2C Trips</span>
+              </div>
+            </div>
+          </mat-card>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 col-12 left-card">
+          <mat-card class="b2b-card p-3">
+
+            <mat-card-title class="">
+              New B2C Trips <span matBadge="{{totalCount}}" matBadgeOverlap="false"
+                class="demo-section active-badge"></span>
+            </mat-card-title>
+            <div *ngIf="Consumernewtrip?.length">
+              <mat-card class="mt-3 card-view" *ngFor="let items of Consumernewtrip;let i=index">
+
+                <card-header class=" card-head justify-content-between d-flex px-3">
+
+                  <div class="header-txt">
+                    Order Code: {{items?.orderCode}}
+                  </div>
+                  <div class="header-txt type">
+                    {{items?.deliveryType}}
+                  </div>
+
+                </card-header>
+
+                <mat-card-content>
+                  <div align="end" class="txt-details">
+                    {{items?.selectedPackage}}
+                  </div>
+                  <div class="txt-details">
+                    Customer Name : <span class="type">{{items?.userDetails?.name}}</span>
+
+                  </div>
+                  <div class="txt-details">
+                    Time: {{items?.createdAt|date:'mediumTime'}}
+                  </div>
+                  <div class="txt-details">
+                    Date: {{items?.createdAt|date}}
+                  </div>
+                  <div class="txt-details">
+                    <p>Payment Mode: {{tripDetails?.paymentMode | uppercase}}</p>
+
+                   
+
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <div class="span-txt">Status: {{items?.orderStatus}}
+                    </div>
+                    <button mat-raised-button class="more-btn" (click)="moredetails(items)">MORE DETAILS</button>
+                  </div>
+
+
+
+                  <div class="row mt-2">
+                    <div class="col-12 col-lg-5 col-md-12 col-sm-12">
+                      <!-- <mat-form-field appearance="fill">
+                      <mat-label>Assign Courier</mat-label>
+                      <mat-select (selectionChange)="onSelectEvent($event.value, items?.pickupAddress,i)">
+                        <mat-option *ngFor="let person of deliveryman" [value]="person">
+                          {{person.name}}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field> -->
+                      <ng-select [items]="deliveryman" [clearable]="false" bindValue="id"
+                        (change)="onSelectionChange($event,items?.pickupAddress,i)" [searchable]="true" bindLabel="name"
+                        placeholder="Select deliveryman">
+                      </ng-select>
+
+                      <div class="text-center mt-3">
+                        <button mat-raised-button class="assign-btn" (click)="assigncourier(items,'consumer')"
+                          [disabled]="items?.disable">Assign</button>
+                      </div>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+            <div *ngIf="!Consumernewtrip?.length">
+              <div class="text-center">
+                <span>No New B2C Trips</span>
+              </div>
+            </div>
+          </mat-card>
+        </div>
+
+<div class="col-lg-12 mt-3">
+  <mat-card class="b2b-card p-3">
+
+    <mat-card-title>
+      Cancelled After Assignment 
+      <span matBadge="{{cancelledTrips?.length}}" matBadgeOverlap="false" class="demo-section active-badge"></span>
+    </mat-card-title>
+
+    <div *ngIf="cancelledTrips?.length">
+
+      <mat-card class="mt-3 card-view" *ngFor="let items of cancelledTrips">
+
+        <card-header class="card-head d-flex justify-content-between px-3">
+
+          <div class="header-txt">
+            Order Code: <span class="type">{{items?.orderCode}}</span>
+          </div>
+
+          <div class="header-txt type text-danger">
+            Cancelled
+          </div>
+
+        </card-header>
+
+        <mat-card-content>
+
+          <div class="txt-details">
+            Customer: <span class="type">{{items?.userDetails?.name}}</span>
+          </div>
+
+          <div class="txt-details">
+            Courier: 
+            <span class="type">
+              {{items?.deliveryManDetails?.name || 'Assigned (No Details)'}}
+            </span>
+          </div>
+
+          <div class="txt-details">
+            Assigned At: {{items?.assignedAt | date:'medium'}}
+          </div>
+
+          <div class="txt-details text-danger">
+            Cancelled At: {{items?.cancelledAt | date:'medium'}}
+          </div>
+
+          <div class="txt-details">
+            Amount: ₹{{items?.amountDetails?.finalAmount}}
+          </div>
+
+          <div class="txt-details">
+            <p>Payment Mode: {{tripDetails?.paymentMode | uppercase}}</p>
+          </div>
+
+          <!-- 🔥 IMPORTANT INDICATOR -->
+          <div class="badge bg-danger mt-2">
+            Cancelled After Courier Accepted
+          </div>
+
+          <div class="text-center mt-3">
+            <button mat-raised-button class="more-btn" (click)="moredetails(items)">
+              MORE DETAILS
+            </button>
+          </div>
+
+        </mat-card-content>
+
+      </mat-card>
+
+    </div>
+
+    <div *ngIf="!cancelledTrips?.length" class="text-center">
+      <span>No Cancelled Orders After Assignment</span>
+    </div>
+
+  </mat-card>
+</div>
+
+
+      </div>
+    </div>
+
+  </div>
+</div>

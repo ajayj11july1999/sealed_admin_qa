@@ -1,0 +1,112 @@
+<!-- <ngx-spinner size="medium" color="#21aa47" type="square-jelly-box" [fullScreen]="true">
+  <p style="color: #F39201;font-weight: 600;"> Loading... </p>
+</ngx-spinner> -->
+
+<div fxLayout="row-wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100" >
+
+
+<!-- <div class="overlay" *ngIf="searchLoad">
+  <div class="spinner"> Loading......!!!</div>
+</div> -->
+
+  <div class="container-fluid p-2 ">
+    <div class=" row-wrap">
+      <div class="col-12 p-0">
+        <mat-card >
+          <mat-card-content class="payoutcard" >
+              <div class="">
+                <div class="  my-3">
+                  <h6 class="heading  mb-2"> COD/COP Completed
+                    <span class="badge badge-light violet">{{totalCount}}</span>
+                  </h6>
+                  <div class=" my-2">
+                    <button *ngIf="payouthistory?.length" mat-raised-button color="primary" class="exportreport"  [ngClass]="{'disable':!payouthistory?.length}" [disabled]="dis" (click)="exportdata()">Export Report</button>
+                  </div>
+                </div>            
+                <div class="row" *ngIf="payouthistory?.length" >
+                  <div class="col-sm-6 col-md-6 col-lg-4 mb-3"  *ngFor="let items of payouthistory;let i=index;"  >
+                    <div class="">
+                    <mat-card class="m-0" >
+                    <mat-card-content class="innercard p-3">
+                          
+                            <div class="row my-1 ">
+                              <div class="col-12">
+                                <div>
+                                  <p> Name : {{items?.userDetails?.name}}</p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row my-1 ">
+                              <div class="col-6 ">
+                                <div>
+                                  <p> Date : {{items?.createdAt|date:'dd-MM-yyyy' }}</p>
+                                </div>
+
+                              </div>
+                              <div class="col-6">
+                                <div>
+                                  <p> Time : {{items?.createdAt|date:'mediumTime' }}</p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row my-1 ">
+                              <div class="col-6">
+                                <div>
+                                  <p> Amount : ₹ {{items?.totalAmount }}</p>
+                                </div>
+                              </div>
+                              <div class="col-6">
+                                <div >
+                                  <div *ngIf="items?.paid; else verified">
+                                    <p [ngClass]="{'green':items?.paid == true}"> Status : Paid</p>
+                                  </div>
+                                  
+                                  <ng-template #verified>
+                                    <p [ngClass]="{'red':items?.paid != true}"> status : Pending</p>
+                                  
+                                  </ng-template>
+                                 <!-- <p *ngIf="items?.paid=='true'">Status : Paid </p> -->
+                                  <!-- <p *ngIf="items?.paid =='true"> Status : Paid</p>
+                                  <p *ngIf="items?.paid =='true"> Status : Pending</p> -->
+                                </div>
+                              </div>
+                            </div>
+                            <div class="text-center my-2">
+                              <button mat-raised-button class="view" (click)="courierpayout_view(items)">View</button>
+                            </div>
+                          
+                    </mat-card-content>
+                    </mat-card>
+                    </div>
+                  </div>
+                  <!-- <div>
+                    <mat-paginator (page)="pageChange($event)" [pageIndex]="currentPage" [pageSize]="limit" aria-label="Select page" [length]="totalCount">
+                    </mat-paginator>
+                  </div> -->
+
+                </div>
+                
+
+
+                <div class="row" *ngIf="!payouthistory?.length">
+                  <div class="text-center">
+                    No Record Found
+                  </div>
+                </div>
+
+
+
+                
+              </div>
+          </mat-card-content>
+        </mat-card>
+      
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+

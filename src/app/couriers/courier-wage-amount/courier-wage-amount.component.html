@@ -1,0 +1,127 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="container-fluid mt-3 ">
+      <div class="row">
+        <div class="col-12 col-padding ">
+          <div class="card card-address ">
+            <div class="p-3 mobile-padding">
+              <div class="container mt-3">
+                <div class="top-header mb-3">
+                  <div>
+                    <h5>Courier Partner Wage Amount (Per km.)</h5>
+                  </div>
+                  <div>
+                    <!-- <button mat-raised-button class="mb-1 export-btn" (click)="downloadExport()">Export</button> -->
+                  </div>
+
+
+                </div>
+                <div class=" col-lg-8 col-md-8 col-4 new-one" (click)="AddModal(addtemplate)" *ngIf="isedit">
+                  <i class="fa fa-plus-circle me-2" aria-hidden="true"></i><span class="add-txt">
+                    Add New</span>
+                </div>
+
+
+                <div class="card-table">
+
+
+                  <table class="table table-striped mb-5 mt-3" style="width:100% !important">
+                    <thead>
+                      <tr>
+                        <th>Sl.NO</th>
+                        <th>Wage Amount (Per km.)</th>
+                        <!-- <th>Date</th>-->
+                        <th>Status</th>
+                        <th>Action</th>
+
+
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      <tr *ngFor="let item of databaseList; let i= index;">
+
+                        <td>
+                          {{i+1}}
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.name}}> {{item?.amount}}</p>
+
+                        </td>
+
+                        <td class="checkname ">
+                          <p> {{item?.status}} </p>
+
+                        </td>
+                        <!-- 
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.name}}>In Active</p>
+
+                        </td> -->
+
+                        <td class="">
+                          <div class=" d-flex justify-content-center te1" *ngIf="userrole !== 'subadmin' || showEdit">
+                            <!-- <i class="fa fa-key me-2" aria-hidden="true" (click)="resetPassword(item)" style="color:grey;"></i> -->
+                            <i class="fa fa-edit address_edit me-2" (click)="AddModal(addtemplate);editTerms(item)"
+                              style=" color:#21aa47" aria-hidden="true"></i>
+                            <!-- <i (click)="deleteWage(item)" class="fa fa-trash trash_icon" aria-hidden="true"></i> -->
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div>
+                    <mat-paginator (page)="pageChange($event)" [pageSize]="limit" aria-label="Select page"
+                      [length]="totalCount" [pageIndex]="currentPage">
+                    </mat-paginator>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #addtemplate>
+  <div class="modal-header">
+    <mat-card-title>Add Pricing</mat-card-title>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form name="form" #f="ngForm">
+      <div class="row">
+
+        <div class="col-md-4 col-sm-12">
+          <mat-form-field>
+            <input matInput placeholder="Trip Amount (Per km.)" [(ngModel)]="createForm.amount" name="amount" required
+              #amount="ngModel">
+          </mat-form-field>
+        </div>
+        <div class="col-md-4 col-sm-12">
+          <mat-form-field>
+            <mat-select placeholder=" Status" [(ngModel)]="createForm.status" name="status" required #status="ngModel">
+              <mat-option value="active">Active</mat-option>
+              <mat-option value="inactive">Inactive</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+
+      </div>
+    </form>
+    <div class="row mt-4">
+      <div class="col">
+        <button mat-button mat-flat-button color="primary" (click)="create(f)">{{isedit ? 'Update' :'Add'}}</button>
+        <button mat-button (click)="cancel()">Cancel</button>
+      </div>
+    </div>
+
+
+  </div>
+</ng-template>

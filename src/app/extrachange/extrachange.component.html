@@ -1,0 +1,199 @@
+<div class="container-fluid mt-3">
+  <div class="row">
+    <div class="col-12 col-padding">
+      <div class="card card-address">
+
+        <!-- HEADER -->
+        <div class="header-container">
+          <h4 class="text-higthligth">Manage Delivery Charge Information</h4>
+
+          <div class="search-box">
+            <input
+              type="search"
+              placeholder="Search"
+              (input)="onsearch($event)"
+              class="search-input"
+            />
+          </div>
+        </div>
+
+        <!-- TABLE AREA -->
+        <div class="container mt-4">
+          <div class="card-table">
+
+            <!-- ADD BUTTON -->
+            <div class="mb-3">
+              <button
+                class="edit-btn"
+                (click)="openAdd(); openModal()"
+                type="button"
+              >
+                <i class="fa fa-plus-circle me-2 text-success"></i>
+                <span class="add-txt">Add</span>
+              </button>
+            </div>
+
+            <!-- TABLE -->
+            <table class="table table-striped mt-3">
+              <thead>
+                <tr>
+                  <th>Sl.NO</th>
+                  <th>Name</th>
+                  <th>Delivery Charge</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr *ngFor="let item of extracharge; let i=index">
+                  <td>{{ i + 1 }}</td>
+
+                  <td>{{ item?.name | titlecase }}</td>
+
+                  <td>{{ item?.extracharges | number:'1.2-2' }}</td>
+
+                  <td>
+                    <mat-slide-toggle
+                      [checked]="item?.status === 'active'"
+                      (change)="updatestatus($event,item?._id)"
+                    >
+                    </mat-slide-toggle>
+                  </td>
+
+                  <td>
+                    <button
+                      type="button"
+                      class="edit-btn"
+                      (click)="editcharge(item); openModal()"
+                    >
+                      <i
+                        class="fa fa-edit address_edit me-2"
+                        style="color:#21aa47"
+                      ></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- PAGINATION -->
+            <mat-paginator
+              (page)="pageChange($event)"
+              [pageSize]="limit"
+              [length]="totalCount"
+              aria-label="Select page"
+            >
+            </mat-paginator>
+
+          </div>
+        </div>
+
+
+        <!-- MODAL -->
+        <ng-template #modalTemplate>
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+              <div class="modal-header">
+                <h5 class="modal-title">
+                  {{ updataform ? 'Edit Delivery Charge' : 'Add Delivery Charge' }}
+                </h5>
+
+                <button
+                  type="button"
+                  class="btn-close"
+                  (click)="closeModal()"
+                ></button>
+              </div>
+
+              <div class="modal-body">
+
+                <form
+                  [formGroup]="deliveryChargeForm"
+                  (ngSubmit)="updataform ? onSubmit() : add()"
+                >
+
+                  <!-- NAME -->
+                  <div class="mb-3">
+                    <label class="form-label">
+                      Name <span style="color:red">*</span>
+                    </label>
+
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="name"
+                      placeholder="Enter charge name"
+                    />
+
+                    <div
+                      *ngIf="f['name'].invalid && (f['name'].dirty || f['name'].touched)"
+                      class="text-danger"
+                    >
+                      <small *ngIf="f['name'].errors?.required">
+                        Name is required
+                      </small>
+                    </div>
+                  </div>
+
+                  <!-- DELIVERY CHARGE -->
+                  <div class="mb-3">
+                    <label class="form-label">
+                      Delivery Charge <span style="color:red">*</span>
+                    </label>
+
+                    <input
+                      type="number"
+                      class="form-control"
+                      formControlName="deliveryCharge"
+                      placeholder="Enter delivery charge"
+                    />
+
+                    <div
+                      *ngIf="f['deliveryCharge'].invalid && (f['deliveryCharge'].dirty || f['deliveryCharge'].touched)"
+                      class="text-danger"
+                    >
+                      <small *ngIf="f['deliveryCharge'].errors?.required">
+                        Delivery charge required
+                      </small>
+
+                      <small *ngIf="f['deliveryCharge'].errors?.min">
+                        Cannot be negative
+                      </small>
+                    </div>
+                  </div>
+
+                  <!-- FOOTER -->
+                  <div class="modal-footer">
+
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      (click)="closeModal()"
+                    >
+                      Close
+                    </button>
+
+                    <button
+                      type="submit"
+                      class="btn save-btn"
+                      [disabled]="deliveryChargeForm.invalid"
+                    >
+                      {{ updataform ? 'Update Changes' : 'Save Changes' }}
+                    </button>
+
+                  </div>
+
+                </form>
+
+              </div>
+
+            </div>
+          </div>
+        </ng-template>
+
+      </div>
+    </div>
+  </div>
+</div>

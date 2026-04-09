@@ -1,0 +1,195 @@
+<div class="container-fluid mt-3">
+
+  <div class="d-flex justify-content-between mb-3">
+    <h4>Manage Store</h4>
+
+    <button class="btn btn-primary"
+      (click)="AddModal(addtemplate); clear()">
+      <i class="fa fa-plus-circle me-2"></i> Add New
+    </button>
+  </div>
+
+  <div class="text-end mb-2">
+    <input type="text" class="form-control w-25 d-inline-block"
+      placeholder="Search store..."
+      (input)="searchUserList($event)">
+  </div>
+
+  <!-- STORE TABLE -->
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Store Name</th>
+        <th>Contact Number</th>
+        <th>Type</th>
+        <th>Address</th>
+        <th>Base Cost</th>
+        <th>Color Price</th>
+        <th>Black Price</th>
+        <th class="text-center">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let s of databaseList; let i = index">
+
+        <td>{{ i + 1 + (offset * limit) }}</td>
+        <td>{{ s.storeName }}</td>
+        <td>{{ s.contactPersonNumber || '-' }}</td>
+        <td>{{ s.type === 'printOnGo' ? 'Print On Go' : 'Buy Document' }}</td>
+        <td>{{ s.fullAddress }}</td>
+        <td>{{ s.baseCost }}</td>
+        <td>{{ s.colorPrice }}</td>
+        <td>{{ s.blackPrice }}</td>
+
+        <td class="text-center">
+          <i class="fa fa-edit text-primary me-2"
+            style="cursor:pointer"
+            (click)="AddModal(addtemplate); editTerms(s)">
+          </i>
+
+          <i class="fa fa-trash text-danger"
+            style="cursor:pointer"
+            (click)="deleteStore(s)">
+          </i>
+        </td>
+
+      </tr>
+    </tbody>
+  </table>
+
+  <mat-paginator
+    [length]="totalCount"
+    [pageSize]="limit"
+    (page)="pageChange($event)">
+  </mat-paginator>
+</div>
+
+
+<!-- ADD / EDIT MODAL -->
+<ng-template #addtemplate>
+  <div class="modal-header">
+    <h5>{{ isedit ? 'Edit Store' : 'Add Store' }}</h5>
+    <button class="btn-close" (click)="cancel()"></button>
+  </div>
+
+  <div class="modal-body">
+    <form #f="ngForm">
+
+     <!-- <div class="input-group mb-3">
+  <input 
+    id="searchInput"
+    class="form-control"
+    placeholder="Search Location..."
+    (input)="onSearch($event)"
+  />
+  <button class="btn btn-outline-secondary">
+    <i class="fa fa-search"></i>
+  </button>
+</div> -->
+
+
+   <div class="input-group mb-3">
+  <input 
+    id="searchInput"
+    class="form-control"
+    placeholder="Search Location..."
+  />
+  <button class="btn btn-outline-secondary">
+    <i class="fa fa-search"></i>
+  </button>
+</div>
+
+<h5 class="fw-bold">{{ selectedPlaceName }}</h5>
+
+
+      <!-- GOOGLE MAP -->
+      <div id="map" style="width:100%; height:350px; border-radius:10px;"></div>
+
+      <!-- ADDRESS DISPLAY -->
+      <div class="mt-3">
+        <strong>Address:</strong> {{ createForm.fullAddress }}
+      </div>
+
+      <div class="row mt-4">
+
+        <div class="col-md-4">
+          <label>Store Name</label>
+          <input class="form-control" [(ngModel)]="createForm.storeName" name="storeName">
+        </div>
+
+        <div class="col-md-4">
+          <label>Base Cost</label>
+          <input type="number" class="form-control"
+            [(ngModel)]="createForm.baseCost" name="baseCost">
+        </div>
+
+        <div class="col-md-4">
+          <label>Color Print Price</label>
+          <input type="number" class="form-control"
+            [(ngModel)]="createForm.colorPrice" name="colorPrice">
+        </div>
+
+        <div class="col-md-4 mt-3">
+          <label>Black Print Price</label>
+          <input type="number" class="form-control"
+            [(ngModel)]="createForm.blackPrice" name="blackPrice">
+        </div>
+
+        <!-- <div class="col-md-4 mt-3">
+          <label>Latitude</label>
+          <input class="form-control"
+            [(ngModel)]="createForm.latitude" name="latitude" readonly>
+        </div>
+
+        <div class="col-md-4 mt-3">
+          <label>Longitude</label>
+          <input class="form-control"
+            [(ngModel)]="createForm.longitude" name="longitude" readonly>
+        </div> -->
+
+        <div class="col-md-12 mt-3">
+          <label>Full Address</label>
+          <textarea class="form-control" rows="2"
+            [(ngModel)]="createForm.fullAddress"
+            name="fullAddress"></textarea>
+        </div>
+
+        <div class="col-md-4 mt-3">
+          <label>Contact Person</label>
+          <input class="form-control" [(ngModel)]="createForm.contactPerson"
+            name="contactPerson" placeholder="Store contact name">
+        </div>
+
+        <div class="col-md-4 mt-3">
+          <label>Contact Number <span class="text-danger">*</span></label>
+          <input class="form-control" [(ngModel)]="createForm.contactPersonNumber"
+            name="contactPersonNumber" placeholder="Used for store login">
+          <small class="text-muted">Phone number used for store app login</small>
+        </div>
+
+        <div class="col-md-4 mt-3">
+          <label>Store Type</label>
+          <select class="form-control" [(ngModel)]="createForm.type" name="type">
+            <option value="printOnGo">Print On Go</option>
+            <option value="buyDocument">Buy Document</option>
+          </select>
+        </div>
+
+        <div class="col-md-4 mt-3">
+          <label>Store Login Password</label>
+          <input type="password" class="form-control" [(ngModel)]="createForm.password"
+            name="password" placeholder="{{ isedit ? 'Leave blank to keep current' : 'Set password for store login' }}">
+          <small class="text-muted">{{ isedit ? 'Only fill to change password' : 'Required for store app login' }}</small>
+        </div>
+
+      </div>
+
+      <div class="mt-4 text-end">
+        <button class="btn btn-success" (click)="saveStore()">Save</button>
+      </div>
+
+    </form>
+  </div>
+</ng-template>

@@ -1,0 +1,114 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="container-fluid mt-3 ">
+      <div class="row">
+        <div class="col-12 col-padding ">
+          <div class="card card-address ">
+            <div class="p-3 mobile-padding">
+              <div class="container mt-3">
+                <div class="top-header mb-3">
+                  <div>
+                    <h5>{{userId ? 'Edit' : 'Add'}} Sub admin</h5>
+                  </div>
+                  <div>
+                  </div>
+
+                </div>
+
+                <div class="sub-form">
+                  <form name="form" #f="ngForm">
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>Name*</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <input matInput placeholder="Enter Name" [(ngModel)]="createForm.name" name="name" required
+                            #name="ngModel">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>Mobile*</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <input matInput placeholder="Enter Mobile" [(ngModel)]="createForm.mobileNo" name="mobileNo"
+                            required #mobileNo="ngModel">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>Email*</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <input type="email" matInput placeholder="Enter Email" [(ngModel)]="createForm.email"
+                            name="email" required #email="ngModel">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row" *ngIf="!userId">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>Password*</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <input type="text" matInput placeholder="Enter Password" [(ngModel)]="createForm.password"
+                            name="password" required #password="ngModel">
+                        </mat-form-field>
+                      </div>
+                    </div>
+
+                    <h4>Display Pages</h4>
+                    <div class="row pt-10" *ngFor="let page of displayDetailpages">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>{{page?.page_name}}</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <div class="d-flex" style="flex-wrap: wrap;">
+                          <div *ngFor="let action of page.action ;let i = index">
+                            <mat-checkbox class="example-margin" [(ngModel)]="action.check"
+                              name=">{{page?.page_name}}{{action.name}}">{{action?.name}}</mat-checkbox>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-sm-12 col-md-2 form-label">
+                        <mat-label>Status*</mat-label>
+                      </div>
+                      <div class="col-sm-12 col-md-10">
+                        <mat-form-field>
+                          <mat-select placeholder="Select Status" [(ngModel)]="createForm.status" name="status" required
+                            #status="ngModel">
+                            <mat-option [value]="true">Active</mat-option>
+                            <mat-option [value]="false">Inactive</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                    </div>
+
+                    <div class="row mt-4">
+                      <div class="col" style="justify-content: center;
+    display: flex;">
+                        <button mat-button mat-flat-button color="primary" (click)="create(f)">{{userId ? 'Update' :
+                          'Add'}}</button>
+                        <button mat-button (click)="cancel()">Cancel</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,516 @@
+<ngx-spinner size="medium" color="#21aa47" type="square-jelly-box" [fullScreen]="true">
+  <p style="color: #F39201;font-weight: 600;"> Loading... </p>
+</ngx-spinner>
+
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100" style="overflow:hidden;">
+    <div class="container-fluid mt-3">
+      <div class="row ">
+        <span><i class="fa fa-arrow-left" aria-hidden="true" (click)="returntocourier()"></i></span>
+      </div>
+    </div>
+    <div class="container-fluid h-100">
+      <div class="row ">
+        <div class="px-3 pt-3">
+          <h5><b>Details</b></h5>
+        </div>
+        <div class="col-lg-8 mt-3">
+          <mat-card class="m-0">
+            <mat-card-content class="p-0">
+              <div class="card-header p-0">
+                <div class="row">
+                  <div class="col-6">
+                    <div class="">
+                      <!-- <span class="text-center">{{isVerified}}</span> -->
+                      <div *ngIf="courierdetails?.isVerified; else verified">
+                        <!-- <div  [ngClass]="{'red': courierdetails?.isVerified != true}">unverified</div> -->
+                        <div class="green">verified</div>
+                      </div>
+                      <ng-template #verified>
+                        <!-- <div  [ngClass]="{'red': courierdetails?.isVerified != true}">unverified</div> -->
+                        <div class="red">unverified</div>
+                      </ng-template>
+                    </div>
+                  </div>
+                  <div class="col-6"></div>
+                </div>
+              </div>
+              <div class="card-body p-0">
+                <div class="p-3">
+                  <div class="col-lg-6 col-md-6 col-sm-12">
+                    <p>{{courierdetails?.name}}</p>
+                    <p><b>Status:</b>
+                      <span *ngIf="courierdetails?.isVerified; else verifiedstatus">
+                        verified
+                      </span>
+                      <ng-template #verifiedstatus>
+                        <span>unverified</span>
+                      </ng-template>
+                    </p>
+                  </div>
+                  <div class="col-lg-6 col-md-6 col-sm-12">
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                      <div class="button">
+                        <button *ngIf="userrole !== 'subadmin' || showEdit" mat-raised-button color="primary"
+                          [disabled]="courierdetails?.isVerified == true" (click)="verifystatus()">verify</button>
+                      </div>
+                    </div>
+                    <div class="col-6"></div>
+                  </div>
+                  <div class="row mt-4">
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                      <p> <b>Contact number</b><br>+91 {{courierdetails?.mobileNo}}</p>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                      <p><b>Email address</b><br>{{courierdetails?.email}}</p>
+                    </div>
+                  </div>
+                  <div class="row mt-3">
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                      <p><b>Address</b><br>
+                        <span>
+                          {{courierdetails?.addressDetails[0]?.address.fullAddress ?? '-'}}
+                        </span>
+                      </p>
+                    </div>
+                    <div class="col-6"></div>
+                  </div>
+                  <div class="row mt-3">
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                      <p><b>Wallet Balance</b><br>{{courierdetails?.walletBalance ?? 0}} ₹</p>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                      <p><b>Vehicle</b><br>{{courierdetails?.vehicleDetails?.name || courierdetails?.vehicle?.name || 'No Vehicle Assigned'}}</p>
+                      <!-- <p><b>Base Price:</b> ₹{{courierdetails?.vehicleDetails?.basePrice || '-'}}</p>
+                      <p><b>Per KM:</b> ₹{{courierdetails?.vehicleDetails?.perkm || '-'}}</p> -->
+                    </div>
+                  </div>
+                  <div class="row mt-3">
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                      <p><b>Bank Account Number</b><br>{{courierdetails?.bankDetails?.accountNumber ?? '-'}}</p>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                      <p><b>IFSC Code</b><br>{{courierdetails?.bankDetails?.ifscCode ?? '-'}}</p>
+                    </div>
+                  </div>
+                  <!-- <div class="row mt-3">
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                      <p>Trips<br>
+                        <button mat-raised-button type="button" class=" btn_trips mt-2">Search all Trips</button>
+                      </p>
+                    </div>
+                  </div> -->
+                  <div class="row">
+                    <div class="col-sm-12 col-md-6 col-lg-6 mt-3">
+                      <p>Active Trips<br>
+                        <button *ngIf="!load && activetrip?.length" mat-raised-button type="button"
+                          class=" btn_active mt-2" (click)="loadActive()">Load
+                          Activate Trips</button>
+                      </p>
+                      <div *ngIf="activetrip?.length ">
+                        <div *ngIf="load">
+                          <mat-card class="m-0 mb-3" *ngFor="let item of activetrip; let i = index">
+                            <mat-card-content class="p-0">
+                              <div class=" card_active mt-3">
+                                <div class=" p-2">
+                                  <p class="text-center cashondelivery">
+                                    <!-- {{items.createdAt |date}} {{items.createdAt |date|:'mediumTime'}} -->
+                                    {{item?.createdAt | date}} {{item?.createdAt |
+                                    date:'mediumTime'}} {{item?.orderCode}}
+                                  </p>
+                                  <div class="col-lg-7 col-md-12 col-sm-12 mt-2">
+                                    <p><b>{{item?.deliveryType}}</b></p>
+                                  </div>
+                                  <div class="col-5"></div>
+
+                                  <div class="row">
+
+                                    <div class="col-lg-8 col-md-8 col-sm-8">
+                                      <div class="card card_bg p-2">
+                                        <p> Time: {{item?.createdAt |
+                                          date:'mediumTime'}}<br>Date: {{item?.createdAt | date}}</p>
+                                      </div>
+                                    </div>
+
+                                  </div>
+
+                                  <div class="row mt-2">
+
+                                    <P>Trip Distance: {{item?.totalKms}} km</P>
+                                    <div class="col-sm-6 col-md-6 col-lg-6 mt-2">
+                                      <div class="card card_bg p-1">
+                                        <!-- <p style="font-size:12px">FROM<br>
+                                          {{item?.pickupAddress[i]?.street}} {{item?.pickupAddress[i]?.city}}
+                                          {{item?.pickupAddress[i]?.state}}
+                                          {{item?.pickupAddress[i]?.country}} {{item.pickupAddress[i]?.postalCode}}
+                                        </p> -->
+                                        <p style="font-size: 12px;"
+                                          *ngFor="let addr of item?.pickupAddress; let j = index">{{addr?.street}}
+                                          ,<br> {{ addr?.city}}<br> {{ addr?.state}} ,
+                                          {{ addr?.country }},
+                                          {{ addr?.postalCode }}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-6 col-lg-6 mt-2">
+                                      <div class="card card_bg p-1">
+                                        <p style="font-size: 12px;"
+                                          *ngFor="let addr of item?.dropAddress; let j = index">{{addr?.street}}
+                                          ,<br> {{ addr?.city}} <br> {{ addr?.state}} ,
+                                          {{ addr?.country }} ,
+                                          {{ addr?.postalCode }}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="row mt-3">
+                                    <div class="col-lg-12 col-md-12 c0l-sm-12">
+                                      <p class="cashondelivery">Courire assigned: {{item?.assigneeDetails.name}}<br>
+                                        Trip Cost: {{item?.amountDetails?.finalAmount}} ₹<br>
+                                        Payment: {{item?.paymentDetails?.paymentMode}}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div class="text-center mt-4 mb-2">
+                                    <button mat-raised-button type="button" class=" btn_details"
+                                      (click)="moredetails(item)">MORE DETAILS</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                      </div>
+                      <div *ngIf="!activetrip?.length">
+                        <tr>No results found.</tr>
+                      </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6 mt-3">
+                      <p>Completed Trips<br>
+                        <button *ngIf="!load1 && completetrip?.length" mat-raised-button type="button"
+                          class=" btn_complete mt-2" (click)="loadComplete()">Load
+                          Complete Trips</button>
+                      </p>
+                      <div *ngIf="completetrip?.length ">
+                        <div *ngIf="load1">
+                          <mat-card class="m-0 mb-3" *ngFor="let item of completetrip; let i = index">
+                            <mat-card-content class="p-0">
+                              <div class=" card_active mt-3">
+                                <div class=" p-2">
+                                  <p class="text-center cashondelivery">
+                                    {{item?.createdAt | date}} {{item?.createdAt |
+                                    date:'mediumTime'}} {{item?.orderCode}}
+                                  </p>
+                                  <div class="col-lg-7 col-md-6 col-sm-6 mt-2">
+                                    <p><b>{{item?.deliveryType}}</b> </p>
+                                  </div>
+                                  <div class="col-5"></div>
+                                  <div class="row">
+                                    <div class="col-lg-8 col-md-8 col-sm-8">
+                                      <div class="card card_bg p-2">
+                                        <p> Time : {{item?.createdAt | date:'mediumTime'}}<br>Date : {{item?.createdAt |
+                                          date}}</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="row mt-2">
+                                    <P>Trip Distance: {{item?.totalKms}} km</P>
+                                    <div class="col-sm-6 col-md-6 col-lg-6 mt-2">
+                                      <div class="card card_bg p-1">
+                                        <p style="font-size: 12px;"
+                                          *ngFor="let addr of item?.pickupAddress; let j = index">
+                                          {{addr?.street}}<br> {{ addr?.city}} ,<br> {{ addr?.state}} ,
+                                          {{ addr?.country }} ,
+                                          {{ addr?.postalCode }}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-6 col-lg-6 mt-2">
+                                      <div class="card card_bg p-1">
+                                        <p style="font-size: 12px;"
+                                          *ngFor="let addr of item?.dropAddress;let j = index">
+                                          {{addr?.street}} <br> {{ addr?.city}} ,<br> {{ addr?.state}} ,
+                                          {{ addr?.country }} ,
+                                          {{ addr?.postalCode }}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="row mt-3">
+                                    <div class="col-lg-12 col-md-12 c0l-sm-12">
+                                      <p class="cashondelivery">Courier assigned: {{item?.assigneeDetails.name}}<br>
+                                        Trip Cost: {{item?.amountDetails?.finalAmount}} ₹<br>
+                                        Payment: {{item?.paymentDetails?.paymentMode}}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div class="text-center mt-4 mb-2">
+                                    <button mat-raised-button type="button" class=" btn_details"
+                                      (click)="moredetails(item)">MORE DETAILS</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                      </div>
+                      <div *ngIf="!completetrip?.length">
+                        <tr>No results found.</tr>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <div class="col-lg-4 my-3">
+          <!-- <mat-card class="m-0">
+            <mat-card-content class="p-0">
+              <div class=" card_height p-3">
+                <div class="text-center p-3">
+                  <span class="">
+                    <img class="img-fluid userimg "
+                      [src]="courierdetails?.imgUrl? courierdetails.imgUrl :'assets/images/custm-nbb/user_dummy.png'"
+                      alt="">
+                  </span>
+                  <div class="">
+                    <form class="mt-3">
+                      <input type="file" name="myfile" (change)="onChange($event.target.files)">
+                    </form>
+                  </div>
+                  <div class="form-group mt-4">
+                    <label for="" class="form-label">Driving License</label>
+                    <div class="">
+                      <img class="img-fluid userimg "
+                        [src]="courierdetails?.drivingLicense? courierdetails.drivingLicense :'assets/images/custm-nbb/user_dummy.png'"
+                        alt="">
+                    </div>
+
+                    <input type="file" class="form-control" value="" accept="application/pdf, image/*">
+
+                    <div class="dflex">
+                      <div class=" upload_attachement">
+                        <div class="close_btn">
+                          <i class="fa-solid fa-circle-xmark"></i>
+                        </div>
+                        test.png
+                      </div>
+                      <div class="download_btn" style="cursor: pointer;">
+                        <i class="fa-solid fa-cloud-arrow-down"></i>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="form-group mt-4">
+                    <label for="" class="form-label">Bike RC Book</label>
+                    <div class="">
+                      <img class="img-fluid userimg "
+                        [src]="courierdetails?.rcBook? courierdetails.rcBook :'assets/images/custm-nbb/user_dummy.png'"
+                        alt="">
+                    </div>
+
+                    <input type="file" class="form-control" value="" accept="application/pdf, image/*">
+
+                    <div class="dflex">
+                      <div class=" upload_attachement">
+                        <div class="close_btn">
+                          <i class="fa-solid fa-circle-xmark"></i>
+                        </div>
+                        test.png
+                      </div>
+                      <div class="download_btn" style="cursor: pointer;">
+                        <i class="fa-solid fa-cloud-arrow-down"></i>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="form-group mt-4">
+                    <label for="" class="form-label">Bike Insurance</label>
+                    <div class="">
+                      <img class="img-fluid userimg "
+                        [src]="courierdetails?.insurance? courierdetails.insurance :'assets/images/custm-nbb/user_dummy.png'"
+                        alt="">
+                    </div>
+
+                    <input type="file" class="form-control" value="" accept="application/pdf, image/*">
+
+                    <div class="dflex">
+                      <div class=" upload_attachement">
+                        <div class="close_btn">
+                          <i class="fa-solid fa-circle-xmark"></i>
+                        </div>
+                        test.png
+                      </div>
+                      <div class="download_btn" style="cursor: pointer;">
+                        <i class="fa-solid fa-cloud-arrow-down"></i>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card> -->
+          <mat-card class="m-0">
+            <mat-card-content class="p-0">
+              <div class=" card_height p-3">
+                <div class="text-center p-3">
+                  <span class="">
+                    <img class="img-fluid userimg "
+                      [src]="courierdetails?.imgUrl? courierdetails.imgUrl :'assets/images/custm-nbb/user_dummy.png'"
+                      alt="">
+                  </span>
+                  <div class="">
+                    <form class="mt-3">
+                      <input *ngIf="!courierdetails?.imgUrl" type="file" name="myfile" class="form-control"
+                        (change)="onChange($event.target.files,'profile')">
+                    </form>
+                    <div class="d-flex" *ngIf="courierdetails?.imgUrl">
+                      <div class=" upload_attachement">
+                        <div class="close_btn" (click)="removeImage('profile')">
+                          <i class="fa-solid fa-circle-xmark"></i>
+                        </div>
+                        {{courierdetails?.imgUrl}}
+                      </div>
+                      <div class="download_btn" style="cursor: pointer;"
+                        (click)="downloadImage(courierdetails?.imgUrl)">
+                        <i class="fa-solid fa-cloud-arrow-down"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- <div class="form-group mt-4">
+                    <label for="" class="form-label">Driving License</label>
+                    <div class="">
+                      <img class="img-fluid userimg "
+                        [src]="courierdetails?.drivingLicense ? courierdetails.drivingLicense :'assets/images/custm-nbb/user_dummy.png'"
+                        alt="">
+                    </div>
+
+                    <input *ngIf="!courierdetails?.drivingLicense" type="file" class="form-control" value=""
+                      accept="application/pdf, image/*" (change)="onChange($event.target.files,'driving')">
+
+                    <div class="d-flex" *ngIf="courierdetails?.drivingLicense">
+                      <div class=" upload_attachement">
+                        <div class="close_btn" (click)="removeImage('driving')">
+                          <i class="fa-solid fa-circle-xmark"></i>
+                        </div>
+                        {{courierdetails?.drivingLicense}}
+                      </div>
+                      <div class="download_btn" style="cursor: pointer;"
+                        (click)="downloadImage(courierdetails?.drivingLicense)">
+                        <i class="fa-solid fa-cloud-arrow-down"></i>
+                      </div>
+                    </div>
+
+                  </div> -->
+                  <div class="form-group mt-4">
+    <label class="form-label">Driving License</label>
+
+    <div class="document-block">
+      <div>
+        <p>Front</p>
+        <img class="img-fluid userimg" [src]="courierdetails?.drivingLicense?.front || 'assets/images/custm-nbb/user_dummy.png'" alt="Driving license front">
+        <div class="btn-group">
+          <button *ngIf="courierdetails?.drivingLicense?.front" class="btn btn-sm" (click)="removeDocumentSide('driving','front')">Remove Front</button>
+          <button *ngIf="courierdetails?.drivingLicense?.front" class="btn btn-sm" (click)="downloadImage(courierdetails?.drivingLicense?.front)">Download Front</button>
+        </div>
+        <input *ngIf="!courierdetails?.drivingLicense?.front" type="file" class="form-control" accept="application/pdf,image/*" (change)="onChange($event.target.files,'driving-front')">
+      </div>
+      <div class="mt-3">
+        <p>Back</p>
+        <img class="img-fluid userimg" [src]="courierdetails?.drivingLicense?.back || 'assets/images/custm-nbb/user_dummy.png'" alt="Driving license back">
+        <div class="btn-group">
+          <button *ngIf="courierdetails?.drivingLicense?.back" class="btn btn-sm" (click)="removeDocumentSide('driving','back')">Remove Back</button>
+          <button *ngIf="courierdetails?.drivingLicense?.back" class="btn btn-sm" (click)="downloadImage(courierdetails?.drivingLicense?.back)">Download Back</button>
+        </div>
+        <input *ngIf="!courierdetails?.drivingLicense?.back" type="file" class="form-control" accept="application/pdf,image/*" (change)="onChange($event.target.files,'driving-back')">
+      </div>
+    </div>
+
+    <div class="mt-2">
+      <button class="btn btn-sm" (click)="removeImage('driving')">Clear Driving License (both)</button>
+    </div>
+  </div>
+
+  <div class="form-group mt-4">
+    <label for="" class="form-label">Bike RC Book</label>
+    <div class="document-block">
+      <div>
+        <p>Front</p>
+        <img class="img-fluid userimg" [src]="courierdetails?.rcBook?.front || 'assets/images/custm-nbb/user_dummy.png'" alt="RC Book front">
+        <div class="btn-group">
+          <button *ngIf="courierdetails?.rcBook?.front" class="btn btn-sm" (click)="removeDocumentSide('rcbook','front')">Remove Front</button>
+          <button *ngIf="courierdetails?.rcBook?.front" class="btn btn-sm" (click)="downloadImage(courierdetails?.rcBook?.front)">Download Front</button>
+        </div>
+        <input *ngIf="!courierdetails?.rcBook?.front" type="file" class="form-control" accept="application/pdf,image/*" (change)="onChange($event.target.files,'rcbook-front')">
+      </div>
+      <div class="mt-3">
+        <p>Back</p>
+        <img class="img-fluid userimg" [src]="courierdetails?.rcBook?.back || 'assets/images/custm-nbb/user_dummy.png'" alt="RC Book back">
+        <div class="btn-group">
+          <button *ngIf="courierdetails?.rcBook?.back" class="btn btn-sm" (click)="removeDocumentSide('rcbook','back')">Remove Back</button>
+          <button *ngIf="courierdetails?.rcBook?.back" class="btn btn-sm" (click)="downloadImage(courierdetails?.rcBook?.back)">Download Back</button>
+        </div>
+        <input *ngIf="!courierdetails?.rcBook?.back" type="file" class="form-control" accept="application/pdf,image/*" (change)="onChange($event.target.files,'rcbook-back')">
+      </div>
+    </div>
+    <div class="mt-2">
+      <button class="btn btn-sm" (click)="removeImage('rcbook')">Clear RC Book (both)</button>
+    </div>
+  </div>
+  <div class="form-group mt-4">
+    <label for="" class="form-label">Bike Insurance</label>
+    <div class="document-block">
+      <div>
+        <p>Front</p>
+        <img class="img-fluid userimg" [src]="courierdetails?.insurance?.front || 'assets/images/custm-nbb/user_dummy.png'" alt="Insurance front">
+        <div class="btn-group">
+          <button *ngIf="courierdetails?.insurance?.front" class="btn btn-sm" (click)="removeDocumentSide('insurance','front')">Remove Front</button>
+          <button *ngIf="courierdetails?.insurance?.front" class="btn btn-sm" (click)="downloadImage(courierdetails?.insurance?.front)">Download Front</button>
+        </div>
+        <input *ngIf="!courierdetails?.insurance?.front" type="file" class="form-control" accept="application/pdf,image/*" (change)="onChange($event.target.files,'insurance-front')">
+      </div>
+      <div class="mt-3">
+        <p>Back</p>
+        <img class="img-fluid userimg" [src]="courierdetails?.insurance?.back || 'assets/images/custm-nbb/user_dummy.png'" alt="Insurance back">
+        <div class="btn-group">
+          <button *ngIf="courierdetails?.insurance?.back" class="btn btn-sm" (click)="removeDocumentSide('insurance','back')">Remove Back</button>
+          <button *ngIf="courierdetails?.insurance?.back" class="btn btn-sm" (click)="downloadImage(courierdetails?.insurance?.back)">Download Back</button>
+        </div>
+        <input *ngIf="!courierdetails?.insurance?.back" type="file" class="form-control" accept="application/pdf,image/*" (change)="onChange($event.target.files,'insurance-back')">
+      </div>
+    </div>
+    <div class="mt-2">
+      <button class="btn btn-sm" (click)="removeImage('insurance')">Clear Insurance (both)</button>
+    </div>
+  </div>
+  <div class="form-group mt-4">
+    <label for="" class="form-label">Pan Card</label>
+    <div class="document-block">
+      <div>
+        <p>Front</p>
+        <img class="img-fluid userimg" [src]="courierdetails?.panCard?.front || 'assets/images/custm-nbb/user_dummy.png'" alt="Pan Card front">
+        <div class="btn-group">
+          <button *ngIf="courierdetails?.panCard?.front" class="btn btn-sm" (click)="removeDocumentSide('pan','front')">Remove Front</button>
+          <button *ngIf="courierdetails?.panCard?.front" class="btn btn-sm" (click)="downloadImage(courierdetails?.panCard?.front)">Download Front</button>
+        </div>
+        <input *ngIf="!courierdetails?.panCard?.front" type="file" class="form-control" accept="application/pdf,image/*" (change)="onChange($event.target.files,'pan-front')">
+      </div>
+      <div class="mt-3">
+        <p>Back</p>
+        <img class="img-fluid userimg" [src]="courierdetails?.panCard?.back || 'assets/images/custm-nbb/user_dummy.png'" alt="Pan Card back">
+        <div class="btn-group">
+          <button *ngIf="courierdetails?.panCard?.back" class="btn btn-sm" (click)="removeDocumentSide('pan','back')">Remove Back</button>
+          <button *ngIf="courierdetails?.panCard?.back" class="btn btn-sm" (click)="downloadImage(courierdetails?.panCard?.back)">Download Back</button>
+        </div>
+        <input *ngIf="!courierdetails?.panCard?.back" type="file" class="form-control" accept="application/pdf,image/*" (change)="onChange($event.target.files,'pan-back')">
+      </div>
+    </div>
+    <div class="mt-2">
+      <button class="btn btn-sm" (click)="removeImage('pan')">Clear Pan Card (both)</button>
+    </div>
+  </div>

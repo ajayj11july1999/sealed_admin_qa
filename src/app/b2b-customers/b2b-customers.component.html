@@ -1,0 +1,132 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+
+
+    <!-- <div class="overlay" *ngIf="searchLoad">
+  <div class="spinner"> Loading......!!!</div>
+</div> -->
+
+
+    <div class="container-fluid p-3">
+      <div class="row-wrap p-3">
+
+        <div class="text-end">
+          <button *ngIf="userrole !== 'subadmin' || showAdd" mat-raised-button class="mb-1"
+            (click)="addCustomers()">Add</button>
+          <button *ngIf="b2bCustomerList?.length && (userrole !== 'subadmin' || showExport)" mat-raised-button
+            class="mb-1 " (click)="downloadExport()">Export</button>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3 customerbtn">
+          <div classs>
+            <button type="button" class="btn buttons">
+              <span class="customer">S2B Customers</span> <span
+                class="badge badge-light float-right violet">{{totalCount}}</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+      <div class="row  px-3 mt-2">
+        <div class="col">
+
+          <button mat-raised-button class=" filter mb-1" [ngClass]="{'active': isViewAllActive}"
+            (click)="viewAll()">ViewAll</button>
+          <button mat-raised-button class="filter mb-1" [ngClass]="{'active': isVerifiedCouriersActive}"
+            (click)="verifiedCouriers()">View Verified Couriers</button>
+          <button mat-raised-button class="filter mb-1" [ngClass]="{'active': isUnverifiedCouriersActive}"
+            (click)="unverifiedCouriers()">View Unverified Couriers</button>
+
+        </div>
+      </div>
+      <div class="row p-3">
+        <mat-card class="m-0">
+          <mat-card-header class="">
+            <div class="cardheader ">
+              <div class="search-container">
+                <div class="row">
+                  <div class="col-lg-12">
+                    <div class=" d-flex">
+                      <div class=" searchone">
+                        <div class="input-group ">
+                          <input type="text" placeholder="Search Customers" autocomplete="off" class="form-control"
+                            (input)="searchCustomer($event)">
+                          <div class="input-group-append">
+                            <button class="btn btnsearch" type="submit" value="search">
+                              <i class="fas fa-search text-white"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="">
+              <div class="row p-0" *ngIf="b2bCustomerList?.length">
+                <div class="col-sm-6 col-md-6 col-lg-4 mb-4  " *ngFor="let items of b2bCustomerList; let i=index;">
+                  <mat-card class="m-0">
+
+                    <mat-card-content class="customerscard p-0">
+
+                      <div class="row-wrap d-flex ">
+                        <div class="col-sm-6"></div>
+                        <div class="col-sm-6 ">
+                          <div class="">
+
+                            <div *ngIf="items?.isVerified; else verified">
+                              <div [ngClass]="{'green': items?.isVerified == true}">verified</div>
+                            </div>
+
+                            <ng-template #verified>
+                              <div [ngClass]="{'red': items?.isVerified != true}">unverified</div>
+
+                            </ng-template>
+                          </div>
+
+                        </div>
+                      </div>
+
+
+                      <div class="p-3">
+                        <h4 class="heading">Name : {{items.name}}</h4>
+                        <h4 class="heading">Phone : {{items.mobileNo}}</h4>
+                        <h4 class="heading">Email : {{items.email}}</h4>
+                        <h4 class="heading">GST : {{items.gstNo}}</h4>
+                        <div class="text-center mt-2">
+                          <button mat-raised-button color="primary" class="verifybtn"
+                            [disabled]="items?.isVerified == true" (click)="updateVerifyStatus(items)"> VERIFY </button>
+
+                          <button mat-raised-button color="primary" class="deleteuser" (click)="deleteUser(items)">
+                            Delete User </button>
+                        </div>
+                      </div>
+
+
+                    </mat-card-content>
+                  </mat-card>
+
+
+                </div>
+
+                <div>
+                  <mat-paginator (page)="pageChange($event)" [pageIndex]="currentPage" [pageSize]="limit"
+                    aria-label="Select page" [length]="totalCount">
+                  </mat-paginator>
+                </div>
+              </div>
+              <div class="" *ngIf="!b2bCustomerList.length">
+                <div class="text-center">
+                  No Record Found
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+  </div>
+</div>

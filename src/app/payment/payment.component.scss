@@ -1,0 +1,51 @@
+::ng-deep .mat-form-field-underline {
+  display: block;
+}
+
+td {
+  padding: 10px !important;
+  font-size: 14px !important;
+  background-color: #fff !important;
+  text-align: -webkit-center;
+  border-bottom: 2px solid #f2f2f2;
+  border-right: 1px solid #f2f2f2;
+
+}
+
+th {
+  padding: 12px !important;
+  // border-bottom: 1px solid rgba(0, 0, 0, 0.3) !important;
+  font-size: 14px !important;
+  background: #21aa47;
+  color: #fff;
+  font-weight: 400;
+  border-right: 1px solid #f2f2f2;
+  text-align: center;
+
+}
+
+@media only screen and (min-width:320px) and (max-width:767px) {
+  .search-input {
+
+    width: 60%;
+    height: 25px;
+
+  }
+
+  .search-button {
+    height: 25px;
+  }
+
+  .col-padding {
+    padding: 0px;
+  }
+
+  .mobile-padding {
+    padding: 5px !important;
+  }
+
+  .card-table {
+    overflow-x: auto !important;
+  }
+
+}

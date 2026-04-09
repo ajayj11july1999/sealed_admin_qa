@@ -1,0 +1,91 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+<div class="row wrap">
+  <div class="col-lg-5">
+<mat-card>
+  <mat-card-content>
+    <div class="row mb-2">
+      <div class="col-12">
+
+        <div class="row">
+          <div class="col-12">
+
+            <mat-label>ENTER TRIP ID</mat-label>
+            <div class="col-12">
+              <mat-form-field>
+              
+                <input matInput placeholder="">
+              </mat-form-field>
+            </div>
+            
+          </div>
+          <div class="col-12">
+            <div class="searchbtn">
+              <button mat-raised-button color="primary">Search ID</button>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        
+          <div class="">
+            <mat-label>ENTER TRIP DATE RANGE</mat-label>
+          </div>
+
+
+
+          <div class="row">
+            <div class="col-12">
+              <mat-form-field>
+
+                <input matInput [matDatepicker]="picker1" placeholder="" [formControl]="">
+
+                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                <mat-datepicker #picker1></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="col-12">
+              <mat-form-field>
+                <input matInput [matDatepicker]="picker2" placeholder="" [formControl]="">
+
+                <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                <mat-datepicker #picker2></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="col-12">
+              <div class="searchbtn">
+                <button mat-raised-button mat-flat-button color="primary">SEARCH DATE</button>
+
+              </div>
+            </div>
+
+
+
+
+            <div class="col-2">
+
+            </div>
+          </div>
+
+
+
+        
+
+      </div>
+    </div>
+
+  </mat-card-content>
+</mat-card>
+  </div>
+</div>
+    
+       
+ 
+
+
+</div>
+</div>

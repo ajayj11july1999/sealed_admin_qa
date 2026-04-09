@@ -1,0 +1,72 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="container-fluid mt-3">
+      <div class="row">
+        <span><i class="fa fa-arrow-left" aria-hidden="true" (click)="backToFlagged()"></i></span>
+      </div>
+    </div>
+    <div class="container-fluid p-3">
+      <div *ngIf="loading" class="text-center p-4">Loading...</div>
+      <div *ngIf="!loading" class="row">
+        <div class="col-sm-12 col-md-12 col-lg-7">
+          <mat-card class="m-0 mb-3">
+            <mat-card-content>
+              <h4 class="text-center heading mb-3">User Details</h4>
+              <div class="row" *ngIf="userDetails">
+                <h5 class="header">Name: {{ userDetails?.name }}</h5>
+                <h5 class="header">Phone: {{ userDetails?.mobileNo }}</h5>
+                <h5 class="header">Email: {{ userDetails?.email }}</h5>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="m-0 mb-3" *ngIf="restrictions">
+            <mat-card-content>
+              <h4 class="text-center heading mb-3">Restrictions & Behavior</h4>
+              <div class="row">
+                <h5 class="header">Post-driver-accept cancellations: {{ restrictions?.postDriverAcceptCancellationCount || 0 }}</h5>
+                <h5 class="header">Pending penalty: ₹{{ restrictions?.pendingPenaltyAmount || 0 }}</h5>
+                <h5 class="header">Status: <span *ngIf="restrictions?.block?.isBlocked" class="text-danger">Blocked</span><span *ngIf="!restrictions?.block?.isBlocked" class="text-success">Active</span></h5>
+                <h5 class="header" *ngIf="restrictions?.block?.reason">Block reason: {{ restrictions?.block?.reason }}</h5>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="m-0 mb-3">
+            <mat-card-content>
+              <h4 class="text-center heading mb-3">Cancelled Orders (after driver accepted)</h4>
+              <div *ngIf="cancelledOrdersAfterDriver?.length">
+                <mat-card class="m-0 mb-2" *ngFor="let order of cancelledOrdersAfterDriver">
+                  <mat-card-content>
+                    <h6><b>{{ order?.orderCode }}</b> - {{ order?.createdAt | date:'medium' }}</h6>
+                    <p class="mb-0" *ngIf="order?.amountDetails">Amount: ₹{{ order?.amountDetails?.finalAmount }}</p>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+              <div *ngIf="!cancelledOrdersAfterDriver?.length">
+                <p class="mb-0">No cancelled orders (after driver accepted) found.</p>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-5">
+          <mat-card class="m-0">
+            <mat-card-content>
+              <h4 class="text-center heading mb-3">Actions</h4>
+              <div *ngIf="restrictions?.block?.isBlocked">
+                <button mat-raised-button color="accent" (click)="unblockUser()" [disabled]="blocking">
+                  {{ blocking ? 'Processing...' : 'Unblock User' }}
+                </button>
+              </div>
+              <div *ngIf="!restrictions?.block?.isBlocked">
+                <button mat-raised-button color="warn" (click)="blockUser()" [disabled]="blocking">
+                  {{ blocking ? 'Processing...' : 'Block User' }}
+                </button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

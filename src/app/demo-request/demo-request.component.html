@@ -1,0 +1,139 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+
+
+
+
+    <div class="container-fluid p-3">
+      <div class="row-wrap px-3">
+        <div class="col-sm-6 col-md-3 col-lg-3 customerbtn">
+          <div classs>
+            <button type="button" class="btn buttons">
+              <span class="customer">Demo Requests</span> <span
+                class="badge badge-light float-right violet">{{totalCount}}</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+      <div class="row p-3">
+        <mat-card class="m-0">
+          <mat-card-header class="">
+            <div class="cardheader ">
+              <div class="search-container">
+                <div class="row">
+                  <div class="col-lg-12">
+                    <div class=" d-flex">
+                      <div class=" searchone">
+                        <div class="input-group ">
+                          <input type="text" placeholder="Search Customers" autocomplete="off" class="form-control"
+                            (input)="searchCustomer($event)">
+                          <div class="input-group-append">
+                            <button class="btn btnsearch" type="submit" value="search">
+                              <i class="fas fa-search text-white"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="">
+              <div class="row p-0" *ngIf="demoList?.length">
+                <div class="col-sm-6 col-md-6 col-lg-4 mb-4  " *ngFor="let items of demoList let i=index">
+                  <mat-card class="m-0" *ngIf="!searchLoad">
+
+                    <mat-card-content class="customerscard p-0">
+
+                      <div class="row-wrap d-flex ">
+                        <div class="col-sm-6"></div>
+                        <div class="col-sm-6 ">
+                          <div class="">
+                            <div *ngIf="items?.demoStatus == 'new'">
+                              <div [ngClass]="{'red': items?.demoStatus == 'new'}">Open</div>
+                            </div>
+                            <div *ngIf="items?.demoStatus == 'closed'">
+                              <div [ngClass]="{'green': items?.demoStatus == 'closed'}"> Closed </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+
+                      <div class="row p-3">
+                        <div class="col-6"><span class="heading">Name</span></div>
+                        <div class="col-6">
+                          <p class="content" data-toggle="tooltip" data-placement="bottom" title="{{items?.name}}">:
+                            {{items?.name}}</p>
+                        </div>
+
+
+                        <!-- <div class="col-6"><span  class="heading">Contact Number </span></div>
+<div class="col-6"><p class="content">: {{items?.contactNumber}}</p></div> -->
+
+                        <div class="col-6"><span class="heading">Email </span></div>
+                        <div class="col-6">
+                          <p class="content" data-toggle="tooltip" data-placement="top" title="{{items?.email}}">:
+                            {{items?.email}}</p>
+                        </div>
+                        <div class="col-6"><span class="heading">Message</span></div>
+                        <div class="col-6">
+                          <p class="content" data-toggle="tooltip" data-placement="top" title="{{items?.message}}">:
+                            {{items?.message}}</p>
+                        </div>
+
+                        <!-- <h4 class="heading">Name : {{items?.name}}</h4> -->
+                        <!-- <h4 class="heading">Bussiness Name : {{items?.businessName}}</h4>
+                        <h4 class="heading">Contact Number : {{items?.contactNumber}}</h4> -->
+                        <!-- <h4 class="heading">Email : {{items?.email}}</h4> -->
+                        <div class="text-center mt-2">
+                          <button mat-raised-button color="primary" class="verifybtn"
+                            [disabled]="items?.demoStatus =='closed'" (click)="updateStatus(items)">
+                            Update
+                          </button>
+                        </div>
+                      </div>
+
+
+                    </mat-card-content>
+                  </mat-card>
+
+
+                </div>
+                <div class="overlay" *ngIf="searchLoad">
+                  <div class="spinner"> Loading......!!!</div>
+                </div>
+                <div>
+                  <mat-paginator (page)="pageChange($event)" [pageSize]="limit" aria-label="Select page"
+                    [length]="totalCount" [pageIndex]="currentPage">
+                  </mat-paginator>
+
+                </div>
+
+
+
+
+
+              </div>
+              <div class="row" *ngIf="!demoList?.length">
+                <div class="text-center">
+                  No Record Found
+                </div>
+              </div>
+            </div>
+
+
+          </mat-card-content>
+        </mat-card>
+
+
+
+      </div>
+    </div>
+
+  </div>
+</div>

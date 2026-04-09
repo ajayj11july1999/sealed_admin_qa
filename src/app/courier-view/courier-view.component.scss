@@ -1,0 +1,163 @@
+.fa-arrow-left {
+  background: #21aa47;
+  color: white;
+  padding: 13px;
+  border-radius: 6px;
+}
+
+.userimg {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+
+.red {
+  padding: 5px !important;
+  text-align: center !important;
+  background: #ff0c0c !important;
+  color: #f4f4f4 !important;
+  border-radius: 5px 0px 0px 0px;
+}
+
+.green {
+  padding: 5px !important;
+  text-align: center !important;
+  background: #21aa47 !important;
+  color: #f4f4f4 !important;
+  border-radius: 5px 0px 0px 0px;
+}
+
+h6 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+// .unverify{
+//   padding: 5px;
+//   text-align: center;
+//   background: red;
+//   color: #F4F4F4;
+//   border-radius: 5px 0px 0px 0px;
+//   height: 100%;
+// }
+.mat-raised-button {
+  line-height: 28px !important;
+}
+
+.card {
+  background: #fff !important;
+  box-shadow: 0px 4px 4px rgb(0 0 0 / 25%) !important;
+  border-radius: 20px;
+  border: none !important;
+}
+
+.card-header {
+  border-radius: 5px 20px 0px 2px !important;
+  border: none !important;
+  background: #fff;
+}
+
+.btn-success1 {
+  background: #21aa47;
+  padding: 3px 15px 3px 15px;
+  /* width: 60%; */
+  font-size: 13px;
+  border-radius: 10px;
+  color: #f4f4f4;
+  border: none;
+}
+
+p {
+  // margin-top: 0;
+  margin-bottom: 0.45em;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.btn_trips {
+  background: #aa2173;
+  color: white;
+  width: 100%;
+  border: none;
+  border-radius: 5px;
+  // padding: 5px;
+}
+
+.btn_active {
+  background: #4348cf;
+  border-radius: 5px;
+  color: white;
+  border: none;
+  width: 100%;
+  // padding: 5px;
+}
+
+.btn_complete {
+  background: #d2be0a;
+  border-radius: 5px;
+  color: white;
+  border: none;
+  width: 100%;
+  // padding: 5px;
+}
+
+.card_active {
+  background: #f5f5f5 !important;
+  box-shadow: 0px 2px 4px #21aa47 !important;
+  border-radius: 5px !important;
+}
+
+.card_bg {
+  background: #21aa47 !important;
+  border-radius: 5px;
+  color: white;
+}
+
+.btn_details {
+  background: #4348cf !important;
+  color: white;
+  border-radius: 5px;
+  border: none;
+  // padding: 5px;
+  font-size: 13px;
+}
+
+.cashondelivery {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: capitalize !important;
+}
+
+.trip_p {
+  font-size: 14px !important;
+}
+
+.type {
+  text-transform: capitalize;
+}
+
+.card_height {
+  min-height: 30vh;
+}
+
+// .card_profile{
+// height: 200px;
+// }
+input {
+  font-size: 13px;
+}
+
+@media only screen and (max-width: 1200px) {
+  .cashondelivery {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+  }
+}
+
+.download_btn {
+  align-items: center;
+  display: flex;
+  margin: 7px;
+  padding: 6px;
+}

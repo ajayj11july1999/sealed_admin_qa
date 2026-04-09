@@ -1,0 +1,113 @@
+<div class="conatiner" *ngIf="status != 'Delete' && status != 'resetPassword'">
+  <div class="text-center">
+    <h5>Add Sub Admin</h5>
+    <!-- <p style="font-size: 14px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit?</p> -->
+  </div>
+  <form [formGroup]="createForm" >
+    <div class="">
+      <label>User Name</label><br>
+      <input type="text" formControlName="username" class="form-control mt-2 mb-2" (input)="numberCheck()">
+      <div *ngIf="submitted && f['username'].errors" class="invalid-feedback" required>
+        <div style="font-size: 10px;" *ngIf="createForm.get('username').errors && !userNameCheck">
+          Username is required</div>
+      </div>
+      <div class="new" *ngIf="userNameCheck">
+        Username doesn't have numbers </div>
+    </div>
+    <div class="">
+      <label>Mobile Number</label><br>
+      <input type='number' formControlName="number" class="form-control mt-2 mb-2" (input)="mobileNumberTest()">
+      <div *ngIf="submitted && f['number'].errors" class="invalid-feedback">
+        <div style="font-size: 10px;" *ngIf="createForm.get('number').errors && !numberStart && !numberError">
+          Mobile number is required</div>
+      </div>
+      <div class="new" *ngIf="numberStart && !numberError">
+        Invalid Mobile Number</div>
+      <div class="new" *ngIf="numberError && !numberStart">
+        Mobile Number should be 10 digits
+      </div>
+      <div class="new" *ngIf="numberError && numberStart">
+        Mobile Number should be valid & have 10 digits
+      </div>
+    </div>
+    <div class="">
+      <label>Email Address</label><br>
+      <input formControlName="email" class="form-control mt-2 mb-2" (input)="emailCheck()">
+      <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
+        <div style="font-size: 10px;" *ngIf="createForm.get('email').errors && !emailAddrCheck">
+          Email is required</div>
+      </div>
+
+      <div class="new" *ngIf="emailAddrCheck">
+        Email Address required & should have proper format
+      </div>
+    </div>
+    <div *ngIf="label == 'create'">
+      <label>Password</label><br>
+      <div class="pass-eye mt-2">
+        <input [type]="password" (input)="pwdLengthCheck()" class="form-control  mb-2 align-text"
+          formControlName="password">
+
+        <button class="eye-align" (click)="onClick()">
+          <i class="fa fa-eye" aria-hidden="true" *ngIf="show"></i>
+          <i class="fa fa-eye-slash" aria-hidden="true" *ngIf="!show"></i>
+        </button>
+      </div>
+      <!-- </div> -->
+
+      <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
+        <div style="font-size: 10px;" *ngIf="f['password'].errors['required'] && !pwdLengCheck">
+          Password is required</div>
+      </div>
+
+      <div class="new" *ngIf="pwdLengCheck && f['password'].errors['required']">
+        Password should be valid & have at least 6 characters
+      </div>
+    </div>
+
+
+    <div class="text-center mt-3">
+      <button class="save-btn me-3" (click)="create()">{{label}}</button>
+      <button class="cancel-btn" mat-dialog-close>cancel</button>
+    </div>
+
+  </form>
+
+</div>
+<div *ngIf="status == 'Delete' && status != 'resetPassword'">
+  <mat-dialog-content>
+    <p class="decoration">
+      {{message}} {{status}} {{msg}}
+    </p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="center">
+    <button mat-raised-button [mat-dialog-close]="'delete'" class="pop" color="primary"
+      tabindex="1">{{confirmButtonText}}</button>
+    <button mat-raised-button mat-dialog-close class="push" mx-2 tabindex="-1">{{cancelButtonText}}</button>
+  </mat-dialog-actions>
+</div>
+
+
+
+<div *ngIf="status == 'resetPassword'">
+
+  <form class="p-3" [formGroup]="resetForm">
+    <div class="text-center ">
+      <h5>Reset Password</h5>
+    </div>
+    <div class="text-center mt-5">
+      <label>Password</label><br>
+      <input class="mt-2 form-control" formControlName="password" type="text">
+    </div>
+
+
+    <div class="text-center mt-4">
+      <button class="save-btn me-2" (click)="resetPassword()">Submit</button>
+
+      <button class="cancel-btn" mat-dialog-close>Cancel</button>
+
+    </div>
+
+
+  </form>
+</div>

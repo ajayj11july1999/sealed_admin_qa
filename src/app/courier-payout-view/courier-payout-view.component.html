@@ -1,0 +1,75 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+
+
+    <section class="p-3">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 col-lg-4 ">
+            <h6 class="heading  mb-2">PAYMENT DETAILS</h6>
+            <mat-card class="m-0">
+              <mat-card-content style="box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+border-radius: 5px;">
+                <div class="mb-5" >
+                  <p>Courier Name: {{name}}</p>
+                  <p>Date of Payout: {{payoutdetails[0]?.createdAt|date}} </p>
+                  <p>Time of Payout: {{payoutdetails[0]?.createdAt|date:'mediumTime'}}</p>
+                  <!-- <p>Payment Status: <span> -->
+                    <span *ngIf="payoutdetails[0]?.paid; else verified">
+                      <p [ngClass]="{'green':payoutdetails[0]?.paid == true}">Payment Status : Paid</p>
+                    </span>
+                    
+                    <ng-template #verified>
+                      <p [ngClass]="{'red':payoutdetails[0]?.paid != true}"> Payment Status : Pending</p>
+                    
+                    </ng-template>
+                  <!-- </span> -->
+                <!-- </p> -->
+                </div>
+              </mat-card-content>
+            </mat-card>
+            <!-- <div class="card p-3">
+          <div class="mb-5">
+            <p>Courier Name: xxxxxxxx</p>
+            <p>Date of Payout: 27/01/2023</p>
+            <p>Time of Payout: 11:15:20 am</p>
+            <p>Payment Status: Paid</p>
+          </div>
+
+        </div> -->
+          </div>
+          <div class="col-lg-8 ">
+            <h6 class="heading mb-2">Trips Included</h6>
+            <div class="row">
+              <div class="col-md-6 col-sm-6 mb-3" *ngFor="let items of payoutdetails[0]?.ordersDetails;let i=index">
+                <mat-card class="m-0">
+                  <mat-card-content style="background-color: #F4F4F4;border-radius: 5px; box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);">
+                    <div class="mb-1">
+                      <p>Date : {{items.deliveredAt|date}}</p>
+                      <p>Time : {{items.deliveredAt|date:'mediumTime'}}</p>
+                      <p>Order Code : {{items.orderCode}} </p>
+                        
+                    </div>
+                    <div>
+                      <button mat-raised-button class=" viewdetails" (click)="moredetails(items)"> View Details</button>
+                    </div>
+                    <br>
+                    
+                  </mat-card-content>
+                </mat-card>
+
+              </div>
+              
+              
+
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+</div>

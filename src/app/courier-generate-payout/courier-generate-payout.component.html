@@ -1,0 +1,111 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="">
+      <div class="col-lg-8">
+
+
+        <mat-card>
+          <mat-card-content>
+            <form [formGroup]="searchtripDateForm">
+              <div class="row my-3">
+                <label for="text" class="text">ENTER TRIP DATE RANGE</label>
+
+                <div class="col-md-6 col-lg-4 col-sm-12 mt-2 ">
+                  <input type="date" class="form-control" formControlName="fromdate" />
+                </div>
+                <div class="col-md-6 col-lg-4 col-sm-12 mt-2 ">
+                  <input type="date" class="form-control" formControlName="todate" />
+                </div>
+                <div class="col-md-6 col-lg-3 col-sm-12 mt-2">
+                  <div class="searchbtn ">
+                    <button mat-raised-button color="primary" (click)="getCompletedTripList()">SEARCH DATE</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+
+      </div>
+    </div>
+    <ng-container>
+      <mat-card>
+        <mat-card-content>
+
+          <mat-card class="my-3 m-0">
+            <mat-card-content class=" innercard p-2">
+              <div class="row">
+                <div class="col-sm-12 col-md-2 col-lg-3">
+                  <div class="row ">
+                    <div class="col-6 col-md-12 col-lg-12 colheader">
+                      <p class="payoutheading">Number of trips include
+                        in this <br>
+                        payout</p>
+                    </div>
+                    <div class="col-6 col-md-12  col-lg-12 ">
+                      <span>{{totalCount}}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-12 col-md-2 col-lg-2">
+                  <div class=" row">
+                    <div class="col-6 col-md-12 col-lg-12 colheader">
+                      <p class="payoutheading">Total cost of all <br>
+                        Trips</p>
+                    </div>
+                    <div class="col-6 col-md-12 col-lg-12">
+                  <span>₹ {{totalAmount}}</span>
+
+                    </div>
+
+                  </div>
+                </div>
+                <div class="col-sm-12 col-md-2 col-lg-4">
+                  
+                </div>
+                
+                <div class="col-sm-12 col-md-2 col-lg-3 viewbtn ">
+
+                  <div class=" p-2 d-flex flex-wrap gap-2">
+                    <button mat-raised-button mat-flat-button color="primary" class="view" (click)="updatePaymentStatus()">Paid</button>
+                    <button mat-raised-button mat-flat-button color="accent" class="view" (click)="exportPayoutHistory()">Export History</button>
+                  </div>
+
+                </div>
+              </div>
+            </mat-card-content>
+
+
+          </mat-card>
+
+          <div class="row mt-3" *ngIf="completetripdetails?.length">
+            <div class="col-md-4 col-sm-12 " *ngFor="let items of completetripdetails;let i=index;">
+              <mat-card-content style="background: #f4f4f4 !important; border-radius: 5px;">
+                <div class="mb-1">
+                  <p><b>Order Code:</b> {{items?.orderCode}}</p>
+                  <p><b>DeliveryType:</b> {{items?.deliveryType}}</p>
+                  <p><b>Date & Time: </b>{{items?.deliveredAt| date:'dd-mm-yyyy'}} {{items?.deliveredAt |date:'mediumTime'}}</p>
+                  <!-- <p>Time: {{items?.deliveredAt |date:'mediumTime'}} </p> -->
+                  <p><b>Selected Package:</b> {{items?.selectedPackage}}</p>
+                  
+
+                </div>
+                <div>
+                  <button mat-raised-button class=" viewdetails" (click)="moredetails(items)"> View Details</button>
+                </div>
+                <br>
+              </mat-card-content>
+            </div>
+
+            
+          </div>
+          <div *ngIf="!completetripdetails?.length">
+          <div class="text-center"> No Data Found</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+    </ng-container>
+  </div>
+</div>

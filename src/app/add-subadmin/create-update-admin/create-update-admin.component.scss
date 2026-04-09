@@ -1,0 +1,15 @@
+.sub-form {
+  .form-label {
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+  }
+
+  .example-margin {
+    margin-inline-start: 12px;
+  }
+
+  .pt-10 {
+    padding: 10px 0px 10px !important;
+  }
+}

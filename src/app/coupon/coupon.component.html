@@ -1,0 +1,196 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="container-fluid mt-3 ">
+      <div class="row">
+        <div class="col-12 col-padding ">
+          <div class="card card-address ">
+            <div class="p-3 mobile-padding">
+              <div class="container mt-3">
+                <div class="top-header mb-3">
+                  <div>
+                    <h5>Manage Coupon</h5>
+                  </div>
+                  <div>
+
+                  </div>
+
+                </div>
+                <div class="row  p-2 " style="background-color: #F4F4F4;align-items: baseline;">
+
+                  <div class=" col-lg-8 col-md-8 col-4 new-one" (click)="AddModal(addtemplate)">
+                    <div *ngIf="userrole !== 'subadmin' || showAdd"><i class="fa fa-plus-circle me-2"
+                        aria-hidden="true"></i><span class="add-txt">
+                        Add New</span></div>
+                  </div>
+                  <div class="col-lg-4 col-md-4 col-8 text-end">
+                    <div class="search-box">
+                      <input type="text" (input)="searchUserList($event)" class="search-input" placeholder="Search..">
+
+                      <button class="search-button" type="submit" value="search">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+
+
+                <div class="tab_button mt-3">
+                  <button class="samebutton" (click)="copyTable()">Copy </button>
+                  <button class="samebutton" (click)="exportAsXLSX()">CSV </button>
+                  <button class="samebutton" (click)="exportAsPdf()">PDF</button>
+                  <button class="samebutton" (click)="printTable()">Print</button>
+
+                </div>
+                <div class="card-table">
+
+
+                  <table id="table" class="table table-striped mb-5 mt-3" style="width:100% !important">
+                    <thead>
+                      <tr>
+                        <th>Sl.NO</th>
+                        <th> Name</th>
+                        <th>Amount</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Action</th>
+
+
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      <tr *ngFor="let item of databaseList; let i= index;">
+
+                        <td>
+                          {{i+1 + (myPaginator.pageIndex * myPaginator.pageSize) }}
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.name}}> {{item?.name}}</p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.amount}}> {{item?.amount}}</p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.startDate}}> {{item?.startDate | date
+                            :'dd/MM/yyyy'}}</p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.endDate}}> {{item?.endDate | date
+                            :'dd/MM/yyyy'}}</p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.type}}> {{item?.type}}</p>
+
+
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.status}}> {{item?.status}} </p>
+
+                        </td>
+
+                        <td class="">
+                          <div class=" d-flex justify-content-center te1">
+
+                            <i *ngIf="userrole !== 'subadmin' || showEdit" class="fa fa-edit address_edit me-2"
+                              (click)="AddModal(addtemplate);editTerms(item)" style="color:#21aa47"
+                              aria-hidden="true"></i>
+                            <i *ngIf="userrole !== 'subadmin' || showDelete" (click)="deleteUserList(item)"
+                              class="fa fa-trash trash_icon" aria-hidden="true"></i>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div>
+                    <mat-paginator (page)="pageChange($event)" [pageSize]="limit" aria-label="Select page"
+                      [length]="totalCount" #myPaginator>
+                    </mat-paginator>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #addtemplate>
+  <div class="modal-header">
+    <mat-card-title>{{isedit ? 'Edit' : 'Add'}} Coupon</mat-card-title>
+    <button type="button" class="close pull-right" (click)="cancel()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form name="form" #f="ngForm">
+      <div class="row">
+
+        <div class="col-md-4 col-sm-12">
+          <mat-form-field>
+            <input matInput placeholder="Coupon Name" [(ngModel)]="couponform.name" name="name" required
+              #name="ngModel">
+          </mat-form-field>
+        </div>
+        <div class="col-md-4 col-sm-12">
+          <mat-form-field>
+            <input matInput [(ngModel)]="couponform.startDate" name="startDate" required #startDate="ngModel"
+              [matDatepicker]="picker1" placeholder="" placeholder="Start Date">
+            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4 col-sm-12">
+          <mat-form-field>
+            <input matInput [(ngModel)]="couponform.endDate" name="endDate" required #endDate="ngModel"
+              [matDatepicker]="picker2" placeholder="" placeholder="End Date">
+            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+            <mat-datepicker #picker2></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4 col-sm-12">
+          <mat-form-field>
+            <input type="number" [(ngModel)]="couponform.amount" name="amount" required #amount="ngModel" matInput
+              placeholder="Coupon  Amount">
+
+          </mat-form-field>
+        </div>
+
+
+        <div class="col-md-4 col-sm-12">
+          <mat-form-field>
+            <mat-select placeholder="Coupon  Type" [(ngModel)]="couponform.type" name="type" required #type="ngModel">
+              <mat-option value="B2C">B2C</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4 col-sm-12">
+          <mat-form-field>
+            <mat-select placeholder="Status" [(ngModel)]="couponform.status" name="status" required #status="ngModel">
+              <mat-option value="active">Active</mat-option>
+              <mat-option value="inactive">Inactive</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+      </div>
+
+      <div class="row mt-4">
+        <div class="col">
+          <button mat-button mat-flat-button color="primary" (click)="addCoupon(f)">{{isedit ? 'Update' :
+            'Add'}}</button>
+          <button mat-button (click)="cancel()">Cancel</button>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</ng-template>

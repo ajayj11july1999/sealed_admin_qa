@@ -1,0 +1,49 @@
+<div class="container p-0 mt-2">
+
+  <!-- <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom" [disableDefaultUI]="false" [zoomControl]="false"
+    (mapClick)="mapClicked($event)">
+
+    <agm-marker *ngFor="let m of markers; let i = index" (markerClick)="clickedMarker(m.label, i)" [latitude]="m.lat"
+      [longitude]="m.lng" [label]="m.label" [markerDraggable]="m.draggable" (dragEnd)="markerDragEnd(m, $event)">
+
+      <agm-info-window>
+        <strong>InfoWindow content</strong>
+      </agm-info-window>
+
+    </agm-marker>
+
+    <agm-circle [latitude]="lat + 0.3" [longitude]="lng" [radius]="5000" [fillColor]="'red'" [circleDraggable]="true"
+      [editable]="true">
+    </agm-circle>
+
+  </agm-map> -->
+  <div class="text-end p-2">
+    <button mat-raised-button color="primary" (click)="refresh()">Refresh</button>
+
+  </div>
+  <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom" [disableDefaultUI]="false" [zoomControl]="true">
+
+    <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.primaryAddress?.latitude"
+      [longitude]="m?.primaryAddress?.longitude" [iconUrl]="'assets/icons/new-map-icon.gif'"
+      (markerClick)="clickedMarker(m.label, i)" (dragEnd)="markerDragEnd(m, $event)">
+
+      <agm-info-window>
+        <strong>{{m.mobileNo}}</strong><br>
+        <strong>{{m.name}}</strong><br>
+      </agm-info-window>
+
+    </agm-marker>
+
+    <!-- <agm-direction [origin]="origin" [destination]="destination">
+    </agm-direction> -->
+    <!-- <agm-circle [latitude]="lat + 0.3" [longitude]="lng" 
+        [radius]="5000"
+        [fillColor]="'red'"
+        [circleDraggable]="true"
+        [editable]="true">
+    </agm-circle> -->
+
+  </agm-map>
+
+
+</div>

@@ -1,0 +1,202 @@
+.trip {
+    background-color: #21aa47;
+    color: white;
+    border-radius: 5px;
+}
+
+.dash_logo {
+    width: 47px;
+}
+
+.radio {
+
+    font-weight: 300;
+
+}
+
+.new-trip {
+    font-size: 14px;
+    color: white;
+    font-weight: 600;
+
+}
+
+.b2btrips {
+    background: #EDEDF6;
+    // opacity: 0.1;
+    border-radius: 20px;
+}
+
+.trips {
+    background: #F8F8FB;
+}
+
+.b2b {
+    display: flex;
+    justify-content: space-between;
+}
+
+.legend {
+    background: #5D6ADF;
+    ;
+    padding: 5px;
+    margin-top: 5px;
+    border: none;
+    margin-left: 5px;
+}
+
+::ng-deep.rectangle {
+    background-color: #5D6ADF !important;
+    height: 15px;
+    width: 25px;
+    margin-left: 3px;
+}
+
+.rectangleg {
+    background-color: #21aa47;
+    height: 15px;
+    width: 25px;
+    margin-left: 3px;
+}
+
+.tripdetails {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+table {
+    width: 100%;
+    padding: 50px !important;
+}
+
+.mat-elevation-z8,
+.mat-mdc-elevation-specific.mat-elevation-z8 {
+    box-shadow: none;
+}
+
+tr.mat-mdc-header-row.mdc-data-table__header-row.cdk-header-row {
+    background: #004566;
+}
+
+.table-head {
+    color: white;
+}
+
+.pencil-icon {
+    color: #5A5A5F
+}
+
+.delete-icon {
+    color: #FF0C0C;
+}
+
+.mat-mdc-table tbody,
+.mat-mdc-table tfoot,
+.mat-mdc-table thead,
+.mat-mdc-cell,
+.mat-mdc-footer-cell,
+.mat-mdc-header-row,
+.mat-mdc-row,
+.mat-mdc-footer-row,
+.mat-mdc-table .mat-mdc-header-cell {
+    text-align: center;
+    padding: 12px !important;
+}
+
+.trips-graph {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+.search-box {
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: end;
+
+}
+.search-button {
+    text-align: center;
+    height: 35px;
+    //   width: 40px;
+    outline: none;
+    cursor: pointer;
+    border: 2px solid #21aa47;
+    border-radius: 0 10px 10px 0;
+    border-left: none;
+    background: none;
+    color: #21aa47;
+    font-size: 14px;
+    //   border-left: 4px solid #111d5e;
+}
+.search-input {
+    width: 100%;
+    height: 35px;
+    padding: 10px;
+    border: 2px solid #21aa47;
+    border-radius: 10px 0 0 10px;
+    border-right: none;
+    outline: none;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.5);
+
+    background: none;
+}
+input {
+    width: 100%;
+    border: none;
+    // background: #f4f4f4;
+}
+::ng-deep.mat-date-range-input-container {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    background-color: transparent;
+}
+.date-pick{
+    align-items: baseline !important;
+}
+::ng-deep.mat-form-field-infix {
+    // padding: 0.5em 0;
+    border-top: 0px solid transparent;
+}
+::ng-deep.mat-form-field-appearance-fill .mat-form-field-flex {
+        background-color: rgb(237 237 246) !important;
+}
+// #chartdiv {
+//     width: 60%;
+//     height: 100px;
+// }
+ 
+@media (min-width: 320px) and (max-width: 767px) {
+
+    .con-padding {
+        padding: 0px;
+    }
+
+    p {
+        font-size: 12px;
+    }
+
+    input {
+        font-size: 12px;
+    }
+
+    #chartdiv {
+        width: 60%;
+        height: 100px;
+    }
+
+    g[opacity="0.4"] {
+        display: none;
+    }
+#chartdiv1 {
+    width: 60%;
+    height: 100px;
+}
+
+g[opacity="0.4"] {
+    display: none;
+}
+}

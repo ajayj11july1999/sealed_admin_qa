@@ -1,0 +1,466 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-6 col-lg-6 col-sm-12">
+          <div style="padding: 10px 0px;">
+            <h6 class=" px-3">Trip Details</h6>
+          </div>
+          <mat-card class="m-0">
+            <mat-card-content>
+              <div class="row ">
+                <div class="text-center header mb-3">
+                  {{tripDetails?.deliveryType}}
+                </div>
+                <div class="col-7">
+                  <p>{{tripDetails?.selectedPackage}}</p>
+                </div>
+                <div class="col-5">
+                  <p>Distance: {{tripDetails?.totalKms | number : '1.0-2'}} km</p>
+                </div>
+              </div>
+              <div class="row ">
+                <div class="col-7">
+                  
+                  <p *ngIf="tripDetails?.orderStatus=='new'">Time: {{tripDetails?.newAt | date:'mediumTime'}}<br>
+                    <span>Date: {{tripDetails?.newAt |date}}</span>
+                  </p>
+                  <p *ngIf="tripDetails?.orderStatus=='orderAssigned'">Time: {{tripDetails?.assignedAt |
+                    date:'mediumTime'}}<br>
+                    <span>Date: {{tripDetails?.assignedAt |date}}</span>
+                  </p>
+                  <p *ngIf="tripDetails?.orderStatus=='orderInProgress'">Time: {{tripDetails?.inProgressAt |
+                    date:'mediumTime'}}<br>
+                    <span>Date: {{tripDetails?.inProgressAt |date}}</span>
+                  </p>
+                  <p *ngIf="tripDetails?.orderStatus=='orderPickedUped'">Time: {{tripDetails?.pickUpedAt |
+                    date:'mediumTime'}}<br>
+                    <span>Date: {{tripDetails?.pickUpedAt |date}}</span>
+                  </p>
+                  <p *ngIf="tripDetails?.orderStatus=='delivered'">Time: {{tripDetails?.deliveredAt |
+                    date:'mediumTime'}}<br>
+                    <span>Date: {{tripDetails?.deliveredAt |date}}</span>
+                  </p>
+                  <p *ngIf="tripDetails?.orderStatus=='cancelled'">Time: {{tripDetails?.cancelledAt |
+                    date:'mediumTime'}}<br>
+                    <span>Date: {{tripDetails?.cancelledAt |date}}</span>
+                  </p>
+                </div>
+                <div class="col-5">
+                  <p>Payment Mode: {{tripDetails?.paymentMode | uppercase}}</p>
+<p>Payment Status: {{tripDetails?.paymentStatus | titlecase}}</p>
+                  
+                  <!-- <p>Extra Charges : {{tripDetails?.extraCharges}}</p>
+                  <p>Wastage KM :{{}}</p> -->
+                </div>
+              </div>
+              <div class="row ">
+                <div class="col-7">
+                  <p *ngIf="tripDetails?.orderStatus == 'new'">Status: New</p>
+                  <p *ngIf="tripDetails?.orderStatus == 'orderPickedUped'">Status: Order Pickuped</p>
+                  <p *ngIf="tripDetails?.orderStatus == 'orderInProgress'">Status: Order InProgress </p>
+                  <p *ngIf="tripDetails?.orderStatus == 'orderAssigned'">Status: Order Assigned </p>
+                  <p *ngIf="tripDetails?.orderStatus == 'delivered'">Status: Delivered </p>
+                  <p *ngIf="tripDetails?.orderStatus == 'cancelled'">Status: Cancelled </p>
+                </div>
+                <div class="col-5">
+                </div>
+              </div>
+              <div class="row ">
+                <div class="col-7">
+                  <p>Cost: ₹ {{tripDetails?.amountDetails?.finalAmount}}</p>
+                </div>
+                <div class="col-5">
+                  <div *ngIf="tripDetails?.orderStatus =='new'">
+                    <button mat-button mat-flat-button color="danger" class="tripbtn left" (click)="canceltrip()">Cancel
+                      Trip</button>
+                  </div>
+                  <div
+                    *ngIf="tripDetails?.orderStatus =='orderAssigned'|| tripDetails?.orderStatus =='orderInProgress'||tripDetails?.orderStatus =='orderPickedUped'">
+
+                    <button mat-button mat-flat-button color="primary" class="tripbtn left"
+                      (click)="deliveredOrder()">Deliver Order</button>
+                  </div>
+
+                </div>
+              </div>
+              <div class="text-center mt-2" *ngIf="tripDetails?.orderStatus =='orderAssigned'">
+                <button mat-button mat-flat-button color="danger" class="tripbtn left me-2"
+                  (click)="removeDeliveryMan()">Remove Courier
+                  Partner</button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+          <mat-card class="m-0 mt-3">
+            <mat-card-content class="p-3 my-3">
+              <div class="text-center header mb-2">
+                Courier Information
+              </div>
+              <div class="row mb-3">
+                <div class="col-7">
+                  <div class="row">
+                    <div class="col-6 pe-0">
+                      <td class="">
+                        <p>Name:</p>
+                      </td>
+                    </div>
+                    <div class="col-6  pe-0">
+                      <td class="">
+                        <p>{{tripDetails?.deliveryManDetails?.name}}</p>
+                      </td>
+                    </div>
+                  </div>
+                  <div class="row ">
+                    <div class="col-6  pe-0">
+                      <td class="">
+                        <p>Phone:</p>
+                      </td>
+                    </div>
+                    <div class="col-6  pe-0">
+                      <td class="">
+                        <p>{{tripDetails?.deliveryManDetails?.mobileNo}}</p>
+                      </td>
+                    </div>
+                  </div>
+                  <div class="row ">
+                    <div class="col-6 pe-0">
+                      <td class="">
+                        <p>Verification:</p>
+                      </td>
+                    </div>
+                    <div class="col-6 pe-0">
+                      <td class="">
+
+                        <div *ngIf="tripDetails?.deliveryManDetails?.isVerified; else verified">
+                          <p [ngClass]="{'green':tripDetails?.deliveryManDetails?.isVerified == true}">verified</p>
+                        </div>
+                        <ng-template #verified>
+                          <p [ngClass]="{'red': tripDetails?.deliveryManDetails?.isVerified != true}">unverified</p>
+                        </ng-template>
+                      </td>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-5">
+                  <div class="text-center">
+                    <img
+                      [src]="tripDetails?.deliveryManDetails?.imgUrl? tripDetails?.deliveryManDetails?.imgUrl :'assets/images/custm-nbb/user_dummy.png'"
+                      alt="" style="width: 80px;height:80px;border-radius:50%">
+
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <div class="col-md-6 col-lg-6 col-sm-12">
+          <div style="padding: 10px 0px;">
+            <h6 class=" px-3">Details</h6>
+          </div>
+          <mat-card class="m-0">
+            <mat-card-content>
+              <div class=" address_details ">
+                <div class="row">
+                  <div class="centertext"><b>Customer Info</b></div>
+                  <div class="mb-1">
+                    <div class="row-wrap d-flex">
+                      <div class="col-6 ">
+                        <b>Name :</b><br>
+                      </div>
+                      <div class="col-6mb-3">
+                        <span class="address">
+                          {{tripDetails?.userDetails?.name}}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="row-wrap d-flex">
+                      <div class="col-6 ">
+                        <b>Contact Number :</b><br>
+                      </div>
+                      <div class="col-6 ">
+                        <span class="address">
+                          {{tripDetails?.userDetails?.mobileNo}}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="centertext"><b>Pickup Info</b></div>
+                  <div *ngIf="tripDetails?.pickupAddress.length == 1">
+                    <div class="col-12 mb-3" *ngFor="let pickup of tripDetails?.pickupAddress;let j=index">
+
+                      <span class="address">
+
+                        {{pickup?.fullAddress}}
+
+                      </span>
+                      <br>
+                      <b>Type : </b> {{pickup?.addressType ? pickup.addressType : 'Home'}} <br>
+                      <span class="address"> <b> LandMark :</b> {{pickup?.landMark}}</span>
+                      <br>
+
+                      <div class="row-wrap d-flex">
+                        <div class="col-6 d-flex">
+                          <span><b>Contact Person :</b><br>
+                            <b>Contact Person Number :</b></span>
+                        </div>
+                        <div class="col-6 d-flex">
+                          <span>{{pickup?.contactPerson}}<br>
+                            {{pickup?.contactPersonNumber}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="tripDetails?.pickupAddress.length > 1">
+                    <mat-card *ngFor="let pickup of tripDetails?.pickupAddress;let j=index">
+                      <div class="col-12 mb-3">
+
+                        <span class="address">
+                          {{pickup?.fullAddress}}
+
+                        </span>
+                        <br>
+                        <b>Type : </b> {{pickup?.addressType ? pickup.addressType : 'Home'}}<br>
+                        <span class="address"> <b>LandMark :</b> {{pickup?.landMark}}</span>
+                        <br>
+
+                        <div class="row-wrap d-flex">
+                          <div class="col-6 d-flex">
+                            <span><b>Contact Person :</b><br>
+                              <b>Contact Person Number :</b></span>
+                          </div>
+                          <div class="col-6 d-flex">
+                            <span>{{pickup?.contactPerson}}<br>
+                              {{pickup?.contactPersonNumber}}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </mat-card>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="centertext"><b>Drop-off Info</b></div>
+                  <div *ngIf="tripDetails?.dropAddress.length == 1">
+                    <div class="col-12 dropinfo mb-3" *ngFor="let drop of tripDetails?.dropAddress;let j=index">
+                      <div class="p-1">
+
+
+                        <span class="address">
+                          {{drop?.fullAddress}}
+                          <!-- {{drop?.street}} {{drop?.city}}
+                        {{drop?.state}} {{drop?.country}}
+                        {{drop?.postalCode}} -->
+                        </span>
+                        <br>
+                        <b>Type : </b>{{drop?.addressType ? drop.addressType : 'Home'}}<br>
+                        <span class="address"><b>Landmark : </b>{{drop?.landMark}}</span><br>
+
+                        <div class="row-wrap d-flex" *ngIf="drop?.contactPerson.length">
+                          <div class="col-6 d-flex">
+                            <span><b>Contact Person :</b><br>
+                              <b>Contact Person Number :</b></span>
+                          </div>
+                          <div class="col-6 d-flex">
+                            <span>{{drop?.contactPerson}}<br>
+                              {{drop?.contactPersonNumber}}</span>
+                          </div>
+                        </div>
+                        <div class="row-wrap d-flex mt-3" *ngIf="!drop?.contactPerson.length">
+                          <div class="col-6 d-flex">
+                            <span><b>Contact Person :</b><br>
+                              <b>Contact Person Number :</b></span>
+                          </div>
+                          <div class="col-6 d-flex">
+                            <span>No Data<br>
+                              No Data</span>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="tripDetails?.dropAddress.length > 1">
+                    <mat-card class="dropinfo m-0" *ngFor="let drop of tripDetails?.dropAddress;let j=index">
+                      <div>
+                        <div class="col-12  mb-3">
+
+                          <span class="address">
+                            {{drop?.fullAddress ? drop?.fullAddress :"-"}}
+                          </span>
+                          <br>
+                          <b>Type : </b>{{ drop?.addressType ? drop.addressType : 'Home'}} <br>
+                          <span class="address"><b>Landmark : </b> {{drop?.landMark ? drop?.landMark :'-'}}</span>
+
+                          <div class="row-wrap d-flex mt-3" *ngIf="drop?.contactPerson.length">
+                            <div class="col-6 d-flex">
+                              <span><b>Contact Person :</b><br>
+                                <b>Contact Person Number :</b></span>
+                            </div>
+                            <div class="col-6 d-flex">
+                              <span>{{drop?.contactPerson}}<br>
+                                {{drop?.contactPersonNumber}}</span>
+                            </div>
+                          </div>
+                          <div class="row-wrap d-flex mt-3" *ngIf="!drop?.contactPerson.length">
+                            <div class="col-6 d-flex">
+                              <span><b>Contact Person :</b><br>
+                                <b>Contact Person Number :</b></span>
+                            </div>
+                            <div class="col-6 d-flex">
+                              <span>No Data<br>
+                                No Data</span>
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                    </mat-card>
+                  </div>
+                </div>
+                <div class="row-wrap d-flex">
+                  <div class="col-6 mb-3">
+                    <b>Total Distance :</b><br>
+                  </div>
+                  <div class="col-6 mb-3">
+                    <span class="address">
+                      {{tripDetails?.totalKms | number : '1.0-2'}} km
+                    </span>
+                  </div>
+                </div>
+                <div class="row-wrap d-flex">
+                  <div class="col-6 mb-3">
+                    <b>Wastage Distance :</b><br>
+                  </div>
+                  <div class="col-6 mb-3">
+                    <span class="address">
+                      {{tripDetails?.baseKm}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid p-0 mt-2">
+      <div>
+<agm-map 
+  *ngIf="origin && destination"
+  [latitude]="origin?.lat" 
+  [longitude]="origin?.lng" 
+  [zoom]="12">
+
+  <!-- Courier route -->
+  <agm-direction
+    *ngIf="delivery && origin"
+    [origin]="delivery"
+    [destination]="origin"
+    travelMode="TWO_WHEELER">
+  </agm-direction>
+
+  <!-- Main trip route -->
+  <agm-direction
+    *ngIf="origin && destination"
+    [origin]="origin"
+    [destination]="destination"
+    [waypoints]="waypoints"
+    travelMode="WALKING"
+    [optimizeWayPoints]="true">
+  </agm-direction>
+
+</agm-map>
+
+
+
+
+      </div>
+
+
+
+
+      <div class="image_section" *ngIf="tripDetails?.files?.length>=1">
+        <mat-card class=" p-0">
+          <div class="row-wrap d-flex viewheight">
+            <div class="col-4  px-3" *ngFor="let item of tripDetails?.files;let i=index">
+
+              <div class="text-center">
+                <img class="img-fluid" [src]="item" style="width: 100%; height:300px" alt="">
+
+              </div>
+
+            </div>
+          </div>
+
+        </mat-card>
+      </div>
+
+    </div>
+    <div class="container-fluid ">
+      <div class="trip my-2">
+        <h6 class="px-3 ">Delivery Logs</h6>
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-md-6 col-lg-3">
+          <mat-card>
+            <mat-card-content class="">
+              <div class="tripdetail">
+
+
+                <h4 class="header "><b>Trip Created</b></h4>
+                <div class="mt-2">
+                  <h4 class="datetime ">{{tripDetails?.createdAt| date }} <br>
+                    {{tripDetails?.createdAt | date:'mediumTime' }}</h4>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+        </div>
+        <div class="col-sm-6 col-md-6 col-lg-3 ">
+          <mat-card>
+            <mat-card-content class="">
+
+              <div class="tripdetail">
+
+                <h4 class="header  "><b>Trip active Courier
+                    has been assigned</b></h4>
+                <div class="mt-2">
+                  <h4 class="datetime ">{{tripDetails?.assignedAt | date}} <br>
+                    {{tripDetails?.assignedAt | date:'mediumTime'}}</h4>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <div class="col-sm-6 col-md-6 col-lg-3">
+          <mat-card>
+            <mat-card-content class=" ">
+              <div class="tripdetail">
+                <h4 class="header  "><b>In Progress</b></h4>
+                <div class="mt-2">
+                  <h4 class="datetime  ">{{tripDetails?.inProgressAt| date}} <br>
+                    {{tripDetails?.inProgressAt |date:'mediumTime'}}</h4>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <div class="col-sm-6 col-md-6 col-lg-3 ">
+          <mat-card>
+            <mat-card-content>
+              <div class="tripdetail">
+                <h4 class="header"><b>Pickup completed</b></h4>
+                <div class="mt-2">
+                  <h4 class="datetime  ">{{tripDetails?.deliveredAt| date}} <br>
+                    {{tripDetails?.deliveredAt| date:'mediumTime'}}</h4>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

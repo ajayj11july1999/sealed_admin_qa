@@ -1,0 +1,190 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="container-fluid mt-3">
+      <div class="row ">
+        <span><i class="fa fa-arrow-left" aria-hidden="true" (click)="returntocustomers()"></i></span>
+      </div>
+    </div>
+    <div class="container-fluid p-3">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-7">
+          <mat-card class="m-0 mb-3">
+            <mat-card-content>
+              <div class=" mb-2">
+                <h4 class="text-center heading">Customer Details</h4>
+                <div class="row">
+                  <h5 class="header">Name: {{userdetails?.name}}</h5>
+                  <h5 class="header">Phone: {{userdetails?.mobileNo}}</h5>
+                  <h5 class="header">Email: {{userdetails?.email}}</h5>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+          <mat-card class="m-0">
+            <mat-card-content>
+              <div class="mb-2">
+                <div class="">
+                  <div class="text-center">
+                    <h4 class=" heading">Trips</h4>
+                  </div>
+                  <!-- <div class="col-5">
+                    <div class="input-group ">
+                      <input type="text" class="form-control" placeholder="order id" aria-label="Search"
+                        (input)="searchtrip($event)" aria-describedby="basic-addon2">
+                      <button class="btn search-btn" type="button"><i class="fa fa-search"></i></button>
+                    </div>
+                  </div> -->
+                </div>
+                <div class="row">
+                  <div class="col-sm-6 col-md-6 col-lg-6 mb-2 activetrip">
+                    <div>
+                      <h5 class="heading">Active trips</h5>
+                      <button *ngIf="!load && activetrip?.length" mat-raised-button color="primary"
+                        (click)="loadActive()" class="green mb-2">Load</button>
+                    </div>
+                    <div *ngIf="activetrip?.length ">
+                      <div *ngIf="load">
+                        <mat-card class="m-0 mb-3" *ngFor="let item of activetrip; let i = index">
+                          <mat-card-content class="p-0">
+                            <div class=" trip p-1">
+                              <div class="my-2">
+                                <h6 class="text-center"><b>{{item?.createdAt | date}} {{item?.createdAt |
+                                    date:'mediumTime'}} {{item?.orderCode}}</b></h6>
+                              </div>
+                              <div class="px-1 ">
+                                <div class="col-sm-8 col-md-8">
+                                  <h5 class="tripheader">{{item?.deliveryType}}</h5>
+                                  <div class="green p-2 mb-2">
+                                    <h6> Time: {{item?.createdAt | date:'mediumTime'}} </h6>
+                                    <h6>Date: {{item?.createdAt | date}} </h6>
+                                  </div>
+                                  <h6>Trip Distance: {{item?.totalKms}} km</h6>
+                                </div>
+                                <div class="row p-2">
+                                  <div class="col-sm-4 col-md-6  col-lg-6 p-1">
+                                    <div class="green p-1">
+                                      <h6 style="font-size: 12px;"><b>FROM</b></h6>
+                                     <h6 *ngFor="let addr of item?.pickupAddress">
+  {{addr?.fullAddress || 'Address not available'}}
+</h6>
+                                    </div>
+                                  </div>
+                                  <div class="col-sm-4 col-md-6  col-lg-6 p-1">
+                                    <div class="green p-1">
+                                      <h6 style="font-size: 12px;"><b>TO </b></h6>
+                                      <h6 *ngFor="let addr of item?.dropAddress">
+  {{addr?.fullAddress || 'Address not available'}}
+</h6>
+                                    </div>
+                                  </div>
+                                </div>
+                                  <h6>Courier assigned:{{item?.deliveryManDetails?.name || 'Not Assigned'}}</h6>                                
+                                <h6>Trip Cost: ₹{{item?.amountDetails?.finalAmount}}</h6>
+                               <h6>Payment: {{item?.paymentMode | uppercase}}</h6>
+                                <div class="text-center my-3">
+                                  <button mat-raised-button class="blue px-3" (click)="moredetails(item)">MORE
+                                    DETAILS</button>
+                                </div>
+                              </div>
+                            </div>
+                          </mat-card-content>
+                        </mat-card>
+                      </div>
+                    </div>
+                    <div *ngIf="!activetrip?.length">
+                      <tr>No results found.</tr>
+                    </div>
+                  </div>
+                  <div class="col-sm-6 col-md-6 col-lg-6 mb-2 completetrip">
+                    <div>
+                      <h5 class="heading">Completed trips </h5>
+                      <button *ngIf="!load1 && completetrip?.length" mat-raised-button color="primary"
+                        (click)="loadComplete()" class="green mb-2">Load</button>
+                    </div>
+                    <div *ngIf="load1">
+                      <mat-card class="m-0 mb-3" *ngFor="let item of completetrip; let i = index">
+                        <mat-card-content class="p-0">
+                          <div class=" trip p-1">
+                            <div class="my-2">
+                              <h6 class="text-center"><b>{{item?.createdAt | date}} {{item?.createdAt |
+                                  date:'mediumTime'}} {{item?.orderCode}}</b></h6>
+                            </div>
+                            <div class="px-1 ">
+                              <div class="col-sm-8 col-md-8">
+                                <h5 class="tripheader">{{item?.deliveryType}}</h5>
+                                <div class="green p-2 mb-2">
+                                  <h6> Time: {{item?.createdAt | date:'mediumTime'}} </h6>
+                                  <h6>Date: {{item?.createdAt | date}} </h6>
+                                </div>
+                                <h6>Trip Distance: {{item?.totalKms}} km</h6>
+                              </div>
+                              <div class="row p-2">
+                                <div class="col-sm-4 col-md-6  col-lg-6 p-1">
+                                  <div class="green p-1">
+                                    <h6 style="font-size: 12px;"><b>FROM</b></h6>
+                                  <h6 *ngFor="let addr of item?.pickupAddress">
+  {{addr?.fullAddress || 'Address not available'}}
+</h6>
+                                  </div>
+                                </div>
+                                <div class="col-sm-4 col-md-6  col-lg-6 p-1">
+                                  <div class="green p-1">
+                                    <h6 style="font-size: 12px;"><b>TO </b></h6>
+                                     <h6 *ngFor="let addr of item?.dropAddress">
+  {{addr?.fullAddress || 'Address not available'}}
+</h6>
+                                  </div>
+                                </div>
+                              </div>
+                              <h6>Courier assigned:{{item?.deliveryManDetails?.name || 'Not Assigned'}}</h6>
+                              <h6>Trip Cost: ₹{{item?.amountDetails?.finalAmount}}</h6>
+                              <h6>Payment: {{item?.paymentMode | uppercase}}</h6>
+                              <div class="text-center my-3">
+                                <button mat-raised-button class="blue px-3" (click)="moredetails(item)">MORE
+                                  DETAILS</button>
+                              </div>
+                            </div>
+                          </div>
+                        </mat-card-content>
+                      </mat-card>
+                    </div>
+                    <div *ngIf="!completetrip?.length">
+                      <tr>No results found.</tr>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-5">
+          <mat-card class="m-0 ">
+            <mat-card-content *ngIf="userdetails?.addressDetails.length">
+              <div class="" *ngFor="let items of userdetails?.addressDetails">
+                <h4 class="text-center heading"> Customer Address</h4>
+                <div class="">
+                  <h4 class="heading">{{items.address.addressType}}</h4>
+                  <div>
+                    <p class="header">
+                      {{items.address.fullAddress}} 
+                    </p>
+                    <p class="header">
+                      <b> Contact Person:</b>{{items.address.contactPerson}}
+                      <br>
+                      <b> Contact Person Number:</b>{{items.address.contactPersonNumber}}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!userdetails?.addressDetails.length">
+                No Data
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

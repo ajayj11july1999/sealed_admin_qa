@@ -1,0 +1,127 @@
+<div class="container-fluid mt-3">
+
+  <!-- HEADER -->
+  <div class="d-flex justify-content-between mb-3">
+    <h4>Manage Zones</h4>
+
+    <button class="btn btn-primary" (click)="enableDraw()">
+      <i class="fa fa-plus-circle me-2"></i> Draw Zone
+    </button>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="text-end mb-2">
+    <input
+      #searchInput
+      type="text"
+      class="form-control w-25 d-inline-block"
+      placeholder="Search zone..."
+    />
+  </div>
+
+  <!-- PREVIEW ACTION -->
+  <div *ngIf="previewZone" class="mb-3 text-end">
+    <button
+      class="btn btn-success me-2"
+      (click)="saveZone()"
+      [disabled]="loading"
+    >
+      Save Zone
+    </button>
+
+    <button class="btn btn-secondary" (click)="cancelPreview()">
+      Cancel
+    </button>
+  </div>
+
+  <!-- MAP -->
+  <div class="mb-4">
+    <div id="map" style="height:350px;width:100%; border-radius:10px;"></div>
+  </div>
+
+  <!-- DELIVERY PARTNERS LIST -->
+  <div *ngIf="selectedDeliveryList && selectedDeliveryList.length > 0" class="mb-4">
+    <h5>
+  Zone: {{ selectedZoneName }}
+</h5>
+   
+    <ul class="list-group">
+      <li *ngFor="let partner of selectedDeliveryList" class="list-group-item partner-item">
+        <strong class="partner-name">{{ partner.name }}</strong>
+        <p>📞 {{ partner.mobileNo || 'No mobile' }}</p>
+        <p><b>🚗 Vehicle:</b> {{ partner.vehicleDetails?.name || 'No Vehicle Assigned' }}</p>
+        <!-- <p><b>Base Price:</b> ₹{{ partner.vehicleDetails?.basePrice || '-' }}</p>
+        <p><b>Per KM:</b> ₹{{ partner.vehicleDetails?.perkm || '-' }}</p> -->
+        <p><b>📍 Zone:</b> {{ partner.zoneDetails?.zoneName || 'No zone' }}</p>
+      </li>
+    </ul>
+    <!-- <ul class="list-group">
+      <li *ngFor="let partner of selectedDeliveryList" class="list-group-item">
+        {{ partner.name }} - {{ partner.mobileNo || 'No mobile' }}
+      </li>
+    </ul> -->
+  </div>
+
+  <!-- ZONE TABLE -->
+  <table class="table table-bordered table-striped">
+
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Zone Name</th>
+        <th>Status</th>
+        <th class="text-center">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      <tr *ngFor="let zone of zones; let i = index">
+
+        <td>{{ i + 1 + (offset * limit) }}</td>
+
+        <td>{{ zone.zoneName }}</td>
+
+        <td>
+          <span
+            class="badge"
+            [ngClass]="zone.isActive ? 'bg-success' : 'bg-danger'"
+          >
+            {{ zone.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </td>
+
+        <td class="text-center">
+
+          <!-- STATUS TOGGLE -->
+          <i
+            class="fa"
+            [ngClass]="zone.isActive ? 'fa-toggle-on text-success' : 'fa-toggle-off text-secondary'"
+            style="cursor:pointer;font-size:20px"
+            (click)="toggleZone(zone)"
+          ></i>
+
+          <!-- DELETE -->
+         <i
+  class="fa fa-trash delete-icon"
+  (click)="deleteZone(zone)"
+></i>
+
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+  <!-- PAGINATION -->
+   <mat-paginator
+  [length]="totalCount"
+  [pageSize]="10"
+  [pageSizeOptions]="[10]"
+  (page)="pageChange($event)">
+</mat-paginator>
+ 
+
+</div>

@@ -1,0 +1,284 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <div class="row">
+          <div class="col-md-6">
+            <mat-card-title>Reports</mat-card-title>
+          </div>
+          <!-- <div class="col-md-6">
+            <div class="text-right">
+              <button mat-raised-button color="primary" (click)="AddModal(addtemplate)">Add</button>
+            </div>
+          </div> -->
+        </div>
+        <div class="row">
+          <div class="col-md-4 col-sm-12">
+            <mat-form-field>
+              <mat-select placeholder="Diet Plan">
+                <mat-option value="option">Balanced</mat-option>
+                <mat-option value="option">Low Carb</mat-option>
+                <mat-option value="option">Vegetarian</mat-option>
+                <mat-option value="option">KETO</mat-option>
+
+              </mat-select>
+            </mat-form-field>
+
+          </div>
+          <div class="col-md-4 col-sm-12">
+            <mat-form-field>
+              <mat-select placeholder="City">
+                <mat-option value="option">Balanced</mat-option>
+                <mat-option value="option">Low Carb</mat-option>
+                <mat-option value="option">Vegetarian</mat-option>
+                <mat-option value="option">KETO</mat-option>
+
+              </mat-select>
+            </mat-form-field>
+
+          </div>
+          <div class="col-md-4 col-sm-12">
+            <mat-form-field>
+              <mat-select placeholder="Payment Mode">
+                <mat-option value="option">Balanced</mat-option>
+                <mat-option value="option">Low Carb</mat-option>
+                <mat-option value="option">Vegetarian</mat-option>
+                <mat-option value="option">KETO</mat-option>
+
+              </mat-select>
+            </mat-form-field>
+
+          </div>
+          <!-- <div class="col-md-4 col-sm-12">
+            <mat-form-field>
+              <input matInput placeholder="Days">
+            </mat-form-field>
+          </div> -->
+
+          <div class="col-md-4 col-sm-12">
+            <mat-form-field>
+              <mat-label>Enter Start Date and Expiry Date</mat-label>
+              <mat-date-range-input [rangePicker]="Rangepicker">
+                <input matStartDate placeholder="Start date">
+                <input matEndDate placeholder="Expiry date">
+              </mat-date-range-input>
+              <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+              <mat-datepicker-toggle matIconSuffix [for]="Rangepicker"></mat-datepicker-toggle>
+              <mat-date-range-picker #Rangepicker></mat-date-range-picker>
+            </mat-form-field>
+          </div>
+
+        </div>
+        <div class="row mt-2">
+          <div class="col">
+            <button mat-button mat-flat-button color="primary">Search</button>
+            <button mat-button>Clear</button>
+          </div>
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row wrap">
+  <div fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <div class="row">
+          <div class="col-md-6">
+            <mat-card-title>Reports</mat-card-title>
+          </div>
+          <!-- <div class="col-md-6">
+            <div class="text-right">
+              <button mat-raised-button color="primary" (click)="AddModal(addtemplate)">Add</button>
+            </div>
+          </div> -->
+
+        </div>
+
+        <div class="table-responsive">
+          <table mat-table [dataSource]="dataSource" class="table employee-list no-wrap">
+
+            <ng-container matColumnDef="#">
+              <th mat-header-cell *matHeaderCellDef> # </th>
+              <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="order_id">
+              <th mat-header-cell *matHeaderCellDef> Order Id </th>
+              <td mat-cell *matCellDef="let element">
+                <div class="d-flex">
+                  <!-- <img class="mat-card-avatar" [src]='element.imagePath'> -->
+                  <div class="m-l-15">
+                    <p class="font-medium m-b-0 m-t-0">{{ element.order_id }}</p>
+                    <!-- <small class="text-muted">{{element.Position}}</small> -->
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="order_date">
+              <th mat-header-cell *matHeaderCellDef> Order Date </th>
+              <td mat-cell *matCellDef="let element"> {{element.order_date}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="customer_id">
+              <th mat-header-cell *matHeaderCellDef> Customer Id </th>
+              <td mat-cell *matCellDef="let element"> {{element.customer_id}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="diet_plan_id">
+              <th mat-header-cell *matHeaderCellDef>Diet Plan Id </th>
+              <td mat-cell *matCellDef="let element"> {{element.diet_plan_id}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="price">
+              <th mat-header-cell *matHeaderCellDef> Price </th>
+              <td mat-cell *matCellDef="let element"> {{element.price}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="discount">
+              <th mat-header-cell *matHeaderCellDef> Discount </th>
+              <td mat-cell *matCellDef="let element"> {{element.discount}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="addition_charges">
+              <th mat-header-cell *matHeaderCellDef> Additional Charges </th>
+              <td mat-cell *matCellDef="let element"> {{element.addition_charges}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="delivery_charges">
+              <th mat-header-cell *matHeaderCellDef> Delivery Charges </th>
+              <td mat-cell *matCellDef="let element"> {{element.delivery_charges}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="vat">
+              <th mat-header-cell *matHeaderCellDef> Vat </th>
+              <td mat-cell *matCellDef="let element"> {{element.vat}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="total_amount">
+              <th mat-header-cell *matHeaderCellDef> Total Amount </th>
+              <td mat-cell *matCellDef="let element"> {{element.total_amount}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="delivery_address">
+              <th mat-header-cell *matHeaderCellDef> Delivery Address </th>
+              <td mat-cell *matCellDef="let element"> {{element.delivery_address}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="billing_address">
+              <th mat-header-cell *matHeaderCellDef> Billing Address </th>
+              <td mat-cell *matCellDef="let element"> {{element.billing_address}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="payment_mode">
+              <th mat-header-cell *matHeaderCellDef> Payment Mode </th>
+              <td mat-cell *matCellDef="let element"> {{element.payment_mode}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="payment_status">
+              <th mat-header-cell *matHeaderCellDef> Payment Status </th>
+              <td mat-cell *matCellDef="let element"> {{element.payment_status}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="payment_reference">
+              <th mat-header-cell *matHeaderCellDef> Payment Reference </th>
+              <td mat-cell *matCellDef="let element"> {{element.payment_reference}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="created_at">
+              <th mat-header-cell *matHeaderCellDef> Created Date </th>
+              <td mat-cell *matCellDef="let element"> {{element.created_at}} </td>
+            </ng-container>
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef> Action </th>
+              <td mat-cell *matCellDef="let element" class="action-link">
+                <!-- <a (click)="AddModal(addtemplate)" class="m-r-10 cursor-pointer"><i class="fa fa-pencil"></i></a> -->
+                <a (click)="openDialog('Delete',element)" class="m-r-10 cursor-pointer">
+                  <i class="fa fa-trash text-danger"></i>
+                </a>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+          <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<ng-template #addtemplate>
+  <!-- <ngx-spinner size="medium" color="#F39201" type="square-jelly-box" [fullScreen]="true">
+    <p style="color: #F39201;font-weight: 600;"> Loading... </p>
+  </ngx-spinner> -->
+  <div class="modal-header">
+    <mat-card-title>Add Coupon</mat-card-title>
+    <!-- <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button> -->
+  </div>
+  <div class="modal-body">
+    <div class="row">
+
+      <div class="col-md-4 col-sm-12">
+        <mat-form-field>
+          <input matInput placeholder="Coupon Code">
+        </mat-form-field>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <mat-form-field>
+          <!-- <mat-label>Start Date</mat-label> -->
+          <input matInput [matDatepicker]="picker" placeholder="Start Date">
+          <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-4 col-sm-12">
+        <mat-form-field>
+          <!-- <mat-label>Expiry Date</mat-label> -->
+          <input matInput [matDatepicker]="endpicker" placeholder="Expiry Date">
+          <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
+          <mat-datepicker-toggle matIconSuffix [for]="endpicker"></mat-datepicker-toggle>
+          <mat-datepicker #endpicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-4 col-sm-12">
+        <mat-form-field>
+          <input matInput placeholder="Discount Amount">
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-4 col-sm-12">
+        <mat-form-field>
+          <input matInput placeholder="Discount Percent">
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-4 col-sm-12">
+        <mat-form-field>
+          <mat-select placeholder="Status">
+            <mat-option value="option">Active</mat-option>
+            <mat-option value="option">Inactive</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col">
+        <button mat-button mat-flat-button color="primary">Add</button>
+        <button mat-button (click)="modalRef.hide()">Cancel</button>
+      </div>
+    </div>
+
+
+  </div>
+</ng-template>

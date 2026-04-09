@@ -1,0 +1,139 @@
+<!-- <div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+
+
+
+
+    <div class="container-fluid mt-3 ">
+      <div class="row">
+        <div class="col-12 col-padding ">
+          <div class="card card-address ">
+            <div class="p-3 mobile-padding">
+
+              <div class="contain mt-3">
+                <div class="text-end mb-3">
+
+                </div>
+                <div class="row  p-2 " style="background-color: #F4F4F4;align-items: baseline;">
+                  
+                  <div class=" col-lg-8 col-md-8 col-4 new-one" (click)="addRestaurant()">
+                    <i class="fa fa-plus-circle me-2" aria-hidden="true"></i><span class="add-txt">Add
+                      Restaurant</span>
+                  </div>
+                  <div class="col-lg-4 col-md-4 col-8 text-end">
+                    <div class="search-box">
+                      <input type="text" (input)="searchUserList($event)" class="search-input" placeholder="Search..">
+
+                      <button class="search-button" type="submit" value="search">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+                  </div>
+
+
+                </div>
+
+
+                <div class="card-table">
+
+
+                  <table class="table table-striped mb-5 mt-3" style="width:100% !important">
+                    <thead>
+                      <tr>
+                        <th>Sl.NO</th>
+                        <th>Restaurant Name</th>
+                        <th>Restaurant Code</th>
+                        <th>Category</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Offer</th>
+                        <th>Location</th>
+                        <th>Action</th>
+
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      <tr *ngFor="let item of Restaurant; let i= index;">
+
+                        <td>
+                          {{i+1}}
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.name}}> {{item?.name}}</p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p> {{item?.resCode}} </p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p> {{item?.category}} </p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p> {{item?.type}} </p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p><mat-slide-toggle [checked]="element?.status == 'active' ? 'true':'false'"
+                              (change)="activeChange($event,element)"></mat-slide-toggle> {{item?.Status}} </p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.offer}}> {{item?.offer}} </p>
+
+
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.location}}> {{item?.location}} </p>
+
+                        </td>
+
+                        <td class="">
+                          <div class=" d-flex justify-content-center te1">
+                            <i class="fa fa-eye address_edit me-2" (click)="viewFood(item)" style="color:#21aa47"
+                              aria-hidden="true"></i>
+                            <i class="fa fa-edit address_edit me-2" (click)="editRestaurant(item)" style="color:#21aa47"
+                              aria-hidden="true"></i>
+                            <i (click)="deleteUserList(item)" class="fa fa-trash trash_icon" aria-hidden="true"></i>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div>
+                    <mat-paginator (page)="pageChange($event)" [pageSize]="limit" aria-label="Select page"
+                      [length]="totalCount" [pageIndex]="currentPage">
+                    </mat-paginator>
+                  </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </div>
+
+
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+</div> -->

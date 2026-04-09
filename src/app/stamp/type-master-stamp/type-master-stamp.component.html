@@ -1,0 +1,152 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="container-fluid mt-3 ">
+      <div class="row">
+        <div class="col-12 col-padding ">
+          <div class="card card-address ">
+            <div class="p-3 mobile-padding">
+              <div class="container mt-3">
+                <div class="top-header mb-3">
+                  <div>
+                    <h5>Type Master Stamp</h5>
+                  </div>
+                  <div>
+
+                  </div>
+
+                </div>
+                <div class="row  p-2 " style="background-color: #F4F4F4;align-items: baseline;">
+
+                  <div class=" col-lg-8 col-md-8 col-4 new-one" (click)="AddModal(addtemplate)">
+                    <div *ngIf="userrole !== 'subadmin' || showAdd"><i class="fa fa-plus-circle me-2"
+                        aria-hidden="true"></i><span class="add-txt">
+                        Add New</span></div>
+                  </div>
+                  <div class="col-lg-4 col-md-4 col-8 text-end">
+                    <div class="search-box">
+                      <input type="text" (input)="searchUserList($event)" class="search-input" placeholder="Search..">
+
+                      <button class="search-button" type="submit" value="search">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+                  </div>
+
+
+
+
+                </div>
+                <div class="tab_button mt-3">
+                  <button class="samebutton" (click)="copyTable()">Copy </button>
+                  <button class="samebutton" (click)="exportAsXLSX()">CSV </button>
+                  <button class="samebutton" (click)="exportAsPdf()">PDF</button>
+                  <button class="samebutton" (click)="printTable()">Print</button>
+
+                </div>
+                <div class="card-table">
+
+
+                  <table id="table" class="table table-striped mb-5 mt-3" style="width:100% !important">
+                    <thead>
+                      <tr>
+                        <th>Sl.NO</th>
+                        <th>Type Name</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+
+
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      <tr *ngFor="let item of databaseList; let i= index;">
+
+                        <td>
+                          {{i+1 + (myPaginator.pageIndex * myPaginator.pageSize)}}
+                        </td>
+                        <td class="checkname " style="text-align: start;">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.name}}> {{item?.name}}</p>
+
+                        </td>
+
+                        <td class="checkname ">
+                          <p> {{ item?.updatedAt | date:'dd/MM/yyyy' }} </p>
+
+                        </td>
+
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.status}}>{{item?.status}}</p>
+
+                        </td>
+
+                        <td class="">
+                          <div class=" d-flex justify-content-center te1">
+                            <!-- <i class="fa fa-key me-2" aria-hidden="true" (click)="resetPassword(item)" style="color:grey;"></i> -->
+                            <i class="fa fa-edit address_edit me-2" *ngIf="userrole !== 'subadmin' || showEdit"
+                              (click)="AddModal(addtemplate);editTerms(item)" style="color:#21aa47"
+                              aria-hidden="true"></i>
+                            <!-- <i (click)="deleteUserList(item)" class="fa fa-trash trash_icon" aria-hidden="true"></i> -->
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div>
+                    <mat-paginator (page)="pageChange($event)" [pageSize]="limit" aria-label="Select page"
+                      [length]="totalCount" #myPaginator>
+                    </mat-paginator>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #addtemplate>
+  <div class="modal-header">
+    <mat-card-title>{{isedit ? 'Edit' :
+      'Add'}} Type Stamp</mat-card-title>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="cancel()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form name="form" #f="ngForm">
+      <div class="row">
+
+        <div class="col-md-4 col-sm-12">
+          <mat-form-field>
+            <input matInput placeholder="Type Name" [(ngModel)]="createForm.name" name="name" required #name="ngModel">
+          </mat-form-field>
+        </div>
+        <div class="col-md-4 col-sm-12">
+          <mat-form-field>
+            <mat-select placeholder="Stamp Status" [(ngModel)]="createForm.status" name="status" required
+              #status="ngModel">
+              <mat-option *ngFor="let item of statuses" [value]="item.value">
+                {{ item.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+
+      </div>
+
+      <div class="row mt-4">
+        <div class="col">
+          <button mat-button mat-flat-button color="primary" (click)="createTypeStamp(f)">{{isedit ? 'Update' :
+            'Add'}}</button>
+          <button mat-button (click)="cancel()">Cancel</button>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</ng-template>

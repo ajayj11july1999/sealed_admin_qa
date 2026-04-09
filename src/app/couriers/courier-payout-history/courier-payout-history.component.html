@@ -1,0 +1,92 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="container-fluid mt-3 ">
+      <div class="row">
+        <div class="col-12 col-padding ">
+          <div class="card card-address ">
+            <div class="p-3 mobile-padding">
+              <div class="container mt-3">
+                <div class="top-header mb-3">
+                  <div>
+                    <h5>Courier Partner Payouts </h5>
+                  </div>
+                  <div>
+                    <!-- <button mat-raised-button class="mb-1 export-btn" (click)="downloadExport()">Export</button> -->
+                  </div>
+
+                </div>
+
+                <div class="tab_button mt-3">
+                  <button class="samebutton" (click)="copyTable()">Copy </button>
+                  <button class="samebutton" (click)="exportAsXLSX()">CSV </button>
+                  <button class="samebutton" (click)="exportAsPdf()">PDF</button>
+                  <button class="samebutton" (click)="printTable()">Print</button>
+
+                </div>
+                <div class="card-table">
+
+
+                  <table id="table" class="table table-striped mb-5 mt-3" style="width:100% !important">
+                    <thead>
+                      <tr>
+                        <th>Sl.NO</th>
+                        <th>Paid Amount</th>
+                        <th>Wage Amount</th>
+                        <th>Payout Type</th>
+                        <th>Date</th>
+                        <!-- <th>Reason</th> -->
+                        <th>Status</th>
+                        <!-- <th>Action</th> -->
+
+
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      <tr *ngFor="let item of deliveryManHistory; let i= index;">
+
+                        <td>
+                          {{i+1+ (myPaginator.pageIndex * myPaginator.pageSize)}}
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.currentAmountPaid}}>
+                            {{item?.currentAmountPaid}}</p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.wageForCurrentOrder}}>
+                            {{item?.wageForCurrentOrder}}</p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.paymentMode}}> {{item?.paymentMode}}</p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p> {{item?.updatedAt | date:'dd/MM/yyyy'}} </p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip"> {{item?.status}} </p>
+
+                        </td>
+
+
+
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div>
+                    <mat-paginator (page)="pageChange($event)" [pageSize]="limit" aria-label="Select page"
+                      [length]="totalCount" #myPaginator>
+                    </mat-paginator>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

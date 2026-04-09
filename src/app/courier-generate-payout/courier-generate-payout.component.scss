@@ -1,0 +1,41 @@
+.viewbtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+p {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 28px;
+  margin: 0px !important;
+}
+.viewdetails {
+  background: #4348cf;
+  border-radius: 5px;
+  color: white;
+  border: none;
+  float: right;
+  // padding: 4px 10px;
+  // font-size: 13px;
+}
+.payoutheading {
+  margin: 0px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.searchbtn {
+  text-align: center;
+    margin-top: 4px;
+}
+span {
+  font-size: 14px;
+  font-weight: 600;
+}
+.mat-raised-button {
+  line-height: 30px !important;
+  padding: 0 28px !important;
+}
+mat-card.mat-card.mat-focus-indicator.my-3.m-0 {
+  background: #f4f4f4;
+}

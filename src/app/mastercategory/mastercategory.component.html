@@ -1,0 +1,193 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="container-fluid mt-3 ">
+      <div class="row">
+        <div class="col-12 col-padding ">
+          <div class="card card-address ">
+            <div class="p-3 mobile-padding">
+              <div class="container mt-3">
+                <div class="top-header mb-3">
+                  <div>
+                    <h5>Manage Category</h5>
+                  </div>
+                  <div>
+                    <!-- <button mat-raised-button class="mb-1 export-btn" (click)="downloadExport()">Export</button> -->
+                  </div>
+
+                </div>
+                <div class="row  p-2 " style="background-color: #F4F4F4;align-items: baseline;">
+                  <!-- <div class=""> -->
+                  <div class=" col-lg-8 col-md-8 col-4 new-one" (click)="AddModal(addtemplate )">
+                    <div *ngIf="userrole !== 'subadmin' || showAdd"><i class="fa fa-plus-circle me-2"
+                        aria-hidden="true"></i><span class="add-txt">
+                        Add Category</span></div>
+                  </div>
+                  <div class="col-lg-4 col-md-4 col-8 text-end">
+                    <div class="search-box">
+                      <input type="text" (input)="searchUserList($event)" class="search-input" placeholder="Search..">
+
+                      <button class="search-button" type="submit" value="search">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+                  </div>
+
+
+
+
+                </div>
+                <div class="tab_button mt-3">
+                  <button class="samebutton" (click)="copyTable()">Copy </button>
+                  <button class="samebutton" (click)="exportAsXLSX()">CSV </button>
+                  <button class="samebutton" (click)="exportAsPdf()">PDF</button>
+                  <button class="samebutton" (click)="printTable()">Print</button>
+                  <!-- <mat-tab-group>
+                    <mat-tab label="Copy"></mat-tab>
+                    <mat-tab label="CSV"></mat-tab>
+                    <mat-tab label="PDF"></mat-tab>
+                    <mat-tab label="Print"></mat-tab>
+
+                  </mat-tab-group> -->
+                </div>
+                <div class="card-table">
+
+
+                  <table id="table" class="table table-striped mb-5 mt-3" style="width:100% !important">
+                    <thead>
+                      <tr>
+                        <th>Sl.NO</th>
+                        <th>Category Name</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+
+
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      <tr *ngFor="let item of categoryList; let i= index;">
+
+                        <td>
+                          {{i+1+ (myPaginator.pageIndex * myPaginator.pageSize) }}
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.name}}> {{item?.name}}</p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p>{{item?.updatedAt | date:'dd/MM/yyyy'}}
+                            <!-- <img src="{{item?.image}}" alt="{{item.categoryName}}" width="50px" height="50px"> -->
+
+                          </p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.email}}> {{item?.status}} </p>
+
+                        </td>
+
+                        <td class="">
+                          <div class=" justify-content-center te1">
+
+                            <i *ngIf="userrole !== 'subadmin' || showEdit" class="fa fa-edit address_edit me-2"
+                              (click)="editCategory(addtemplate,item)" style="color:#21aa47;font-size: 18px;"
+                              aria-hidden="true"></i>
+                            <!-- <i (click)="deleteCategory(item)" class="fa fa-trash trash_icon" aria-hidden="true"></i> -->
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div>
+
+                    <mat-paginator (page)="pageChange($event)" [pageSize]="limit" aria-label="Select page"
+                      [length]="totalCount" #myPaginator>
+                    </mat-paginator>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #addtemplate>
+  <div class="modal-header">
+    <mat-card-title>Add Category</mat-card-title>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form #categoryForm="ngForm" name="form">
+
+      <div class="row">
+
+
+        <div class="col-md-4 col-sm-12">
+          <!-- <mat-label> CategoryName</mat-label> -->
+          <!-- <mat-form-field class="custom-mat-form-field">
+            <input matInput placeholder="Category Name" name="categoryName" [(ngModel)]="category.categoryName"
+              required>
+          </mat-form-field> -->
+          <mat-form-field>
+            <input matInput type="text" placeholder="Category Name" name="categoryName" id="categoryName"
+              [(ngModel)]="category.name" required>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4 col-sm-12">
+          <!-- <mat-label> Category Image </mat-label>
+         
+          <div class="image-card" *ngIf="!imagelist">
+            <input style="border: 1px solid #e0e0e0;padding: 14px;width: 100%;border-radius: 5px;margin-top: 5px;"
+              type="file" placeholder="CategoryImage" name="categoryImage" id="category?.categoryImage"
+              [(ngModel)]="category.categoryImage" (change)="onFileSelected($event)" required>
+          </div>
+          <div class="image-card" *ngIf="imagelist">
+            <img src="{{imagelist}}" alt="" width="50px" height="50px">
+            <div class="close-icon" (click)="removeimg()">
+              <i class="fa fa-times"></i>
+            </div>
+          </div> -->
+          <mat-form-field *ngIf="category.image == '' || category.image == null">
+            <mat-label>Stamp Image</mat-label>
+            <input matInput [value]="selectedFile?.name || ''" readonly>
+            <button mat-raised-button matSuffix (click)="fileInput.click()">Browse</button>
+            <input type="file" #fileInput (change)="onChange($event.target.files)" style="display:none">
+          </mat-form-field>
+
+          <div class="upload-images image_div file_btn" *ngIf="category.image" style="position: relative;">
+            <i class="fa-solid fa-circle-xmark text-danger"
+              style="position: absolute;right: -8px;top: -4px;cursor: pointer;font-size: 14px;background: #fff;border-radius: 12px;"
+              (click)="removeImage()"></i>
+            <img [src]="category.image" width="80px">
+          </div>
+        </div>
+        <div class="col-md-4 col-sm-12">
+          <!-- <mat-label> Category Status</mat-label> -->
+
+          <mat-form-field>
+            <mat-select placeholder="Status " name="status" id="status" [(ngModel)]="category.status" required>
+              <mat-option value="active">Active</mat-option>
+              <mat-option value="inactive">Inactive</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </form>
+
+    <div class="row mt-4">
+      <div class="col">
+        <button mat-button mat-flat-button color="primary" (click)="addCategory(categoryForm,item)">{{ buttonText
+          }}</button>
+        <button mat-button (click)="cancel()">Cancel</button>
+      </div>
+    </div>
+
+
+  </div>
+</ng-template>

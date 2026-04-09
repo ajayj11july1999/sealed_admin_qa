@@ -1,0 +1,101 @@
+// body{
+//     background: #E5E5E5;
+//     // font-size: 14px;
+//     // font-weight: 500;
+//     line-height: 24px;
+// }
+.heading{
+    font-size: 15px;
+    font-weight: 700;
+    // line-height: 28px;
+    margin: 0px;
+}
+.exportreport{
+    background: #21AA47;
+    border-radius: 5px;
+    color: #fff;
+    border: none;
+    // padding: 2px 20px;
+    // font-size: 13px;
+}
+.innercard{
+    background: #FFFFFF;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    
+   
+}
+.viewbtn{
+      display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.view{
+    color: white;
+    background: #4348CF;
+    border-radius:5px;
+    // padding: 2px 20px;
+    font-size: 13px;
+    border: none;
+}
+.mat-raised-button {
+   
+    line-height: 28px !important;
+}
+.payoutheading{
+    margin: 0px;
+    font-size: 14px;
+    font-weight: 600;
+    
+}
+span{
+    font-size: 14px;
+    font-weight: 500;
+    
+
+}
+// .card {
+//     position: relative;
+//     display: flex;
+//     border: 1px solid rgba(0,0,0,.125);
+//     border-radius: 0.25rem;
+//     background: #FFFFFF;
+//     box-shadow: 0px 4px 4px rgb(0 0 0 / 25%);
+//     border: none;
+// }
+
+@media (min-width: 768px){
+
+.colheader {
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: 50px !important;
+}
+
+}
+
+
+@media (max-width: 768px) {
+   
+.view{
+    border-radius: 5px;
+    padding: 0px 15px;
+    font-size: 13px;
+}
+
+}
+@media (min-width: 320px) and (max-width:768px) {
+
+
+.payoutheading{
+    margin: 0px;
+    font-size: 13px;
+    font-weight: 600;
+    
+}
+span{
+    font-size: 13px;
+    font-weight: 600;
+}
+
+}

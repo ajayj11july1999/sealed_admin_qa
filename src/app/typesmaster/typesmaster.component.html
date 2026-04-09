@@ -1,0 +1,168 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="container-fluid mt-3 ">
+      <div class="row">
+        <div class="col-12 col-padding ">
+          <div class="card card-address ">
+            <div class="p-3 mobile-padding">
+              <div class="container mt-3">
+                <div class="top-header mb-3">
+                  <div>
+                    <h5>Manage Type Category</h5>
+                  </div>
+                  <div>
+
+                  </div>
+
+                </div>
+                <div class="row  p-2 " style="background-color: #F4F4F4;align-items: baseline;">
+
+                  <div class=" col-lg-8 col-md-8 col-4 new-one">
+                    <div *ngIf="userrole !== 'subadmin' || showAdd" (click)="addModal(addtemplate)">
+                      <i class="fa fa-plus-circle me-2" aria-hidden="true"></i><span class="add-txt">
+                        Add Types</span>
+                    </div>
+                  </div>
+                  <div class="col-lg-4 col-md-4 col-8 text-end">
+                    <div class="search-box">
+                      <input type="text" (input)="searchUserList($event)" class="search-input" placeholder="Search..">
+
+                      <button class="search-button" type="submit" value="search">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+
+
+                <div class="tab_button mt-3">
+                  <button class="samebutton" (click)="copyTable()">Copy </button>
+                  <button class="samebutton" (click)="exportAsXLSX()">CSV </button>
+                  <button class="samebutton" (click)="exportAsPdf()">PDF</button>
+                  <button class="samebutton" (click)="printTable()">Print</button>
+
+                </div>
+                <div class="card-table">
+
+
+                  <table id="table" class="table table-striped mb-5 mt-3" style="width:100% !important">
+                    <thead>
+                      <tr>
+                        <th>Sl.NO</th>
+                        <th>Type Name</th>
+                        <th>Category Name</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+
+
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      <tr *ngFor="let item of categorytypesList; let i= index;">
+
+                        <td>
+                          {{i + 1 + (myPaginator.pageIndex * myPaginator.pageSize) }}
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.typename}}> {{item?.name}}</p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.name}}> {{item?.categoryDetails?.name}}
+                          </p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p> {{item?.updatedAt | date:'dd/MM/yyyy'}} </p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.email}}> {{item?.status}} </p>
+
+                        </td>
+
+                        <td class="">
+                          <div class=" d-flex justify-content-center te1">
+
+                            <i *ngIf="userrole !== 'subadmin' || showEdit" class="fa fa-edit address_edit me-2"
+                              (click)="editCategory(addtemplate,item)" style="color:#21aa47" aria-hidden="true"></i>
+
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div>
+
+                    <mat-paginator (page)="pageChange($event)" [pageSize]="limit" aria-label="Select page"
+                      [length]="totalCount" #myPaginator>
+                    </mat-paginator>
+                  </div>
+                </div>
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #addtemplate>
+  <div class="modal-header">
+    <mat-card-title>Add Category Types </mat-card-title>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form #categoryTypesForm="ngForm" name="form">
+      <div class="row">
+        <div class="col-md-4 col-sm-12">
+
+
+          <mat-label> Category Type Name</mat-label>
+
+          <mat-form-field>
+            <input matInput type="text" placeholder="Category type Name" name="typeName" id="typeName"
+              [(ngModel)]="category.typeName" required>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4 col-sm-12">
+          <mat-label> Category Name</mat-label>
+          <mat-form-field>
+            <mat-select [(ngModel)]="category.categoryName" name="categoryName" id="categoryName" required>
+              <mat-option [value]="item?._id" *ngFor="let item of categoryList">{{item?.name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+
+        <div class="col-md-4 col-sm-12">
+          <mat-label> Category Types Status</mat-label>
+          <mat-form-field>
+            <mat-select [(ngModel)]="category.status" name="status" id="status" required>
+              <mat-option [value]="item?.value" *ngFor="let item of CategoryStatus">{{item?.viewValue}}</mat-option>
+
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </form>
+    <div class="row mt-4">
+      <div class="col">
+        <button mat-button mat-flat-button color="primary"
+          (click)="addCategoryTypes(categoryTypesForm,item)">{{buttonText}}</button>
+
+        <button mat-button (click)="cancel()">Cancel</button>
+      </div>
+    </div>
+
+
+  </div>
+</ng-template>

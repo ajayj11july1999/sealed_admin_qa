@@ -1,0 +1,99 @@
+<!-- <div class="modal-header">
+    <h4 class="modal-title">Alert</h4>
+      <button type="button" class="close" aria-label="Close" (click)="dismiss()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <h6>Your session expired , please login again</h6>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn nbb-btn-color" (click)="accept()" style="color: #fff;"><i class="fa-solid fa-circle-check"></i> Ok</button>
+    </div> -->
+<!-- <div mat-dialog-title style="text-align:end">
+      <button mat-flat-button class="close-icon" [mat-dialog-close]="true">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div> -->
+<div *ngIf="status == 'Update'">
+
+
+  <mat-dialog-content>
+    <p>
+      {{message}} {{status}} {{msg}}
+    </p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="center">
+    <button mat-raised-button color="primary" tabindex="1" (click)="onNoClick()">{{confirmButtonText}}</button>
+    <button mat-raised-button mat-dialog-close tabindex="-1">{{cancelButtonText}}</button>
+
+  </mat-dialog-actions>
+</div>
+<div *ngIf="status == 'Delete'">
+
+
+  <mat-dialog-content>
+    <p>
+      {{message}} {{status}} {{msg}}
+    </p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="center">
+    <button mat-raised-button color="primary" tabindex="1" (click)="onNoClick()">{{confirmButtonText}}</button>
+    <button mat-raised-button mat-dialog-close tabindex="-1">{{cancelButtonText}}</button>
+  </mat-dialog-actions>
+</div>
+
+<div *ngIf="status == 'Cancel'">
+  <mat-dialog-content>
+    <p>
+      {{message}} {{status}} this Order
+    </p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="center">
+    <button mat-raised-button color="primary" tabindex="1" (click)="onNoClick()">{{confirmButtonText}}</button>
+    <button mat-raised-button mat-dialog-close tabindex="-1">{{cancelButtonText}}</button>
+
+  </mat-dialog-actions>
+</div>
+
+<div *ngIf="status == 'Remove'">
+  <mat-dialog-content>
+    <p>
+      {{message}} {{status}} this Courier Partner
+    </p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="center">
+    <button mat-raised-button color="primary" tabindex="1" (click)="onNoClick()">{{confirmButtonText}}</button>
+    <button mat-raised-button mat-dialog-close tabindex="-1">{{cancelButtonText}}</button>
+
+  </mat-dialog-actions>
+</div>
+<div *ngIf="status == 'Deliver'">
+  <mat-dialog-content>
+    <p>
+      {{message}} {{status}} this Order
+    </p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="center">
+    <button mat-raised-button color="primary" tabindex="1" (click)="onNoClick()">{{confirmButtonText}}</button>
+    <button mat-raised-button mat-dialog-close tabindex="-1">{{cancelButtonText}}</button>
+
+  </mat-dialog-actions>
+</div>
+
+
+<div *ngIf="data?.login">
+
+
+  <mat-dialog-content style="width:300px" align="center">
+    <div><mat-icon style="color: red;">report_problem</mat-icon></div>
+    <p class="text-center">
+
+      Access Denied ! Not A Admin !
+    </p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="center">
+    <button mat-raised-button color="primary" tabindex="1" (click)="onNoClick()">Ok</button>
+
+  </mat-dialog-actions>
+</div>

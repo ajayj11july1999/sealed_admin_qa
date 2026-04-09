@@ -1,0 +1,80 @@
+
+<div fxLayout="row wrap">
+    <div fxFlex.gt-sm="100" fxFlex="100">
+<div class="container-fluid p-3">
+    <div class="row ">
+        <div class="col-12 ">
+            <mat-card class="m-0">
+                <card-header>
+                    <div class="text-center">
+                        <h5>{{btnlabel}} Food</h5>
+                    </div>
+                </card-header>
+                <form [formGroup]="foodForm" (ngSubmit)="onSubmit()">
+                    <mat-card-content>
+                        <div class="row">
+                            <div class="col-lg-4 col-12">
+                                <label>Food Name</label><br>
+                                <input class="form-control" placeholder="Enter the Restaurant Name"
+                                    formControlName="foodName">
+                                <br>
+                                <!-- <div *ngIf="submitted && f['foodName'].errors" class="invalid-feedback" required>
+                                    <div style="font-size: 12px;" *ngIf="f['foodName'].errors['required']">
+                                        Food Name is required</div>
+                                </div> -->
+                            </div>
+                            <div class="col-lg-4 col-12 ">
+                                        <label > Description</label>
+                                        <input class="form-control" placeholder="Description"
+                                            formControlName="description">
+                                        <!-- <div *ngIf="submitted && f['description'].errors" class="invalid-feedback"
+                                            required>
+                                            <div style="font-size: 10px;" *ngIf="f['description'].errors['required']">
+                                                Description is required</div>
+                                        </div> -->
+                            </div>
+                            <div class="col-lg-4 col-12 ">
+                                <div class="mt-4">
+                                    <section class="example-section">
+                                        <mat-checkbox class="example-margin" formControlName="veg"
+                                            (change)="onCheckboxChange($event,'veg')">Veg</mat-checkbox>
+                                        <mat-checkbox class="example-margin mx-3" formControlName="nonVeg"
+                                            (change)="onCheckboxChange($event,'nonveg')">Non Veg</mat-checkbox>
+                                    </section>
+                                </div>
+                            </div>
+                            <!-- <div class="col-lg-4 col-12 mt-2">
+                                <div class="mt-2">
+                                     <label> Category</label>
+                                        <ng-select [items]="category" [clearable]="false" bindValue="id" 
+                        [searchable]="true" bindLabel="name" placeholder="Select deliveryman">
+                      </ng-select>
+                                </div>
+                            </div> -->
+                            <div class="col-lg-4 col-12 mt-2">
+                            <div class="mt-2">
+                                <label> Ratings</label>
+                                <input class="form-control" placeholder="Give the Ratings"
+                                    formControlName="ratings">
+                            </div>
+                            <!-- <div *ngIf="submitted && f['ratings'].errors" class="invalid-feedback" required>
+                                <div style="font-size: 10px;" *ngIf="f['ratings'].errors['required']">
+                                    Ratings is required</div>
+                            </div> -->
+                        </div>
+                            <div class="col-lg-4 col-12 mt-2">
+                            <div class="mt-2">
+                                <label> Offer</label>
+                                <input class="form-control" placeholder=" Enter the Restaurant Offer"
+                                    formControlName="resoffer">
+                            </div>
+                        </div>
+                        </div>
+                        </mat-card-content>
+                        </form>
+                    </mat-card>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

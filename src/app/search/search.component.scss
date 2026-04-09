@@ -1,0 +1,135 @@
+// .searchbtn{
+// //  display: flex;
+// //  justify-content: center;
+// //  align-items: center;
+// }
+// mat-form-field
+.mat-form-field-underline {
+    display: none !important;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    // background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.export-btn {
+    background-color: #21aa47;
+    color: #fff;
+}
+
+.spinner {
+    font-weight: 600;
+    font-size: 20px;
+    color: #21aa47;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.mat-form-field-flex {
+    background: #E5E5E5;
+    box-shadow: 0px 4px 21px rgba(0, 0, 0, 0.08);
+    border-radius: 5px;
+}
+
+:host::ng-deep.mat-form-field-appearance-legacy .mat-form-field-suffix .mat-icon-button {
+    vertical-align: super !important;
+}
+
+.mat-form-field-infix {
+    padding: 0.5em 0;
+    border-top: 0.4375em solid transparent !important;
+}
+
+.form-control:focus {
+    color: #212529;
+    background-color: #fff;
+    border: 0px solid #ced4da !important;
+    outline: 0;
+    box-shadow: none !important;
+}
+
+.mat-raised-button {
+    line-height: 33px !important;
+}
+
+.form-control {
+    background-color: #E5E5E5 !important;
+
+    border: 0px solid #ced4da !important;
+}
+
+.noData {
+    height: 35vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+
+
+// .mat-icon-button .mat-button-wrapper{
+//     vertical-align: -webkit-baseline-middle;
+// }
+// .mat-form-field-appearance-legacy .mat-form-field-infix {
+//     // padding: 0.5875em 0;
+//     padding: 0 !important;
+// }
+// .mat-form-field-infix {
+
+//     border-top: 0 0 !important;
+// }
+// .mat-form-field-flex {
+
+//     background: #ececec !important;
+// }
+
+
+
+
+
+
+
+
+
+.txt {
+    align-items: center !important;
+    // text-align: center !important; 
+    display: flex !important;
+    justify-content: center !important;
+    ;
+}
+
+p {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 0px !important;
+    text-transform: capitalize;
+}
+
+span {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+// .p-2.cardheight {
+//     height: 100%;
+//     overflow-y: scroll;
+// }

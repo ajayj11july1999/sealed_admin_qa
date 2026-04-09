@@ -1,0 +1,115 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="container-fluid mt-3 ">
+      <div class="row">
+        <div class="col-12 col-padding ">
+          <div class="card card-address ">
+            <div class="p-3 mobile-padding">
+              <div class="container mt-3">
+                <div class="top-header mb-3">
+                  <div>
+                    <h5>Manage Review &amp; Rating</h5>
+                  </div>
+                  <div>
+                    <!-- <button mat-raised-button class="mb-1 export-btn" (click)="downloadExport()">Export</button> -->
+                  </div>
+
+                </div>
+                <div class="row p-2 filter-strip" style="background-color: #F4F4F4;align-items: baseline;">
+                  <div class="col-lg-8 col-md-7 col-12 mb-2 mb-md-0">
+                    <div class="filter-group">
+                      <select class="filter-select" [(ngModel)]="selectedReviewerType" (change)="onReviewerTypeChange()">
+                        <option value="">All Flows</option>
+                        <option value="user">Customer → Delivery Partner</option>
+                        <option value="delivery_man">Delivery Partner → Customer</option>
+                      </select>
+
+                      <select class="filter-select" [(ngModel)]="selectedRating" (change)="onRatingChange()">
+                        <option value="">All Ratings</option>
+                        <option [value]="5">5 Star</option>
+                        <option [value]="4">4 Star</option>
+                        <option [value]="3">3 Star</option>
+                        <option [value]="2">2 Star</option>
+                        <option [value]="1">1 Star</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-lg-4 col-md-5 col-12 text-end">
+                    <div class="search-box">
+                      <input type="text" (input)="searchUserList($event)" class="search-input" placeholder="Search by order / comment">
+
+                      <button class="search-button" type="submit" value="search">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab_button mt-3">
+                  <button class="samebutton" (click)="copyTable()">Copy </button>
+                  <button class="samebutton" (click)="exportAsXLSX()">CSV </button>
+                  <button class="samebutton" (click)="exportAsPdf()">PDF</button>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-striped" id="reviewTable">
+                    <thead>
+                      <tr>
+                        <th>S.No</th>
+                        <th>Order ID</th>
+                        <th>Reviewer Type</th>
+                        <th>Target Type</th>
+                        <th>Flow</th>
+                        <th>Rating</th>
+                        <th>Comment</th>
+                        <th>Feedback</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of reviewList; let i= index;">
+                        <td>
+                          {{i+1+ (myPaginator.pageIndex * myPaginator.pageSize)}}
+                        </td>
+                        <td>
+                          <p>{{item?.order_id || '-'}}</p>
+                        </td>
+                        <td>
+                          <span class="review-badge">{{getDisplayUserType(item?.reviewer_type)}}</span>
+                        </td>
+                        <td>
+                          <p>{{getDisplayUserType(item?.target_type)}}</p>
+                        </td>
+                        <td>
+                          <p>{{ getReviewFlow(item?.reviewer_type) }}</p>
+                        </td>
+                        <td>
+                          <p class="rating-text">{{ getStars(item?.rating) }} <span class="muted-text">({{item?.rating || 0}}/5)</span></p>
+                        </td>
+                        <td class="text-start">
+                          <p>{{item?.comment || 'No comment'}}</p>
+                        </td>
+                        <td class="text-start">
+                          <p>{{item?.feedback || '-'}}</p>
+                        </td>
+                        <td>
+                          <p>{{item?.created_at | date:'medium'}}</p>
+                        </td>
+                      </tr>
+                      <tr *ngIf="!reviewList?.length">
+                        <td colspan="9" class="empty-state">No Reviews Available</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div>
+                    <mat-paginator (page)="pageChange($event)" [pageSize]="limit" aria-label="Select page"
+                      [length]="totalCount" #myPaginator>
+                    </mat-paginator>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,98 @@
+<ngx-spinner size="medium" color="#F39201" type="square-jelly-box" [fullScreen]="true">
+    <p style="color: #21aa47;font-weight: 600;"> Loading... </p>
+</ngx-spinner>
+<div class="login-register"
+    style="background-size: cover;background-position: top;background :#21aa47d4">
+    <div class="col-lg-4 col-md-5 col-sm-12 login_main_box">
+        <div class="login-register">
+            <mat-card class="m-t-10 w-100">
+                <mat-card-content>
+                    <form *ngIf="isTempPassChange" [formGroup]="temppassform" (ngSubmit)="changeTempPass()">
+
+                        <div class="login_box">
+                            <div class="text-center login-head">
+                                <img alt="homepage" src="../../assets/images/sealed-logo.png">
+                                <h4 class="m-t-0 py-4">Change Temporary Password</h4>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="" class="form-label">Password </label>
+                                <input type="text" [formControl]="temppassform.controls['newpassword']"
+                                    class="form-control" id="" placeholder="Enter username">
+
+                            </div>
+                            <small
+                                *ngIf="temppassform.controls['newpassword'].hasError('required') && temppassform.controls['newpassword'].touched"
+                                class="text-danger support-text">New Password is required.</small>
+
+                            <!-- <div class="form-group  mb-3">
+                                    <label for="" class="form-label">Password</label>
+                                    <input type="password" [formControl]="form.controls['password']" class="form-control" id="" placeholder="Enter password">
+                                </div> -->
+                            <!-- <small *ngIf="form.controls['password'].hasError('required') && form.controls['password'].touched" -->
+                            <!-- class="text-danger support-text">Password is required.</small> -->
+
+                            <!-- <div class="forgot-password my-3">
+                                    <a  class="text-right forgot" (click)="forgot()">Forgot password?</a>
+                                </div> -->
+                            <div class="text-center" *ngIf="error_message">
+                                <mat-spinner *ngIf="isLoading"></mat-spinner> 
+                                <small class="text-danger support-text">{{error_message}}</small>
+                            </div>
+
+                            <div class="login-btn">
+                                <button type="submit" mat-raised-button color="warn" class="">Change Password</button>
+                            </div>
+                            <!-- <mat-spinner *ngIf="isLoading"></mat-spinner> -->
+
+
+                        </div>
+
+
+
+                    </form>
+                    <form *ngIf="!isTempPassChange" [formGroup]="form" (ngSubmit)="loginAuth()">
+                        <div class="login_box">
+                            <div class="text-center login-head">
+                                <img alt="homepage" src="../../assets/images/sealed-logo.png">
+                                <h4 class="m-t-0 pt-4 ">Log In </h4>
+
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <mat-form-field>
+                                    <input matInput placeholder="Email"type="email" [formControl]="form.controls['email']"
+                                        id="email" required>
+                                </mat-form-field>
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <mat-form-field>
+                                    <input matInput placeholder="Password" type="password"
+                                        [formControl]="form.controls['password']" id="password" required>
+                                </mat-form-field>
+                            </div>
+<!-- 
+                            <div class="forgot-password">
+                                <a class="text-right forgot" (click)="forgot()"><i class="fa-solid fa-lock"></i> Forgot
+                                    password?</a>
+                            </div> -->
+                            <div class="text-center" *ngIf="error_message">
+                                <small class="text-danger support-text">{{error_message}}</small>
+                            </div>
+
+                            <div class="login-btn">
+                                <button type="submit" mat-raised-button  class="green"><i
+                                        class="fa-solid fa-right-to-bracket"></i> Log in</button>
+                            </div>
+                        </div>
+                    </form>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </div>
+</div>

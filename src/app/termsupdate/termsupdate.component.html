@@ -1,0 +1,55 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="container-fluid p-3">
+      <div class="row ">
+        <div class="col-12 ">
+          <mat-card class="m-0">
+            <card-header>
+              <div class="text-start">
+
+              </div>
+              <div class="container mb-5">
+                <form name="form" #f="ngForm">
+
+                  <div class="row">
+                    <div class="col-12 my-3">
+                      <label for="Content"></label>
+                      <ejs-richtexteditor id='defaultRTE' width="100%" height="300px" [(ngModel)]="termsForm.content"
+                        name="content" required #content="ngModel">
+                        <ng-template #valueTemplate>
+                          <h3>Privacy policy</h3>
+                          <div>
+                            <div></div>
+                            <div></div>
+                          </div>
+                          <div><a target="_blank" rel="nofollow"
+                              href="https://sealedsecuredelivery.blogspot.com/2023/03/privacy-policy.html">March 11,
+                              2023</a></div>
+
+                        </ng-template>
+                      </ejs-richtexteditor>
+
+                    </div>
+                    <div class="col-12 my-3">
+                      <label for="SubType"></label>
+                      <ng-select [items]="userType" [clearable]="false" bindValue="name" [(ngModel)]="termsForm.type"
+                        name="type" required #type="ngModel" (change)="onSelectionChange($event)" [searchable]="true"
+                        bindLabel="name" placeholder="Select Type">
+                      </ng-select>
+                    </div>
+                    <div class="mb-5">
+                      <button class="save-btn me-2" (click)="updateTerms(f)">Submit</button>
+                      <button class="cancel-btn" (click)="cancel()">Cancel</button>
+                    </div>
+                  </div>
+                </form>
+
+              </div>
+
+            </card-header>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

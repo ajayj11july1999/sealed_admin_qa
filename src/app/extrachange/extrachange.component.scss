@@ -1,0 +1,211 @@
+.card-address {
+    background: #FEFEFE;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    min-height: 100vh;
+    width: 100%;
+    border-radius: 5px;
+    border: none;
+    /* min-height: 100vh!important; */
+  }
+  .text-higthligth{
+    color: #15842f;
+  }
+  .search-box {
+    width: 25%;
+    position: relative;
+    display: flex;
+    justify-content: end;
+  
+  }
+  .new-one{
+    width: 50%;
+    color: #15842f;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  .search-input {
+    width: 100%;
+    height: 35px;
+    padding: 10px;
+    border: 2px solid #21aa47;border-radius: 10px;
+    // border-radius: 10px 0 0 10px;
+    // border-right: none;
+    outline: none;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.5);
+  
+    background: none;
+  }
+  .header-container{
+    display: flex;
+    justify-content: space-between;
+    margin: 30px;
+  }
+  .table-container{
+    width: 100%;
+    overflow: hidden;
+    margin: 30px;
+  }
+  .table-container table{
+    width: 100%;
+  }
+  
+td {
+    padding: 10px !important;
+    font-size: 14px !important;
+    background:#ffff;
+    text-align: center;
+    border-bottom: 2px solid #f2f2f2;
+    border-right: 1px solid #f2f2f2;
+  }
+  
+  th {
+    padding: 12px !important;
+    // border-bottom: 1px solid rgba(0, 0, 0, 0.3) !important;
+    font-size: 14px !important;
+    background: #21aa47;
+    color: #fff;
+    font-weight: 400;
+    border-right: 1px solid #f2f2f2;
+    text-align: center;
+  
+  }
+  
+  .card_table {
+    background: #FFFFFF;
+    box-shadow: -1px -1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px rgba(0, 0, 0, 0), 2px 2px 2px rgba(0, 0, 0, 0.2), 0px 0px 0px rgba(0, 0, 0, 0);
+    border-radius: 8px;
+    // padding-left: 1rem;
+    // padding-right: 1rem;
+    border: none;
+    overflow-x: auto;
+  
+  
+  }
+  
+  .ellip {
+    white-space: nowrap !important;
+    width: 100px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  
+  p {
+    margin-bottom: 0px !important;
+  }
+  
+  
+  .table-striped>tbody>tr:nth-of-type(odd)>* {
+    --bs-table-accent-bg: rgba(33, 170, 71, 0.06);
+    /* color: var(--bs-table-striped-color); */
+  }
+  
+  
+  .text-higthligth{
+    color: #15842f;
+  }
+  .cop-container{
+    background-color: #6c757d;
+    border: 2px solid #6c757d;
+    color: #fff;
+    width: 200px;
+    padding: 5px;
+    text-align: center;
+  }
+  .cop-container button{
+    background-color:transparent;
+    border: none;
+    color: #fff;
+  }
+
+
+  // input:number arrow hidden
+  /* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+  
+.edit-btn{
+  background-color: transparent;
+  border: none;
+}
+.save-btn{
+  background-color: #15842f;
+  color: #fff;
+  border: none;
+}
+::ng-deep .mat-mdc-slide-toggle.mat-accent {
+  --mdc-switch-selected-focus-state-layer-color: #256834;
+  --mdc-switch-selected-handle-color: #256834;
+  --mdc-switch-selected-hover-state-layer-color: #256834;
+  --mdc-switch-selected-pressed-state-layer-color: #256834;
+  --mdc-switch-selected-focus-handle-color: #0e512e;
+  --mdc-switch-selected-hover-handle-color: #0e512e;
+  --mdc-switch-selected-pressed-handle-color: #0e512e;
+  --mdc-switch-selected-focus-track-color: #32833c;
+  --mdc-switch-selected-hover-track-color: #32833c;
+  --mdc-switch-selected-pressed-track-color: #32833c;
+  --mdc-switch-selected-track-color: #32833c;
+}
+  
+  @media only screen and (min-width:320px) and (max-width:767px) {
+
+    .header-container{
+        flex-direction: column;
+      }
+      .search-box{
+        width: 100%;
+      }
+
+    // .search-input {
+  
+    //   width: 60%;
+    //   height: 25px;
+  
+    // }
+    .add-txt {
+      font-size: 12px;
+  }
+    .search-button {
+      height: 25px;
+    }
+  
+    .col-padding {
+      padding: 0px;
+    }
+  
+    .mobile-padding {
+      padding: 5px !important;
+    }
+  
+    .card-table {
+      overflow-x: auto !important;
+    }
+  
+  }
+  
+  
+  @media only screen and (min-width:768px) and (max-width:991px) {
+  
+    .ellip {
+      width: 70px !important;
+    }
+  
+  
+  
+  
+  }
+  .te1{
+    cursor: pointer;
+  }
+  .trash_icon{
+    color: red;
+  }
+

@@ -1,0 +1,206 @@
+<!-- <ngx-spinner size="medium" color="#F39201" type="ball-scale-multiple" [fullScreen]="true">
+  <p style="color: #21aa47;font-weight: 600;"> Loading... </p>
+</ngx-spinner> -->
+<!-- <ngx-spinner size="medium" color="#21aa47" type="square-jelly-box" [fullScreen]="true">
+  <p style="color: #F39201;font-weight: 600;"> Loading... </p>
+</ngx-spinner> -->
+
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+
+    <!-- <div class="overlay" *ngIf="searchLoad">
+      <div class="spinner"> Loading......!!!</div>
+    </div> -->
+
+    <div class=" container-fluid container_courier mt-3">
+
+      <div class="row p-3">
+        <div class="text-end">
+          <button *ngIf="userrole !== 'subadmin' || showAdd" mat-raised-button class="mb-1 export-btn"
+            (click)="AddCourier()">Add</button>
+
+          <button *ngIf="courier_list?.length  && ( userrole !== 'subadmin' || showExport)" mat-raised-button
+            class="mb-1 export-btn" (click)="downloadExport()">Export</button>
+        </div>
+        <div class="col-md-3 col-sm-12">
+
+
+          <!-- <button type="button" class="btn btn-badges p-0" style="background-color:#fff;width:100%;">
+                <span class="courier">Courier</span> <span class="badge Notification">4</span>
+            </button> -->
+          <button type="button" class="btn  buttons" style="background-color:#fff;width:100%;">
+            <span class="courier_count">Courier</span>
+            <span class="badge Notification">{{totalCount}}</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- <div class="container  mt-2 p-0"> -->
+      <!-- <div class="flex">
+    <button mat-raised-button color="primary" type="button" class=" button  mt-3 me-3">View all</button>
+    <button mat-raised-button color="primary" type="button" class=" button  mt-3 me-3">View active couriers</button>
+    <button mat-raised-button color="primary" type="button" class=" button mt-3 me-3">View inactive couriers</button>
+  </div> -->
+      <div class="row  px-3">
+        <div class="col">
+          <!-- <button mat-raised-button class="mb-1" (click)="viewAll()">View All</button>
+          <button mat-raised-button class="mb-1" (click)="verifiedCouriers()">View Verified Couriers</button>
+          <button mat-raised-button class="mb-1" (click)="unverifiedCouriers()">View Unverified Couriers</button> -->
+          <button mat-raised-button class=" filter mb-1" [ngClass]="{'active': isViewAllActive}"
+            (click)="viewAll()">ViewAll</button>
+          <button mat-raised-button class="filter mb-1" [ngClass]="{'active': isVerifiedCouriersActive}"
+            (click)="verifiedCouriers()">View Verified Couriers</button>
+          <button mat-raised-button class="filter mb-1" [ngClass]="{'active': isUnverifiedCouriersActive}"
+            (click)="unverifiedCouriers()">View Unverified Couriers</button>
+
+        </div>
+      </div>
+
+      <!-- </div> -->
+      <mat-card>
+        <mat-card-header class="p-3" style="background: #ADADAD;border-radius: 6px 6px 0px 0px;">
+          <div class="search-container">
+            <div fxLayout="row wrap">
+              <div fxFlex.gt-sm="100" fxFlex="100">
+                <div class=" d-flex">
+                  <div class=" searchone">
+                    <div class="input-group">
+                      <input type="text" placeholder="Search Couriers" class="form-control"
+                        (input)="searchCourier($event)">
+                      <div class="input-group-append"><button type="submit" value="search" class="btn btnsearch"
+                          style="background: #21AA47;"><i class="fas fa-search text-white"></i></button></div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+
+          <div class="row" *ngIf="courier_list?.length">
+            <div class="col-md-4 col-sm-12  mb-4" *ngFor="let items of courier_list ">
+              <div class="card card-courier">
+                <div class="card-head" style="padding: 0;">
+
+                  <div class="row">
+
+                    <div class="col-6">
+                      <div class="px-4 ">
+                        Status:
+                        <mat-slide-toggle class="py-2" [checked]="items?.status == true"
+                          (change)="onStatusChange($event,items)"></mat-slide-toggle>
+                      </div>
+
+                    </div>
+
+                    <!-- for map -->
+                      <!-- <div class="col-6">
+  <div class="px-4 ">
+    Active:
+    <mat-slide-toggle class="py-2"
+      [checked]="items?.isActive"
+      (change)="onActiveChange($event,items)">
+    </mat-slide-toggle>
+  </div> 
+</div>-->
+
+
+
+                    <div class="col-6">
+                      <div class="">
+                        <!-- <span class="text-center">{{items.isVerified}}</span> -->
+                        <div *ngIf="items.isVerified; else verified">
+                          <div [ngClass]="{'green': items.isVerified == true}">verified</div>
+                        </div>
+
+                        <ng-template #verified>
+                          <div [ngClass]="{'red': items.isVerified != true}">unverified</div>
+
+                        </ng-template>
+
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+
+                <div class="card-body  p-2">
+                  <div class="row h-40">
+                    <div class="col-6">
+                      <p class="font mt-2 px-2">
+                        {{items.name | titlecase}}<br>
+                        📞 +91 {{items.mobileNo}}<br>
+                        🚗 Vehicle: {{ items?.vehicleDetails?.name || 'No Vehicle Assigned' }}<br>
+                        <!-- <span class="vehicle-extra"><b>Base Price:</b> ₹{{ items?.vehicleDetails?.basePrice || '-' }}</span><br>
+                        <span class="vehicle-extra"><b>Per KM:</b> ₹{{ items?.vehicleDetails?.perkm || '-' }}</span> -->
+                      </p>
+                      <!-- {{items.address}} -->
+                    </div>
+                    <div class="col-6">
+                      <div class="text-center">
+                        <img [src]="items?.imgUrl? items.imgUrl :'assets/images/custm-nbb/user_dummy.png'"
+                          class="img-fluid">
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <div class="row mt-3">
+                    <div class="col-6 text-center">
+                      <button mat-stroked-button type="button" class="btn btn-primary1"
+                        (click)="couriersView(items?._id)">VIEW
+                        <br> DETAILS</button>
+                    </div>
+                    <div class="col-6 text-center">
+                      <button mat-stroked-button type="button" class="btn btn-primary1"
+                        (click)="courierPayout(items?._id)">PAYOUT
+                        <br>HISTORY</button>
+                    </div>
+                  </div>
+
+
+                  <div class="row mt-3 mb-3">
+                    <div class="col-6 text-center">
+                      <button mat-stroked-button type="button" class="btn btn-primary1"
+                        (click)="generatePayout(items?._id)">GENARATE<br> PAYOUT</button>
+                    </div>
+                    <div class="col-6 text-center">
+                      <button mat-stroked-button type="button" class="btn btn-primary1"
+                        (click)="searchtrip(items?._id)">SEARCH<br> TRIPS</button>
+                    </div>
+                  </div>
+                  <div class="text-center">
+                    <button mat-raised-button color="primary" (click)="deletecourier(items)"
+                      style="background-color:#FF0C0C!important;width: 80% !important;">
+                      REMOVE COURIER</button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <!-- <div *ngIf="!courier_list?.length">
+              <tr>No results found.</tr>
+            </div> -->
+            <div>
+              <mat-paginator (page)="pageChange($event)" [pageSize]="limit" aria-label="Select page"
+                [length]="totalCount" [pageIndex]="currentPage">
+              </mat-paginator>
+            </div>
+          </div>
+          <div *ngIf="!courier_list?.length">
+            <div class="text-center">
+              No Record found
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+
+
+    </div>
+  </div>
+</div>

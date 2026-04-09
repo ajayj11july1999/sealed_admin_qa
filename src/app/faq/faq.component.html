@@ -1,0 +1,220 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="container-fluid mt-3 ">
+      <div class="row">
+        <div class="col-12 col-padding ">
+          <div class="card card-address ">
+            <div class="p-3 mobile-padding">
+              <div class="container mt-3">
+                <div class="top-header mb-3">
+                  <div>
+                    <h5>Manage FAQ</h5>
+                  </div>
+                  <div>
+                    <!-- <button mat-raised-button class="mb-1 export-btn" (click)="downloadExport()">Export</button> -->
+                  </div>
+
+                </div>
+                <div class="row  p-2 " style="background-color: #F4F4F4;align-items: baseline;">
+                  <!-- <div class=""> -->
+                  <div class=" col-lg-8 col-md-8 col-4 new-one" (click)="AddModal(addtemplate)">
+                    <div *ngIf="userrole !== 'subadmin' || showAdd"><i class="fa fa-plus-circle me-2"
+                        aria-hidden="true"></i><span class="add-txt">Add
+                        New</span>
+                    </div>
+                  </div>
+                  <div class="col-lg-4 col-md-4 col-8 text-end">
+                    <div class="search-box">
+                      <input type="text" (input)="searchUserList($event)" class="search-input" placeholder="Search..">
+
+                      <button class="search-button" type="submit" value="search">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+                  </div>
+
+
+
+
+                </div>
+                <div class="tab_button mt-3">
+                  <button class="samebutton" (click)="copyTable()">Copy </button>
+                  <button class="samebutton" (click)="exportAsXLSX()">CSV </button>
+                  <button class="samebutton" (click)="exportAsPdf()">PDF</button>
+                  <button class="samebutton" (click)="printTable()">Print</button>
+                  <!-- <mat-tab-group>
+                    <mat-tab label="Copy"></mat-tab>
+                    <mat-tab label="CSV"></mat-tab>
+                    <mat-tab label="PDF"></mat-tab>
+                    <mat-tab label="Print"></mat-tab>
+
+                  </mat-tab-group> -->
+                </div>
+                <div class="card-table">
+                  <table id="table" class="table table-striped mb-5 mt-3" style="width:100% !important">
+                    <thead>
+                      <tr>
+                        <th>Sl.NO</th>
+                        <th>Type</th>
+                        <th>Question</th>
+                        <th>Answer</th>
+                        <th>Status</th>
+                        <th>Action</th>
+
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      <tr *ngFor="let item of faqList; let i= index;">
+
+                        <td>
+                          {{i+1+ (myPaginator.pageIndex * myPaginator.pageSize)}}
+                        </td>
+                        <td>
+                          <p>{{item?.type}}</p>
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.question}}> {{item?.question}}</p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p> {{item?.answer}} </p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip"> {{item?.status}} </p>
+
+                        </td>
+
+                        <td class="">
+                          <div class=" d-flex justify-content-center te1">
+                            <!-- <i class="fa fa-key me-2" aria-hidden="true" (click)="resetPassword(item)" style="color:grey;"></i> -->
+                            <i class="fa fa-edit address_edit me-2" *ngIf="userrole !== 'subadmin' || showEdit"
+                              (click)="AddModal(addtemplate);editFaq(item)" style="color:#21aa47"
+                              aria-hidden="true"></i>
+                            <i (click)="deleteFaq(item)" *ngIf="userrole !== 'subadmin' || showDelete"
+                              class="fa fa-trash trash_icon" aria-hidden="true"></i>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div>
+                    <mat-paginator (page)="pageChange($event)" [pageSize]="limit" aria-label="Select page"
+                      [length]="totalCount" #myPaginator>
+                    </mat-paginator>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #addtemplate>
+  <div class="modal-header">
+    <mat-card-title>{{isedit ? 'Edit' : 'Add'}} FAQ</mat-card-title>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <!-- <div class="row">
+
+
+      <div class="col-md-12 col-sm-12">
+        <mat-form-field>
+          <input matInput placeholder="Category Name">
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-12 col-sm-12">
+
+        <input type="file" placeholder="CategoryImage">
+       
+      </div>
+
+      <div class="col-md-12 col-sm-12">
+        <mat-form-field>
+          <mat-select placeholder="Status">
+            <mat-option value="option">Active</mat-option>
+            <mat-option value="option">Inactive</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div> -->
+    <div class="row">
+      <div class="col-md-12">
+        <form #f="ngForm" name="form">
+          <div class="">
+            <label>FAQ Type</label><br>
+            <select class="form-select mb-2 mt-2" aria-label="Default select example" name="type"
+              [(ngModel)]="faqForm.type" required #type="ngModel">
+              <option selected>Select Faq Type</option>
+              <option value="About Our Service">About Our Services</option>
+              <option value="Payment & Cancellation">Payment & Cancellation</option>
+              <option value="Ordering Process">Ordering Process</option>
+              <option value="Current and Prevoius Orders">Current and Previous Orders</option>
+
+
+            </select>
+          </div>
+
+          <div class="">
+            <label>Question</label><br>
+            <textarea type="text" name="question" [(ngModel)]="faqForm.question" rows="4" cols="95" required
+              #question="ngModel">
+              </textarea>
+            <!-- <div *ngIf="submitted && f['question'].errors" class="invalid-feedback" required>
+              <div style="font-size: 10px;" *ngIf="createForm.get('question').errors ">
+                Question is required</div>
+            </div> -->
+            <!-- <div class="new" *ngIf="userNameCheck">
+              Username doesn't have numbers </div> -->
+          </div>
+          <div class="">
+            <label>Answer</label><br>
+            <textarea type="text" name="answer" [(ngModel)]="faqForm.answer" rows="4" cols="95" required
+              #answer="ngModel">
+                          </textarea>
+            <!-- <input type="text" formControlName="answer" class="form-control mt-2 mb-2"> -->
+            <!-- <div *ngIf="submitted && f['answer'].errors" class="invalid-feedback" required>
+              <div style="font-size: 10px;" *ngIf="createForm.get('answer').errors ">
+                Answer is required</div>
+            </div> -->
+            <!-- <div class="new" *ngIf="userNameCheck">
+                            Username doesn't have numbers </div> -->
+          </div>
+          <div class="">
+            <label>Status</label><br>
+            <select class="form-select mb-2 mt-2" aria-label="Default select example" name="status"
+              [(ngModel)]="faqForm.status" required #status="ngModel">
+              <option selected>Open this select menu</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+
+            </select>
+            <!-- <input formControlName="email" class="form-control mt-2 mb-2" > -->
+            <!-- <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
+              <div style="font-size: 10px;" *ngIf="createForm.get('email').errors && !emailAddrCheck">
+                status is required</div>
+            </div> -->
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col">
+        <button mat-button mat-flat-button color="primary" (click)="AddFaq(f)">{{isedit ? 'Update' :
+          'Add'}}</button>
+        <button mat-button (click)="cancel()">Cancel</button>
+      </div>
+    </div>
+
+
+  </div>
+</ng-template>

@@ -1,0 +1,218 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+
+    <div class="overlay" *ngIf="searchLoad">
+      <div class="spinner"> Loading......!!!</div>
+    </div>
+
+    <mat-card *ngIf="!searchLoad">
+      <mat-card-content>
+        <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+          <mat-tab label="Banner Management">
+            <div class="container">
+              <div class="row">
+                <mat-card-title class="p-2">
+                  <h6 class="heading">consumer dashboard</h6>
+                </mat-card-title>
+                <div class="col-lg-4 col-md-4 col-sm-12" *ngFor="let items of bannerConsumerList; let i= index;">
+
+                  <div class=" card-settings mb-3">
+                    <div class="col-sm-12">
+
+                      <div class="shadow" style="height:300px !important">
+                        <div class=" text-center p-2">
+                          <img src="{{items.imageUrl}}" class=" img-fluid" style="width:100% ;height: 207px !important;"
+                            alt="img">
+                        </div>
+
+                        <div class=" text-end p-1">
+
+                          <button class="file-upload-button1">
+                            <input type="file" #fileInput
+                              (change)="onChange($event?.target?.files,'mobile',items?._id)" />
+                          </button>
+
+
+                          <button mat-fab color="danger" (click)="deleteBanner(i,bannerConsumerList,'mobile')">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12" *ngFor="let items of banner_management">
+                  <div class=" card-settings mb-3" *ngIf='consumerCheck'>
+                    <div class="col-sm-12">
+
+                      <div class="shadow text-center">
+                        <img src={{items.imgUrl}} class="p-2" alt="img">
+                        <div class="card-body text-center">
+                          <button class="file-upload-button">
+                            <input type="file" #fileInput (change)="onChange($event.target.files,'mobile')" />
+                          </button>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <mat-card-title class="p-2">
+                  <h6 class="heading">web dashboard</h6>
+                </mat-card-title>
+                <div class="col-lg-4 col-md-4 col-sm-12" *ngFor="let items of bannerWebList; let i= index;">
+
+                  <div class=" card-settings mb-3">
+                    <div class="col-sm-12">
+
+                      <div class="shadow">
+                        <div class=" text-center p-2">
+                          <img src="{{items.imageUrl}}" class=" img-fluid" style="width:100% ;height: 207px !important;"
+                            alt="img">
+                        </div>
+                        <div class=" text-end p-1">
+
+                          <button class="file-upload-button1">
+                            <input type="file" #fileInput (change)="onChange($event?.target?.files,'web',items?._id)" />
+                          </button>
+
+                          <button mat-fab color="danger" (click)="deleteBanner(i,bannerWebList,'web')">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="col-4" *ngFor="let items of banner_management">
+                  <div class=" card-settings mb-3" *ngIf='webCheck'>
+                    <div class="col-sm-12">
+
+                      <div class="shadow text-center">
+                        <img src={{items.imgUrl}} class="p-2" alt="img">
+                        <div class="card-body text-center">
+                          <button class="file-upload-button">
+                            <input type="file" #fileInput (change)="onChange($event.target.files,'web')" />
+                          </button>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <mat-card-title class="p-2">
+                  <h6 class="heading">Notary dashboard</h6>
+                </mat-card-title>
+                <div class="col-lg-4 col-md-4 col-sm-12" *ngFor="let items of bannerNotaryList; let i= index;">
+
+                  <div class=" card-settings mb-3">
+                    <div class="col-sm-12">
+
+                      <div class="shadow">
+                        <div class=" text-center p-2">
+                          <img src="{{items.imageUrl}}" class=" img-fluid" style="width:100% ;height: 207px !important;"
+                            alt="img">
+                        </div>
+                        <div class=" text-end p-1">
+
+                          <button class="file-upload-button1">
+                            <input type="file" #fileInput
+                              (change)="onChange($event?.target?.files,'notary',items?._id)" />
+                          </button>
+                          <button mat-fab color="danger" (click)="deleteBanner(i,bannerNotaryList,'notary')">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="col-4" *ngFor="let items of banner_management">
+                  <div class=" card-settings mb-3" *ngIf='notaryCheck'>
+                    <div class="col-sm-12">
+
+                      <div class="shadow text-center">
+                        <img src={{items.imgUrl}} class="p-2" alt="img">
+                        <div class="card-body text-center">
+                          <button class="file-upload-button">
+                            <input type="file" #fileInput (change)="onChange($event.target.files,'notary')" />
+                          </button>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </mat-tab>
+          <mat-tab label="Advertisement">
+            <div class="container">
+
+              <div class="row">
+                <mat-card-title class="p-2">
+                  <h6 class="heading">Advertisement</h6>
+                </mat-card-title>
+                <div class="col-lg-4 col-md-4 col-sm-12" *ngFor="let items of advertiseList; let i= index;">
+
+                  <div class=" card-settings mb-3">
+                    <div class="col-sm-12">
+
+                      <div class="shadow" style="height:300px !important">
+                        <div class=" text-center p-2">
+                          <img src="{{items.imageUrl}}" class=" img-fluid" style="width:100% ;height: 207px !important;"
+                            alt="img">
+                        </div>
+                        <div class=" text-end p-1">
+                          <button class="file-upload-button1">
+                            <input type="file" #fileInput
+                              (change)="onChange($event?.target?.files,'advertise',items?._id)" />
+                          </button>
+
+
+                          <button mat-fab color="danger" (click)="deleteBanner(i,advertiseList,'advertise')">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12" *ngFor="let items of banner_management">
+                  <div class=" card-settings mb-3" *ngIf='advertiseCheck'>
+                    <div class="col-sm-12">
+
+                      <div class="shadow text-center">
+                        <img src={{items.imgUrl}} class="p-2" alt="img">
+                        <div class="card-body text-center">
+                          <button class="file-upload-button">
+                            <input type="file" #fileInput (change)="onChange($event.target.files,'advertise')" />
+                          </button>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+
+
+  </div>
+</div>

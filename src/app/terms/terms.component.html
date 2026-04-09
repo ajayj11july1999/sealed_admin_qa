@@ -1,0 +1,104 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="container-fluid mt-3 ">
+      <div class="row">
+        <div class="col-12 col-padding ">
+          <div class="card card-address ">
+            <div class="p-3 mobile-padding">
+              <div class="container mt-3">
+                <div class="top-header mb-3">
+                  <div>
+                    <h5>Manage Terms</h5>
+                  </div>
+                  <div>
+                    <!-- <button mat-raised-button class="mb-1 export-btn" (click)="downloadExport()">Export</button> -->
+                  </div>
+
+                </div>
+                <div class="row  p-2 " style="background-color: #F4F4F4;align-items: baseline;">
+                  <!-- <div class=""> -->
+                  <div class=" col-lg-8 col-md-8 col-4 new-one">
+                    <div *ngIf="termsList.length !== 2"><i class="fa fa-plus-circle me-2" aria-hidden="true"></i><span
+                        class="add-txt">
+                        Add New</span></div>
+                  </div>
+                  <div class="col-lg-4 col-md-4 col-8 text-end">
+                    <div class="search-box">
+                      <input type="text" (input)="searchUserList($event)" class="search-input" placeholder="Search..">
+
+                      <button class="search-button" type="submit" value="search">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+                  </div>
+
+
+
+
+                </div>
+                <!-- <div class="tab_button mt-3">
+                  <button class="samebutton">Copy </button>
+                  <button class="samebutton">CSV </button>
+                  <button class="samebutton">PDF</button>
+                  <button class="samebutton">Print</button>
+                  
+                </div> -->
+                <div class="card-table">
+
+
+                  <table class="table table-striped mb-5 mt-3" style="width:100% !important">
+                    <thead>
+                      <tr>
+                        <th>Sl.NO</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Action</th>
+
+
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      <tr *ngFor="let item of termsList; let i= index;">
+
+                        <td>
+                          {{i+1}}
+                        </td>
+                        <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.type}}> {{item?.type}}</p>
+
+                        </td>
+                        <td class="checkname ">
+                          <p> {{item?.updatedAt | date:'dd/MM/yyyy'}} </p>
+
+                        </td>
+                        <!-- <td class="checkname ">
+                          <p class="ellip" data-toggle="tooltip" title={{item?.email}}> {{item?.status}} </p>
+
+                        </td> -->
+
+                        <td class="">
+                          <div class=" d-flex justify-content-center te1">
+                            <!-- <i class="fa fa-key me-2" aria-hidden="true" (click)="resetPassword(item)" style="color:grey;"></i> -->
+                            <i class="fa fa-edit address_edit me-2" (click)="editTerms(item)" style="color:#21aa47"
+                              aria-hidden="true"></i>
+                            <!-- <i (click)="deleteUserList(item)" class="fa fa-trash trash_icon" aria-hidden="true"></i> -->
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div>
+                    <mat-paginator (page)="pageChange($event)" [pageSize]="limit" aria-label="Select page"
+                      [length]="totalCount" [pageIndex]="currentPage">
+                    </mat-paginator>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

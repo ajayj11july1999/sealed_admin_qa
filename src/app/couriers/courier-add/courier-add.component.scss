@@ -1,0 +1,11 @@
+.example-margin {
+  margin-inline-start: 12px;
+}
+
+.pt-10 {
+  padding: 10px 0px 10px !important;
+}
+
+::ng-deep .mat-form-field-appearance-legacy .mat-form-field-underline {
+  height: 1px !important;
+}

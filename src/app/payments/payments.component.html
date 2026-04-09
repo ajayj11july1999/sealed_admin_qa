@@ -1,0 +1,205 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <div class="row">
+          <div class="col-md-6">
+            <mat-card-title>Payment Details</mat-card-title>
+          </div>
+
+        </div>
+        <div class="row">
+          <div class="col-md-4 col-sm-12">
+            <mat-form-field>
+              <!-- <mat-label>Toppings</mat-label> -->
+              <mat-select placeholder="Payment Method" [formControl]="toppings" multiple>
+                <mat-option *ngFor="let topping of toppingList" [value]="topping">{{topping}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-md-4 col-sm-12">
+            <mat-form-field>
+              <!-- <mat-label>Toppings</mat-label> -->
+              <mat-select placeholder="Payment Status" [formControl]="paymentStatus" multiple>
+                <mat-option *ngFor="let status of statusList" [value]="status">{{status}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+          </div>
+          <div class="col-md-4 col-sm-12">
+            <mat-form-field>
+              <input matInput placeholder="OrderID">
+            </mat-form-field>
+          </div>
+          <div class="col-md-4 col-sm-12">
+            <mat-form-field>
+              <input matInput placeholder="SubscriptionID">
+            </mat-form-field>
+          </div>
+
+        </div>
+        <div class="row mt-2">
+          <div class="col">
+            <button mat-button mat-flat-button color="primary">Search</button>
+            <button mat-button>Clear</button>
+          </div>
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row wrap">
+  <div fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <div class="row">
+          <div class="col-md-6">
+            <mat-card-title>Payment Details List</mat-card-title>
+          </div>
+          <!-- <div class="col-md-6">
+            <div class="text-right">
+              <button mat-raised-button color="primary" (click)="AddModal(addtemplate)">Add</button>
+            </div>
+          </div> -->
+
+        </div>
+
+        <div class="table-responsive">
+          <table mat-table [dataSource]="dataSource" class="table employee-list no-wrap">
+
+            <ng-container matColumnDef="#">
+              <th mat-header-cell *matHeaderCellDef> # </th>
+              <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="custmerId">
+              <th mat-header-cell *matHeaderCellDef> Customer ID </th>
+              <td mat-cell *matCellDef="let element">
+                <div class="d-flex">
+                  <!-- <img class="mat-card-avatar" [src]='element.imagePath'> -->
+                  <div class="m-l-15">
+                    <p class="font-medium m-b-0 m-t-0">{{ element.custmerId }}</p>
+                    <!-- <small class="text-muted">{{element.Position}}</small> -->
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="subscriptionId">
+              <th mat-header-cell *matHeaderCellDef> SubscriptionID </th>
+              <td mat-cell *matCellDef="let element"> {{element.subscriptionId}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="amountPaid">
+              <th mat-header-cell *matHeaderCellDef> AmountPaid </th>
+              <td mat-cell *matCellDef="let element"> {{element.amountPaid}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="PaymentMethod">
+              <th mat-header-cell *matHeaderCellDef>Payment Method </th>
+              <td mat-cell *matCellDef="let element"> {{element.PaymentMethod}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="paymentStatus">
+              <th mat-header-cell *matHeaderCellDef> Payment Status </th>
+              <td mat-cell *matCellDef="let element"> {{element.paymentStatus}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="authcode">
+              <th mat-header-cell *matHeaderCellDef> Authcode </th>
+              <td mat-cell *matCellDef="let element"> {{element.authcode}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="orderId">
+              <th mat-header-cell *matHeaderCellDef> OrderID </th>
+              <td mat-cell *matCellDef="let element"> {{element.orderId}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef> Action </th>
+              <td mat-cell *matCellDef="let element" class="action-link">
+                <a (click)="AddModal(addtemplate)" class="m-r-10 cursor-pointer"><i class="fa fa-pencil"></i></a>
+                <a (click)="openDialog('Delete',element)" class="m-r-10 cursor-pointer">
+                  <i class="fa fa-trash text-danger"></i>
+                </a>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+          <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<ng-template #addtemplate>
+  <!-- <ngx-spinner size="medium" color="#F39201" type="square-jelly-box" [fullScreen]="true">
+    <p style="color: #F39201;font-weight: 600;"> Loading... </p>
+  </ngx-spinner> -->
+  <div class="modal-header">
+    <mat-card-title>Edit Payment Details</mat-card-title>
+    <!-- <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button> -->
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-4 col-sm-12">
+        <mat-form-field>
+          <input matInput placeholder="CustomerID">
+        </mat-form-field>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <mat-form-field>
+          <input matInput placeholder="SubscriptionID">
+        </mat-form-field>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <mat-form-field>
+          <input matInput placeholder="Amount Paid">
+        </mat-form-field>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <mat-form-field>
+          <!-- <mat-label>Toppings</mat-label> -->
+          <mat-select placeholder="Payment Method" [formControl]="toppings" multiple>
+            <mat-option *ngFor="let topping of toppingList" [value]="topping">{{topping}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <mat-form-field>
+          <!-- <mat-label>Toppings</mat-label> -->
+          <mat-select placeholder="Payment Status" [formControl]="paymentStatus" multiple>
+            <mat-option *ngFor="let status of statusList" [value]="status">{{status}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <mat-form-field>
+          <input matInput placeholder="Authcode">
+        </mat-form-field>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <mat-form-field>
+          <input matInput placeholder="OrderID">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col">
+        <button mat-button mat-flat-button color="primary">Save</button>
+        <button mat-button (click)="modalRef.hide()">Cancel</button>
+      </div>
+    </div>
+
+
+  </div>
+</ng-template>

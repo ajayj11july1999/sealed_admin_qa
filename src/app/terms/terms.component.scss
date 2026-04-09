@@ -1,0 +1,137 @@
+.card-address {
+  background: #FEFEFE;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+  min-height: 100vh;
+  width: 100%;
+  border-radius: 5px;
+  border: none;
+  /* min-height: 100vh!important; */
+}
+
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  gap: 20px;
+}
+
+.search-box {
+  width: 100%;
+  position: relative;
+  display: flex;
+  justify-content: end;
+
+}
+
+.search-input {
+  width: 100%;
+  height: 35px;
+  padding: 10px;
+  border: 2px solid #21aa47;
+  border-radius: 10px 0 0 10px;
+  border-right: none;
+  outline: none;
+  font-size: 12px;
+  color: black;
+  background: none;
+}
+
+.search-button {
+  text-align: center;
+  height: 35px;
+  //   width: 40px;
+  outline: none;
+  cursor: pointer;
+  border: 2px solid #21aa47;
+  border-radius: 0 10px 10px 0;
+  border-left: none;
+  background: none;
+  color: #21aa47;
+  font-size: 14px;
+  //   border-left: 4px solid #111d5e;
+}
+
+// ::ng-deep .mat-tab-label {
+//   padding: 0px !important;
+//   min-width: 90px !important;
+// }
+
+// ::ng-deep .mat-tab-group.mat-primary .mat-ink-bar,
+// .mat-tab-nav-bar.mat-primary .mat-ink-bar {
+//   background-color: #21aa47;
+// }
+
+// ::ng-deep.mat-ink-bar {
+
+//   height: 50px !important;
+// }
+
+.tab_button {
+  display: flex;
+
+}
+
+.samebutton {
+  color: #fff;
+  background-color: #6c757d;
+  border: #6c757d;
+  padding: 8px 20px;
+}
+
+.samebutton:hover {
+  background-color: #5a6268;
+  color: #fff;
+  border-color: #5a6268;
+}
+
+td {
+  padding: 20px !important;
+  font-size: 14px !important;
+  background-color: #fff !important;
+  text-align: -webkit-center;
+  border-bottom: 2px solid #f2f2f2;
+  border-right: 1px solid #f2f2f2;
+
+}
+
+p {
+  margin-bottom: 0px !important;
+}
+
+th {
+  padding: 20px !important;
+  // border-bottom: 1px solid rgba(0, 0, 0, 0.3) !important;
+  font-size: 14px !important;
+  background: #21aa47;
+  color: #fff;
+  font-weight: 400;
+  border-right: 1px solid #f2f2f2;
+  text-align: center;
+
+}
+
+@media only screen and (min-width:320px) and (max-width:767px) {
+  .search-input {
+
+    width: 60%;
+    height: 25px;
+
+  }
+
+  .search-button {
+    height: 25px;
+  }
+
+  .col-padding {
+    padding: 0px;
+  }
+
+  .mobile-padding {
+    padding: 5px !important;
+  }
+
+  .card-table {
+    overflow-x: auto !important;
+  }
+
+}

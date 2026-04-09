@@ -1,0 +1,214 @@
+<!-- <ngx-spinner size="medium" color="#21aa47" [fullScreen]="true">
+  <p style="color: #F39201;font-weight: 600;"> Loading... </p>
+</ngx-spinner> -->
+
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+
+
+    <div class="overlay" *ngIf="searchLoad">
+      <div class="spinner"> Loading......!!!</div>
+    </div>
+
+    <mat-card class="" *ngIf="!searchLoad">
+
+      <mat-card-content>
+        <div class="row">
+          <div class="text-end">
+            <button mat-raised-button class="mb-1 export-btn me-2" (click)="cpReportsExport('summaryCP')">Summary Report
+              Cp`s</button>
+            <!-- <button mat-raised-button class="mb-1 export-btn me-2" (click)="cpReportsExport('incentiveCp')">Incentive to
+              Cp`s</button> -->
+
+            <button mat-raised-button class="mb-1 export-btn" (click)="downloadExport()">Export</button>
+
+          </div>
+          <div class="">
+            <mat-label>ENTER ORDER ID</mat-label>
+            <div class="row">
+              <div class="  col-md-6 col-lg-2 col-sm-12 mt-2">
+                <form [formGroup]="searchtripidForm">
+                  <input type=" text" class="form-control" formControlName='tripid'>
+                </form>
+
+              </div>
+              <div class="  col-md-3 col-lg-1 col-sm-12 mx-2">
+                <div class="searchbtn my-2">
+                  <button mat-raised-button color="primary" (click)="searchTrip()">Search ID</button>
+
+                </div>
+              </div>
+
+              <!-- <div class="col-md-3 col-lg-2 col-sm-12 mt-2 mx-4" *ngIf="showSubAdmin">
+
+                <ng-select [items]="customerList" [clearable]="false" bindValue="_id"
+                  (change)="onSelectionChange($event)" [searchable]="true" bindLabel="name"
+                  placeholder="Select SubAdmin">
+                </ng-select>
+
+              </div> -->
+              <div class="col-md-3 col-lg-2 col-sm-12 mt-2 mx-4">
+                <button mat-raised-button color="primary" (click)="clear()">Clear</button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+        <form [formGroup]="searchtripDateForm">
+          <div class="row my-3">
+
+            <label for="text" class="text">ENTER TRIP DATE RANGE</label>
+
+            <div class="col-md-6 col-lg-2 col-sm-12 mt-2 ">
+              <input type="date" class="form-control" formControlName='fromdate' [max]="yesterday">
+            </div>
+            <div class="col-md-6 col-lg-2 col-sm-12 mt-2 ">
+              <input type="date" class="form-control" formControlName='todate' [max]="yesterday">
+            </div>
+
+            <div class="col-md-6 col-lg-2 col-sm-12 ">
+              <div class="searchbtn my-2">
+                <button mat-raised-button color="primary" (click)="searchTripByDate()">SEARCH DATE</button>
+
+              </div>
+
+            </div>
+            <div class="col-md-3 col-lg-3 col-sm-12 mt-2 mx-4">
+
+              <ng-select [items]="orderStatus" [clearable]="false" bindValue="value" formControlName='orderstatus'
+                (change)="onSelectionStatusChange($event)" [searchable]="true" bindLabel="viewValue"
+                placeholder="Select Status">
+              </ng-select>
+
+            </div>
+
+          </div>
+        </form>
+
+        <div class="ng-container ">
+          <div class=" p-2 cardheight" *ngIf="alltripdetails?.length">
+            <mat-card *ngFor="let items of alltripdetails" style="background-color: #f4f4f4;">
+              <mat-card-content class="p-3">
+
+                <div class="row d-flex text-center justify-center">
+                  <div class="col-2 txt p-0">
+                    <div class="">
+                      <ng-container *ngIf="items?.orderStatus == 'new';else second">
+                        <p>{{items?.createdAt |date}} {{items?.newAt |date:'mediumTime'}}</p>
+                      </ng-container>
+                      <ng-template #second>
+                        <ng-container *ngIf="items?.orderStatus == 'orderAssigned';else third">
+                          <p> {{items?.assignedAt|date}} {{items?.assignedAt|date:'mediumTime'}}</p>
+                        </ng-container>
+                      </ng-template>
+                      <ng-template #third>
+                        <ng-container *ngIf="items?.orderStatus == 'orderInProgress';else fourth">
+                          <p> {{items?.inProgressAt|date}} {{items?.inProgressAt|date:'mediumTime'}}</p>
+                        </ng-container>
+                      </ng-template>
+                      <ng-template #fourth>
+                        <ng-container *ngIf="items?.orderStatus == 'orderPickedUped';else fifth">
+                          <p> {{items?.pickUpedAt|date}} {{items?.pickUpedAt|date:'mediumTime'}}</p>
+                        </ng-container>
+                      </ng-template>
+                      <ng-template #fifth>
+                        <ng-container *ngIf="items?.orderStatus == 'delivered';else sixth">
+                          <p> {{items?.deliveredAt|date}} {{items?.deliveredAt|date:'mediumTime'}}</p>
+                        </ng-container></ng-template>
+                      <ng-template #sixth>
+                        <ng-container *ngIf="items?.orderStatus == 'cancelled'">
+                          <p> {{items?.cancelledAt|date}} {{items?.cancelledAt|date:'mediumTime'}}</p>
+                        </ng-container></ng-template>
+                      <p>{{items?.orderCode}} </p>
+                      <p>{{items?.userDetails?.name}} </p>
+                    </div>
+                  </div>
+                  <div class="col-1 txt p-0">
+                    <div class="">
+
+                      <p>{{items?.deliveryType}}</p>
+                    </div>
+                  </div>
+                  <div class="col-2 txt p-0">
+                    <div class="">
+
+                      <p>{{items?.selectedPackage}}</p>
+                    </div>
+                  </div>
+
+                  <div class="col-2 txt p-0">
+                    <div class="">
+                      <p *ngIf="items?.orderStatus == 'new'">Courier Not Yet Assigned</p>
+                      <p *ngIf="items?.orderStatus== 'orderAssigned'">Courier Assigned to
+                        {{items?.assigneeDetails?.name}}</p>
+                      <p *ngIf="items?.orderStatus== 'orderInProgress'">Courier Assigned to
+                        {{items?.assigneeDetails?.name}}</p>
+                      <p *ngIf="items?.orderStatus== 'orderPickedUped'">Courier Assigned to
+                        {{items?.assigneeDetails?.name}}</p>
+                      <p *ngIf="items?.orderStatus== 'delivered'">Courier Delivered by {{items?.assigneeDetails?.name}}
+                      </p>
+                      <p *ngIf="items?.orderStatus== 'cancelled'">Courier Cancelled</p>
+
+                    </div>
+                  </div>
+
+                  <div class="col-2 txt p-0">
+
+                    <div>
+                      <p *ngIf="items?.orderStatus=='new' ">New</p>
+                      <p *ngIf="items?.orderStatus=='orderAssigned' ">Assigned</p>
+                      <p *ngIf="items?.orderStatus=='orderInProgress' ">Inprogress</p>
+                      <p *ngIf="items?.orderStatus=='orderPickedUped'">Pickuped</p>
+                      <p *ngIf="items?.orderStatus=='delivered' ">Delivered</p>
+                      <p *ngIf="items?.orderStatus=='cancelled' ">Cancelled</p>
+                      <p></p>
+                    </div>
+                  </div>
+
+                  <div class="col-1 txt p-0">
+                    <div class="">
+
+
+                      <p>{{items?.paymentDetails?.paymentMode}}</p>
+                    </div>
+                  </div>
+                  <div class="col-2 txt p-0">
+                    <div class="">
+
+                      <div class="detail ">
+                        <button mat-raised-button color="primary" class="detailbtn"
+                          (click)="moredetails(items)">Details</button>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card-content class="p-3">
+              <mat-paginator (page)="pageChange($event)" [pageSize]="limit" aria-label="Select page"
+                [length]="totalCount">
+              </mat-paginator>
+            </mat-card-content>
+
+
+
+
+          </div>
+          <div *ngIf="alltripdetails?.length == 0">
+            <div class="noData">
+              No Record Found
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+
+
+  </div>
+</div>

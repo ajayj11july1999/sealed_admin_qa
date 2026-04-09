@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="keywords" content="SEALED | SEALED">
+  <meta name="description" content="SEALED | SEALED">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Sealed Admin</title>
+  <link rel="icon" type="image/x-icon" href="./assets/images/sealed-logo.png">
+  <link rel="stylesheet" href="./assets/styles/icons/fontawesome-free-6.0.0-web/css/all.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#1976d2">
+  <link href="https://cdn.syncfusion.com/ej2/26.2.4/material.css" rel="stylesheet" />
+</head>
+
+<body>
+  <app-root></app-root>
+  <script src="../src/assets/js/bootstrap.js"></script>
+  
+  <script src="./bootstrap.js"></script>
+  <!-- AIzaSyC3JGwD6pCdix01cD62dNz-RPa7uiBi_Jw -->
+
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAOZewZNjU5p3SRKy4waqDjhkpvK2vIjso&libraries=places,drawing&language=en"></script>
+  <noscript>Please enable JavaScript to continue using this application.</noscript>
+
+  <script>
+
+    var global = global || window;
+    var Buffer = Buffer || [];
+    var cancelURL = window.location.origin + '/verifyPayment;status=cancel';
+    var successURL = window.location.origin + '/verifyPayment';
+
+    document.write('<script src="https://credimax.gateway.mastercard.com/checkout/version/61/checkout.js" data-error="errorCallback" data-cancel="'
+      + cancelURL + '" data-complete="' + successURL
+      + '"data-beforeRedirect="Checkout.saveFormFields" data-afterRedirect="Checkout.restoreFormFields"><\/script>');
+
+  </script>
+</body>
+
+</html>

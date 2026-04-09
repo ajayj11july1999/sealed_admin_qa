@@ -1,0 +1,403 @@
+<div fxLayout="row wrap">
+  <div fxFlex.gt-sm="100" fxFlex="100">
+    <div class="container con-padding mb-5">
+      <mat-card>
+        <mat-card-content>
+
+          <div class="row">
+            <!-- <div class="col-md-3 col-lg-3 col-sm-12">
+              <mat-card class="trip m-0 mt-3">
+                <mat-card-content class="p-2">
+                  <div class="d-flex justify-content-between">
+                    <div class="mt-2">
+                      <img class="logo_sealed dash_logo" src="assets/images/box1.png">
+                    </div>
+                    <div class=" radio" align="end">
+                      <h4><b>{{s2bnew}}</b></h4>
+                      <p class="new-trip">New S2B Trip</p>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+
+            </div>
+            <div class="col-md-3 col-lg-3 col-sm-12">
+              <mat-card class="trip m-0 mt-3">
+                <mat-card-content class="p-2">
+                  <div class="d-flex justify-content-between">
+                    <div class="mt-2">
+                      <img class="logo_sealed dash_logo" src="assets/images/boxtick.png">
+                    </div>
+                    <div class=" radio" align="end">
+                      <h4><b>{{s2bactive}}</b></h4>
+                      <p class="new-trip">Active S2B Trip</p>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+
+            </div> -->
+            
+            <div class="col-md-3 col-lg-3 col-sm-12">
+              <mat-card class="trip m-0 mt-3">
+                <mat-card-content class="p-2">
+                  <div class="d-flex justify-content-between">
+                    <div class="mt-2">
+                      <img class="logo_sealed dash_logo" src="assets/images/box1.png">
+                    </div>
+                    <div class=" radio" align="end">
+                      <h4><b>{{b2cnew}}</b></h4>
+                      <p class="new-trip">New B2C trip</p>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+
+            </div>
+            <div class="col-md-3 col-lg-3 col-sm-12">
+              <mat-card class="trip m-0 mt-3">
+                <mat-card-content class="p-2">
+                  <div class="d-flex justify-content-between">
+                    <div class="mt-2">
+                      <img class="logo_sealed dash_logo" src="assets/images/boxtick.png">
+                    </div>
+                    <div class=" radio" align="end">
+                      <h4><b>{{b2cactive}}</b></h4>
+                      <p class="new-trip">Active B2C Trip</p>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+
+            </div>
+          </div>
+          <div class="row">
+            <!-- <div class="col-md-6 mt-4">
+              <mat-card class="m-0 b2btrips p-3">
+                <form [formGroup]="dateForm">
+                  <div class="d-flex justify-content-between  date-pick">
+                    <div class=" ">
+                      <p>B2B Trips</p>
+                    </div>
+                    <div class="">
+                      <mat-form-field appearance="fill">
+                        <mat-label>Enter a date range</mat-label>
+                        <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+                          <input matStartDate formControlName="start" placeholder="Start date">
+                          <input matEndDate formControlName="end" placeholder="End date">
+                        </mat-date-range-input>
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-date-range-picker #picker>
+                          <mat-date-range-picker-actions>
+                            <button mat-button matDateRangePickerCancel>Cancel</button>
+                            <button mat-button matDateRangePickerCancel (click)="resetDateRangeForm()">Reset</button>
+                            <button mat-raised-button color="primary" matDateRangePickerApply
+                              (click)="s2bFilter()">Apply</button>
+                          </mat-date-range-picker-actions>
+                        </mat-date-range-picker>
+
+                        <mat-error *ngIf="range.controls.start.hasError('matStartDateInvalid')">Invalid start
+                          date</mat-error>
+                        <mat-error *ngIf="range.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </form>
+                <mat-divider></mat-divider>
+
+                 <div class="row p-3">
+                  <div class="col-md-8">
+                    <div class="d-flex justify-content-between">
+                      <div class="row">
+                        <div class=" d-flex justify-content-center mt-1">
+
+                          <p class="rectangle"></p>
+                          <span>Total Trips</span>
+                        </div>
+                        <div class=" d-flex justify-content-center mt-1">
+
+                          <p class="rectangle"></p>
+                          <span>Complete Trips</span>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="text-center">fdgd</div>
+                        <div class="text-center">fdgd</div>
+                      </div>
+
+
+
+
+                    </div>
+                  </div>
+
+
+                  <div class="col-md-4 trips-graph">
+
+                    <img class="logo_sealed dash_logo" src="assets\images\deliverd-orders.png">
+
+
+                  </div>
+
+
+
+                </div> 
+
+                <mat-card-content class="p-0">
+                  <div class="row mt-4">
+                    <div class="col-lg-7 col-md-7 col-sm-6 col-12  ">
+
+                      <div class="d-flex justify-content-between p-1">
+
+                        <div>
+                          <p class="rectangle"></p>
+                        </div>
+
+                        <div>
+                          <p>Total Trips</p>
+                        </div>
+
+                        <div>
+                          <P *ngIf="s2bTotalOrderCountPercen=='NaN'">0 %</P>
+                          <p *ngIf="s2bTotalOrderCountPercen!='NaN'">{{s2bTotalOrderCountPercen}} %</p>
+                        </div>
+
+                      </div>
+
+                      <div class="d-flex justify-content-between p-1">
+
+                        <div>
+                          <p class="rectangleg "></p>
+                        </div>
+
+                        <div>
+                          <p>Complete Trips</p>
+                        </div>
+
+                        <div>
+                            <P *ngIf="s2bCompletedOrderCountPercen=='NaN'">0 %</P>
+                            <p *ngIf="s2bCompletedOrderCountPercen!='NaN'">{{s2bCompletedOrderCountPercen}} %</p>
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                    <div class="col-md-5 col-lg-5 col-sm-6 col-12 trips-graph">
+                      <div id="chartdiv1"></div>
+
+                    </div>
+
+                  </div>
+
+
+
+
+                </mat-card-content>
+
+
+
+              </mat-card>
+
+            </div>-->
+
+
+
+
+
+
+
+            <div class="col-md-6 mt-4">
+              <mat-card class="m-0 b2btrips p-3">
+                <div class="d-flex justify-content-between date-pick">
+                  <div class="">
+                    <p>Mobile app Trips</p>
+                  </div>
+                  <div class="">
+                    <mat-form-field appearance="fill">
+                      <mat-label>Enter a date range</mat-label>
+                      <mat-date-range-input [formGroup]="range1" [rangePicker]="picker1">
+                        <input matStartDate formControlName="start" placeholder="Start date">
+                        <input matEndDate formControlName="end" placeholder="End date">
+                      </mat-date-range-input>
+                      <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                      <mat-date-range-picker #picker1>
+                        <mat-date-range-picker-actions>
+                          <button mat-button matDateRangePickerCancel>Cancel</button>
+                          <button mat-button matDateRangePickerCancel (click)="resetDateRangeForm1()">Reset</button>
+                          <button mat-raised-button color="primary" matDateRangePickerApply
+                            (click)="s2bFilter()">Apply</button>
+                        </mat-date-range-picker-actions>
+                      </mat-date-range-picker>
+
+                      <mat-error *ngIf="range.controls.start.hasError('matStartDateInvalid')">Invalid start
+                        date</mat-error>
+                      <mat-error *ngIf="range.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <mat-divider></mat-divider>
+                <mat-card-content class="p-0">
+                  <div class="row mt-4">
+                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+
+                      <div class="d-flex justify-content-between p-1">
+
+                        <div>
+                          <p class="rectangle"></p>
+                        </div>
+
+                        <div>
+
+                          <p>Total Trips</p>
+                        </div>
+                        <div>
+                          <P *ngIf="totalOrderCountPercen=='NaN'">0 %</P>
+                          <p *ngIf="totalOrderCountPercen!='NaN'">{{totalOrderCountPercen}} %</p>
+                        </div>
+
+                      </div>
+                      <div class="d-flex justify-content-between p-1">
+
+                        <div>
+                          <p class="rectangleg "></p>
+                        </div>
+
+                        <div>
+
+                          <p>Complete Trips</p>
+                        </div>
+
+
+
+                        <div>
+
+                          <P *ngIf="completedOrderCountPercen=='NaN'">0 %</P>
+                          <p *ngIf="completedOrderCountPercen!='NaN'">{{completedOrderCountPercen}} %</p>
+                        </div>
+
+                      </div>
+                    </div>
+
+                    <div class="col-md-5 col-lg-5 col-sm-6 col-12 trips-graph">
+                      <div id="chartdiv"></div>
+                    </div>
+
+                  </div>
+
+
+
+
+                </mat-card-content>
+
+
+
+
+
+              </mat-card>
+
+            </div>
+
+          </div>
+
+          <div class="row">
+
+            <div class="col-md-6 mt-4">
+
+              <h5>Order Details</h5>
+              <div class="search-box">
+                <input type="search" (input)="searchUserList($event)" class="search-input"
+                  placeholder="Search By OrderCode">
+
+                <button class="search-button" type="submit" value="search">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+              <mat-card class="m-0 trips">
+
+                <table mat-table [dataSource]="order_list" class="mat-elevation-z8">
+                  <!-- Position Column -->
+                  <!-- Name Column -->
+                  <ng-container matColumnDef="orderCode">
+                    <th mat-header-cell *matHeaderCellDef>Order Code</th>
+                    <td mat-cell *matCellDef="let element">{{element?.orderCode}} </td>
+                  </ng-container>
+
+                  <!-- Weight Column -->
+                  <ng-container matColumnDef="finalAmount">
+                    <th mat-header-cell *matHeaderCellDef>Final Amount</th>
+                    <td mat-cell *matCellDef="let element">{{element?.amountDetails?.finalAmount}} </td>
+                  </ng-container>
+
+                  <!-- Symbol Column -->
+                  <ng-container matColumnDef="totalKms">
+                    <th mat-header-cell *matHeaderCellDef>Total Kms</th>
+                    <td mat-cell *matCellDef="let element"> {{element?.totalKms}} KM </td>
+                  </ng-container>
+
+
+                  <ng-container matColumnDef="orderStatus">
+                    <th mat-header-cell *matHeaderCellDef>Order Status</th>
+                    <td mat-cell *matCellDef="let element">{{element?.orderStatus}} </td>
+
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+                <mat-paginator *ngIf="order_list?.length != 0" (page)="pageChange($event)" [pageSize]="limit"
+                  aria-label="Select page" [length]="totalCount">
+                </mat-paginator>
+
+
+              </mat-card>
+
+
+
+            </div>
+
+            <div class="col-md-6 mt-4">
+
+
+
+
+            </div>
+
+          </div>
+
+
+
+
+
+
+
+
+
+
+
+
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+</div>
