@@ -1,18 +1,41 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ApiServiceService } from '../service/api-service.service';
 import { Router } from '@angular/router';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
-import { FormBuilder, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { Toast, ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ExcelService } from '../service/exportService/excelService';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
+/** End date must be >= start date (yyyy-MM-dd from native date inputs). */
+function tripDateRangeOrderValidator(
+  group: AbstractControl
+): ValidationErrors | null {
+  const from = group.get('fromdate')?.value;
+  const to = group.get('todate')?.value;
+  if (!from || !to) {
+    return null;
+  }
+  if (from > to) {
+    return { dateRangeOrder: true };
+  }
+  return null;
+}
+
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
 })
-export class SearchComponent implements OnInit {
+export class SearchComponent implements OnInit, OnDestroy {
   alltripdetails: any;
   totalCount: any;
   value: any;
@@ -27,8 +50,8 @@ export class SearchComponent implements OnInit {
   searchtripDateForm: any;
   fromDate: any;
   toDate: any;
-  yesterday = new Date();
   searchLoad: boolean = false;
+  private destroy$ = new Subject<void>();
   currentPage: number | undefined;
   customerList: any;
   orderStatus = [
@@ -52,11 +75,14 @@ export class SearchComponent implements OnInit {
     this.searchtripidForm = this.formBuilder.group({
       tripid: ['', [Validators.required]],
     });
-    this.searchtripDateForm = this.formBuilder.group({
-      fromdate: ['', [Validators.required]],
-      todate: ['', [Validators.required]],
-      orderstatus: ['',]
-    });
+    this.searchtripDateForm = this.formBuilder.group(
+      {
+        fromdate: ['', [Validators.required]],
+        todate: ['', [Validators.required]],
+        orderstatus: [''],
+      },
+      { validators: tripDateRangeOrderValidator }
+    );
   }
   userInfo: any;
   userrole: any;
@@ -73,6 +99,85 @@ export class SearchComponent implements OnInit {
     }
     this.getListAllTrip();
     this.getListbyB2bcustomer();
+    this.searchtripDateForm
+      .get('fromdate')
+      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe((fromVal) => {
+        const toCtrl = this.searchtripDateForm.get('todate');
+        const toVal = toCtrl?.value;
+        if (fromVal && toVal && fromVal > toVal) {
+          toCtrl?.patchValue(fromVal, { emitEvent: false });
+        }
+        this.searchtripDateForm.updateValueAndValidity({ emitEvent: false });
+      });
+    this.searchtripDateForm
+      .get('todate')
+      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe((toVal) => {
+        const fromCtrl = this.searchtripDateForm.get('fromdate');
+        const toCtrl = this.searchtripDateForm.get('todate');
+        const fromVal = fromCtrl?.value;
+        if (fromVal && toVal && toVal < fromVal) {
+          toCtrl?.patchValue(fromVal, { emitEvent: false });
+        }
+        this.searchtripDateForm.updateValueAndValidity({ emitEvent: false });
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /** Latest calendar day allowed (local) — matches “today” in the date picker. */
+  get tripDateRangeMax(): string {
+    return this.formatLocalYmd(new Date());
+  }
+
+  /** From date cannot be after to date or after max day. */
+  get fromDateInputMax(): string {
+    const to = this.searchtripDateForm?.get('todate')?.value;
+    if (!to) {
+      return this.tripDateRangeMax;
+    }
+    return this.minYmd(to, this.tripDateRangeMax);
+  }
+
+  /** To date cannot be before from date. */
+  get toDateInputMin(): string | null {
+    const from = this.searchtripDateForm?.get('fromdate')?.value;
+    return from || null;
+  }
+
+  private formatLocalYmd(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  private minYmd(a: string, b: string): string {
+    return a <= b ? a : b;
+  }
+
+  private isRangeInvalid(from: string, to: string): boolean {
+    return !!(from && to && from > to);
+  }
+
+  /** Runs when a date field loses focus — enforces end >= start even if the browser ignored min/max. */
+  onTripDateInputBlur(): void {
+    const fromCtrl = this.searchtripDateForm.get('fromdate');
+    const toCtrl = this.searchtripDateForm.get('todate');
+    const fromVal = fromCtrl?.value;
+    const toVal = toCtrl?.value;
+    if (fromVal && toVal && fromVal > toVal) {
+      toCtrl.patchValue(fromVal, { emitEvent: true });
+    }
+    this.searchtripDateForm.updateValueAndValidity();
+  }
+
+  get tripDateRangeInvalid(): boolean {
+    return this.searchtripDateForm.hasError('dateRangeOrder');
   }
   getListAllTrip() {
     this.searchLoad = true;
@@ -127,6 +232,7 @@ export class SearchComponent implements OnInit {
   clear() {
     this.searchtripidForm.reset();
     this.searchtripDateForm.reset();
+    this.selectedStatus = '';
     this.getListAllTrip();
   }
   ordertype
@@ -176,8 +282,17 @@ export class SearchComponent implements OnInit {
   searchTripByDate() {
 
     this.tripId = this.searchtripidForm?.controls['tripid'].value;
+    this.searchtripDateForm.updateValueAndValidity();
     this.fromDate = this.searchtripDateForm?.controls['fromdate'].value;
     this.toDate = this.searchtripDateForm?.controls['todate'].value;
+    if (this.isRangeInvalid(this.fromDate, this.toDate)) {
+      this.searchtripDateForm.markAllAsTouched();
+      this.toastr.warning('End date cannot be before start date.');
+      return;
+    }
+    const orderStatusFilter =
+      this.searchtripDateForm?.get('orderstatus')?.value ?? '';
+    this.selectedStatus = orderStatusFilter;
     console.log(this.tripId);
     console.log(this.fromDate);
     console.log(this.toDate);
@@ -189,7 +304,8 @@ export class SearchComponent implements OnInit {
         this.fromDate,
         this.toDate,
         this.limit,
-        this.offset, this.selectedStatus
+        this.offset,
+        orderStatusFilter
       )
       .then((res) => {
         console.log(res);
@@ -266,6 +382,9 @@ export class SearchComponent implements OnInit {
 
     if (!this.fromDate && !this.toDate) {
       this.toastr.warning('please Select the FromDate and ToDate')
+    } else if (this.isRangeInvalid(this.fromDate, this.toDate)) {
+      this.searchtripDateForm.markAllAsTouched();
+      this.toastr.warning('End date cannot be before start date.');
     } else {
 
       this.selectedStatus = this.searchtripDateForm?.controls['orderstatus'].value;

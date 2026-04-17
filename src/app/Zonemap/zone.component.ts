@@ -9,6 +9,7 @@ import { ApiServiceService } from '../service/api-service.service';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
+import { HttpErrorResponse } from '@angular/common/http';
 declare const google: any;
 
 @Component({
@@ -32,8 +33,11 @@ export class ZoneComponent implements OnInit, AfterViewInit {
 
   zones: any[] = [];
   allZones: any[] = [];
-  zoneName: string = '';  
-  
+  zoneName: string = '';
+
+  /** Editable name when a zone preview exists; letters and spaces only. */
+  pendingZoneName = '';
+
   previewZone: any = null;
 
   lat = 13.0827;
@@ -56,8 +60,19 @@ searchValue = '';
   /** Minimum edge length (width and height) for a drawn zone, in meters. */
   private readonly minZoneSideMeters = 3000;
 
+  /** Maximum edge length (width and height) for a drawn zone, in meters. */
+  private readonly maxZoneSideMeters = 50000;
+
   private get minZoneSideDisplay(): string {
     const m = this.minZoneSideMeters;
+    if (m >= 1000 && m % 1000 === 0) {
+      return `${m / 1000} km`;
+    }
+    return `${m} m`;
+  }
+
+  private get maxZoneSideDisplay(): string {
+    const m = this.maxZoneSideMeters;
     if (m >= 1000 && m % 1000 === 0) {
       return `${m / 1000} km`;
     }
@@ -296,11 +311,13 @@ mapDeliveryPartnersToZones() {
         map: this.map,
       });
 
+      const rawName =
+        this.extractZone(place.address_components || []) ||
+        this.searchInput.nativeElement.value;
+      this.pendingZoneName = this.sanitizeZoneNameInput(rawName);
+
       this.previewZone = {
-        // zoneName: this.extractZone(place.address_components || []),
-        zoneName: this.searchInput.nativeElement.value,
-        //zoneName: this.zoneName || 'Manual Zone',
-        
+        zoneName: this.pendingZoneName,
         placeId: place.place_id,
         center: {
           lat: place.geometry.location.lat(),
@@ -324,6 +341,71 @@ mapDeliveryPartnersToZones() {
     return area?.long_name || 'Unknown Zone';
   }
 
+  /** Strip numbers and symbols; keep Unicode letters and spaces. */
+  private sanitizeZoneNameInput(raw: string): string {
+    if (!raw) return '';
+    return raw.replace(/[^\p{L}\s]/gu, '').replace(/\s+/g, ' ');
+  }
+
+  onPendingZoneNameNgModelChange(): void {
+    const cleaned = this.sanitizeZoneNameInput(this.pendingZoneName);
+    if (cleaned !== this.pendingZoneName) {
+      this.pendingZoneName = cleaned;
+    }
+    if (this.previewZone) {
+      this.previewZone.zoneName = this.pendingZoneName;
+    }
+  }
+
+  /**
+   * Reads user-facing text from API errors.
+   * NestJS 400 body: { message: string | string[], error: "Bad Request", statusCode: 400 }
+   * — use `message` only; `error` is the generic HTTP label, not the detail.
+   */
+  private readApiErrorMessage(err: unknown, fallback: string): string {
+    const e = err as Record<string, unknown> | null;
+    const httpLike =
+      err instanceof HttpErrorResponse ||
+      (!!e &&
+        typeof e === 'object' &&
+        typeof (e as { status?: unknown }).status === 'number' &&
+        'error' in e);
+
+    const body = httpLike
+      ? (err as HttpErrorResponse).error
+      : (e as any)?.error ?? err;
+
+    if (typeof body === 'string') {
+      const t = body.trim();
+      if (t.startsWith('{') || t.startsWith('[')) {
+        try {
+          return this.readApiErrorMessage({ error: JSON.parse(t) }, fallback);
+        } catch {
+          return t || fallback;
+        }
+      }
+      return t || fallback;
+    }
+
+    if (body && typeof body === 'object') {
+      const o = body as Record<string, unknown>;
+      const fromData =
+        typeof o['data'] === 'object' && o['data'] !== null
+          ? (o['data'] as Record<string, unknown>)['message']
+          : undefined;
+
+      const raw = o['message'] ?? o['msg'] ?? fromData;
+
+      if (Array.isArray(raw)) {
+        const parts = raw.filter((x) => typeof x === 'string' && x.trim());
+        if (parts.length) return parts.join(', ');
+      }
+      if (typeof raw === 'string' && raw.trim()) return raw.trim();
+    }
+
+    return fallback;
+  }
+
   /**
    * Approximate width/height of a lat/lng bounding box in meters (adequate for city-scale zones).
    */
@@ -342,14 +424,18 @@ mapDeliveryPartnersToZones() {
     };
   }
 
-  private isZoneLargeEnough(
+  private zoneSideLengthIssue(
     ne: { lat: number; lng: number },
     sw: { lat: number; lng: number }
-  ): boolean {
+  ): 'small' | 'large' | null {
     const { widthM, heightM } = this.boundsSideLengthsMeters(ne, sw);
-    return (
-      widthM >= this.minZoneSideMeters && heightM >= this.minZoneSideMeters
-    );
+    if (widthM < this.minZoneSideMeters || heightM < this.minZoneSideMeters) {
+      return 'small';
+    }
+    if (widthM > this.maxZoneSideMeters || heightM > this.maxZoneSideMeters) {
+      return 'large';
+    }
+    return null;
   }
 
   // ---------------- MANUAL DRAW RECTANGLE ----------------
@@ -394,9 +480,18 @@ mapDeliveryPartnersToZones() {
 
         const nePlain = { lat: ne.lat(), lng: ne.lng() };
         const swPlain = { lat: sw.lat(), lng: sw.lng() };
-        if (!this.isZoneLargeEnough(nePlain, swPlain)) {
+        const sideIssue = this.zoneSideLengthIssue(nePlain, swPlain);
+        if (sideIssue === 'small') {
           this.toastr.warning(
             `Draw a larger zone. Each side must be at least ${this.minZoneSideDisplay}.`
+          );
+          rectangle.setMap(null);
+          this.drawingManager.setDrawingMode(null);
+          return;
+        }
+        if (sideIssue === 'large') {
+          this.toastr.warning(
+            `Zone is too large. Each side must be at most ${this.maxZoneSideDisplay}.`
           );
           rectangle.setMap(null);
           this.drawingManager.setDrawingMode(null);
@@ -407,9 +502,12 @@ mapDeliveryPartnersToZones() {
 
         const center = bounds.getCenter();
 
+        this.pendingZoneName = this.sanitizeZoneNameInput(
+          this.searchInput.nativeElement.value
+        );
+
         this.previewZone = {
-          zoneName: this.searchInput.nativeElement.value,
-          // zoneName: this.zoneName || 'Manual Zone',
+          zoneName: this.pendingZoneName,
           center: {
             lat: center.lat(),
             lng: center.lng(),
@@ -438,20 +536,37 @@ mapDeliveryPartnersToZones() {
   if (!this.previewZone) return;
 
   const b = this.previewZone.bounds;
-  if (
-    b?.northeast &&
-    b?.southwest &&
-    !this.isZoneLargeEnough(b.northeast, b.southwest)
-  ) {
+  if (b?.northeast && b?.southwest) {
+    const sideIssue = this.zoneSideLengthIssue(b.northeast, b.southwest);
+    if (sideIssue === 'small') {
+      this.toastr.warning(
+        `Zone is too small. Each side must be at least ${this.minZoneSideDisplay}.`
+      );
+      return;
+    }
+    if (sideIssue === 'large') {
+      this.toastr.warning(
+        `Zone is too large. Each side must be at most ${this.maxZoneSideDisplay}.`
+      );
+      return;
+    }
+  }
+
+  const name = this.pendingZoneName.trim();
+  if (!name) {
     this.toastr.warning(
-      `Zone is too small. Each side must be at least ${this.minZoneSideDisplay}.`
+      'Enter a zone name using letters only (no numbers or special characters).'
+    );
+    return;
+  }
+  if (!/^[\p{L}\s]+$/u.test(name)) {
+    this.toastr.warning(
+      'Zone name can only contain letters and spaces.'
     );
     return;
   }
 
-  this.previewZone.zoneName =
-    this.previewZone.zoneName || this.searchInput.nativeElement.value;
-
+  this.previewZone.zoneName = name;
   this.loading = true;
 
   this.api.createZone(this.previewZone).subscribe({
@@ -461,9 +576,11 @@ mapDeliveryPartnersToZones() {
       this.loadZones();
       this.searchInput.nativeElement.value = '';
     },
-    error: () => {
+    error: (err: unknown) => {
       this.loading = false;
-      this.error = 'Failed to save zone';
+      const text = this.readApiErrorMessage(err, 'Failed to save zone');
+      this.error = text;
+      this.toastr.error(text);
     },
   });
 }
@@ -474,6 +591,7 @@ mapDeliveryPartnersToZones() {
 
   clearPreview() {
     this.previewZone = null;
+    this.pendingZoneName = '';
 
     if (this.previewPolyline) {
       this.previewPolyline.setMap(null);
@@ -586,9 +704,10 @@ toggleZone(zone: any) {
       zone.isActive = !zone.isActive;
       this.drawSavedZones(); // refresh map color
     },
-    error: () => {
-      console.error("Failed to update zone");
-    }
+    error: (err: unknown) => {
+      console.error('Failed to update zone', err);
+      this.toastr.error(this.readApiErrorMessage(err, 'Failed to update zone'));
+    },
   });
 
 }

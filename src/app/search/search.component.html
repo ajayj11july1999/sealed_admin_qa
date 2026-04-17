@@ -61,18 +61,24 @@
             <label for="text" class="text">ENTER TRIP DATE RANGE</label>
 
             <div class="col-md-6 col-lg-2 col-sm-12 mt-2 ">
-              <input type="date" class="form-control" formControlName='fromdate' [max]="yesterday">
+              <input type="date" class="form-control" formControlName='fromdate' [max]="fromDateInputMax"
+                (blur)="onTripDateInputBlur()">
             </div>
             <div class="col-md-6 col-lg-2 col-sm-12 mt-2 ">
-              <input type="date" class="form-control" formControlName='todate' [max]="yesterday">
+              <input type="date" class="form-control" formControlName='todate' [min]="toDateInputMin"
+                [max]="tripDateRangeMax" (blur)="onTripDateInputBlur()">
             </div>
 
             <div class="col-md-6 col-lg-2 col-sm-12 ">
               <div class="searchbtn my-2">
-                <button mat-raised-button color="primary" (click)="searchTripByDate()">SEARCH DATE</button>
+                <button mat-raised-button color="primary" (click)="searchTripByDate()"
+                  [disabled]="tripDateRangeInvalid">SEARCH DATE</button>
 
               </div>
 
+            </div>
+            <div class="col-12 mt-1" *ngIf="tripDateRangeInvalid">
+              <small class="text-danger">End date must be on or after the start date.</small>
             </div>
             <div class="col-md-3 col-lg-3 col-sm-12 mt-2 mx-4">
 

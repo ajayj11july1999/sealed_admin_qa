@@ -20,18 +20,36 @@
   </div>
 
   <!-- PREVIEW ACTION -->
-  <div *ngIf="previewZone" class="mb-3 text-end">
-    <button
-      class="btn btn-success me-2"
-      (click)="saveZone()"
-      [disabled]="loading"
-    >
-      Save Zone
-    </button>
-
-    <button class="btn btn-secondary" (click)="cancelPreview()">
-      Cancel
-    </button>
+  <div *ngIf="previewZone" class="mb-3">
+    <div class="d-flex flex-wrap align-items-end gap-3 justify-content-end">
+      <div class="d-flex flex-column" style="min-width: 220px; max-width: 320px">
+        <label class="form-label mb-1" for="pendingZoneNameInput">Zone name</label>
+        <input
+          id="pendingZoneNameInput"
+          type="text"
+          class="form-control"
+          name="pendingZoneName"
+          [(ngModel)]="pendingZoneName"
+          (ngModelChange)="onPendingZoneNameNgModelChange()"
+          placeholder="e.g. West Chennai"
+          autocomplete="off"
+          spellcheck="true"
+        />
+        <p class="text-muted small mb-0 mt-1">
+          Letters and spaces only.
+        </p>
+      </div>
+      <button
+        class="btn btn-success"
+        (click)="saveZone()"
+        [disabled]="loading"
+      >
+        Save Zone
+      </button>
+      <button class="btn btn-secondary" (click)="cancelPreview()">
+        Cancel
+      </button>
+    </div>
   </div>
 
   <!-- MAP -->
