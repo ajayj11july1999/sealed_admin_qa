@@ -31,6 +31,8 @@ export class CourierPayoutHistoryComponent implements OnInit {
   id: any;
   modalRef!: BsModalRef;
   deliveryManHistory: any;
+  courierName = '';
+  courierMobileNo = '';
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute, private printService: PrintService,
     private modalService: BsModalService, private excelService: ExcelService, private pdfService: PdfService, private copyService: CopyService,
@@ -38,12 +40,29 @@ export class CourierPayoutHistoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.activatedRoute.params.subscribe((params: any) => {
-      console.log(params);
       this.id = params?.id;
+      if (!this.id) {
+        return;
+      }
+      this.loadCourierPartnerSummary();
+      this.getHistory();
     });
-    this.getHistory();
-
   }
+
+  loadCourierPartnerSummary(): void {
+    this.apiservice
+      .getListCouriergetById(this.id)
+      .then((res) => {
+        const d = res?.data;
+        this.courierName = d?.name ?? '';
+        this.courierMobileNo = d?.mobileNo != null ? String(d.mobileNo) : '';
+      })
+      .catch(() => {
+        this.courierName = '';
+        this.courierMobileNo = '';
+      });
+  }
+
   getHistory() {
     this.apiservice
       .getpayoutHistoryById(this.id, this.limit, this.offset)

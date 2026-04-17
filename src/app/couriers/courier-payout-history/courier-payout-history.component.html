@@ -8,7 +8,12 @@
               <div class="container mt-3">
                 <div class="top-header mb-3">
                   <div>
-                    <h5>Courier Partner Payouts </h5>
+                    <h5>Courier Partner Payouts</h5>
+                    <p *ngIf="courierName || courierMobileNo" class="mb-0 mt-2 text-muted small">
+                      <span *ngIf="courierName"><strong>{{ courierName }}</strong></span>
+                      <span *ngIf="courierName && courierMobileNo"> · </span>
+                      <span *ngIf="courierMobileNo">+91 {{ courierMobileNo }}</span>
+                    </p>
                   </div>
                   <div>
                     <!-- <button mat-raised-button class="mb-1 export-btn" (click)="downloadExport()">Export</button> -->
