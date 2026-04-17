@@ -52,6 +52,18 @@ searchValue = '';
   selectedDeliveryList: any[] = [];
   selectedZoneName: string = '';
   infoWindow: google.maps.InfoWindow | null = null;
+
+  /** Minimum edge length (width and height) for a drawn zone, in meters. */
+  private readonly minZoneSideMeters = 3000;
+
+  private get minZoneSideDisplay(): string {
+    const m = this.minZoneSideMeters;
+    if (m >= 1000 && m % 1000 === 0) {
+      return `${m / 1000} km`;
+    }
+    return `${m} m`;
+  }
+
 constructor(
   private api: ApiServiceService,
   private dialog: MatDialog,
@@ -312,6 +324,34 @@ mapDeliveryPartnersToZones() {
     return area?.long_name || 'Unknown Zone';
   }
 
+  /**
+   * Approximate width/height of a lat/lng bounding box in meters (adequate for city-scale zones).
+   */
+  private boundsSideLengthsMeters(
+    ne: { lat: number; lng: number },
+    sw: { lat: number; lng: number }
+  ): { widthM: number; heightM: number } {
+    const latMid = (ne.lat + sw.lat) / 2;
+    const degLat = Math.abs(ne.lat - sw.lat);
+    const degLng = Math.abs(ne.lng - sw.lng);
+    const mPerDegLat = 111320;
+    const mPerDegLng = 111320 * Math.cos((latMid * Math.PI) / 180);
+    return {
+      heightM: degLat * mPerDegLat,
+      widthM: degLng * mPerDegLng,
+    };
+  }
+
+  private isZoneLargeEnough(
+    ne: { lat: number; lng: number },
+    sw: { lat: number; lng: number }
+  ): boolean {
+    const { widthM, heightM } = this.boundsSideLengthsMeters(ne, sw);
+    return (
+      widthM >= this.minZoneSideMeters && heightM >= this.minZoneSideMeters
+    );
+  }
+
   // ---------------- MANUAL DRAW RECTANGLE ----------------
   initDrawing() {
     this.drawingManager = new google.maps.drawing.DrawingManager({
@@ -341,13 +381,30 @@ mapDeliveryPartnersToZones() {
 
         // ✅ STRICT MODE SAFE
         const rectangle = event.overlay as google.maps.Rectangle;
-        this.previewRectangle = rectangle;
 
         const bounds = rectangle.getBounds();
-        if (!bounds) return;
+        if (!bounds) {
+          rectangle.setMap(null);
+          this.drawingManager.setDrawingMode(null);
+          return;
+        }
 
         const ne = bounds.getNorthEast();
         const sw = bounds.getSouthWest();
+
+        const nePlain = { lat: ne.lat(), lng: ne.lng() };
+        const swPlain = { lat: sw.lat(), lng: sw.lng() };
+        if (!this.isZoneLargeEnough(nePlain, swPlain)) {
+          this.toastr.warning(
+            `Draw a larger zone. Each side must be at least ${this.minZoneSideDisplay}.`
+          );
+          rectangle.setMap(null);
+          this.drawingManager.setDrawingMode(null);
+          return;
+        }
+
+        this.previewRectangle = rectangle;
+
         const center = bounds.getCenter();
 
         this.previewZone = {
@@ -358,8 +415,8 @@ mapDeliveryPartnersToZones() {
             lng: center.lng(),
           },
           bounds: {
-            northeast: { lat: ne.lat(), lng: ne.lng() },
-            southwest: { lat: sw.lat(), lng: sw.lng() },
+            northeast: nePlain,
+            southwest: swPlain,
           },
           isActive: true,
         };
@@ -379,6 +436,18 @@ mapDeliveryPartnersToZones() {
   // ---------------- SAVE ----------------
  saveZone() {
   if (!this.previewZone) return;
+
+  const b = this.previewZone.bounds;
+  if (
+    b?.northeast &&
+    b?.southwest &&
+    !this.isZoneLargeEnough(b.northeast, b.southwest)
+  ) {
+    this.toastr.warning(
+      `Zone is too small. Each side must be at least ${this.minZoneSideDisplay}.`
+    );
+    return;
+  }
 
   this.previewZone.zoneName =
     this.previewZone.zoneName || this.searchInput.nativeElement.value;

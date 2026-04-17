@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+tmp/
+out-tsc/
+*.tsbuildinfo
+
+# Angular
+.angular/
+
+# Testing
+coverage/
+libpeerconnection.log
+testem.log
+
+# IDEs and editors
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs and debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment and secrets (uncomment if you keep local env files out of git)
+# .env
+# .env.local
+# .env.*.local
+
+# Optional: local tooling
+*.local
