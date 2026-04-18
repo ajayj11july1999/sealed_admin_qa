@@ -37,6 +37,73 @@ public delivery: { lat: number; lng: number } | null = null;
   uneffectiveDist: any;
   movementPath: { lat: number; lng: number }[] = [];
   // dottedLineSegments: any;
+
+  /** Vehicle for this trip: nested on delivery man or top-level array from API. */
+  get courierVehicle(): any {
+    const nested = this.tripDetails?.deliveryManDetails?.vehicleDetails;
+    if (nested) {
+      return nested;
+    }
+    const list = this.tripDetails?.deliveryManVehicleDetails;
+    if (Array.isArray(list) && list.length > 0) {
+      return list[0];
+    }
+    return null;
+  }
+
+  get hasAcceptedPosition(): boolean {
+    const p = this.tripDetails?.acceptedPosition;
+    if (!p) {
+      return false;
+    }
+    const latOk = p.lat != null && p.lat !== '';
+    const lngOk = p.lng != null && p.lng !== '';
+    return latOk || lngOk;
+  }
+
+  formatInstructionEntry(ins: any): string {
+    if (ins == null) {
+      return '';
+    }
+    if (typeof ins === 'string') {
+      return ins;
+    }
+    return (
+      ins.text ??
+      ins.message ??
+      ins.description ??
+      ins.name ??
+      ''
+    ).toString();
+  }
+
+  formatExtraChargeLine(charge: any): string {
+    if (charge == null) {
+      return '';
+    }
+    if (typeof charge === 'string') {
+      return charge;
+    }
+    const label =
+      charge.name ??
+      charge.title ??
+      charge.label ??
+      charge.extraChargeName ??
+      charge.type ??
+      'Charge';
+    const amt = charge.amount ?? charge.price ?? charge.value ?? charge.charge;
+    const extra = charge.reason ?? charge.description;
+    const parts: string[] = [String(label)];
+    if (amt != null && amt !== '') {
+      parts.push(`₹ ${amt}`);
+    }
+    if (extra) {
+      parts.push(`— ${extra}`);
+    }
+    const line = parts.join(' ').trim();
+    return line || JSON.stringify(charge);
+  }
+
   constructor(
     private activatedRoute: ActivatedRoute, private trackingService: DeliveryTrackingService,
     private apiService: ApiServiceService, private toastr: ToastrService, private dialog: MatDialog
