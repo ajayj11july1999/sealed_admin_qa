@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ChangeDetectionStrategy } from '@angular/core';
+import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { ApiServiceService } from '../service/api-service.service';
 import { ToastrService } from 'ngx-toastr';
@@ -105,7 +106,9 @@ public delivery: { lat: number; lng: number } | null = null;
   }
 
   constructor(
-    private activatedRoute: ActivatedRoute, private trackingService: DeliveryTrackingService,
+    private activatedRoute: ActivatedRoute,
+    private location: Location,
+    private trackingService: DeliveryTrackingService,
     private apiService: ApiServiceService, private toastr: ToastrService, private dialog: MatDialog
   ) { }
 
@@ -571,20 +574,31 @@ removeDeliveryMan() {
 
       if (result) {
         console.log(result);
+        // B2C order APIs often expose payment on the order; nested paymentDetails may be absent.
+        const paymentMode =
+          this.tripDetails?.paymentDetails?.paymentMode ??
+          this.tripDetails?.paymentMode;
+
         // Update the delivered value for each dropAddress
-        const updatedDropAddress = this.tripDetails.dropAddress.map((address) => ({
+        const dropList = this.tripDetails?.dropAddress ?? [];
+        const updatedDropAddress = dropList.map((address: any) => ({
           ...address,
           delivered: true
         }));
 
 
-        if (this.tripDetails.paymentDetails.paymentMode == 'cash on pickup') {
+        if (paymentMode == 'cash on pickup') {
           this.paymentStatus = 'COPcompleted'
-        } else if (this.tripDetails.paymentDetails.paymentMode == 'cash on delivery') {
+        } else if (paymentMode == 'cash on delivery') {
           this.paymentStatus = 'CODcompleted'
         } else {
           this.paymentStatus = 'credit';
         }
+        const orderId =
+          this.tripDetails?._id ||
+          this.tripDetails?.orderId ||
+          this.id;
+
         let payload = {
           deliveredAt: new Date(),
           orderStatus: "delivered",
@@ -606,19 +620,21 @@ removeDeliveryMan() {
 
         };
         this.apiService
-          .deliveredTrip(this.id, payload)
-          .subscribe((response) => {
-            if (response.code == 200) {
-              this.toastr.success('Successfully Updated...!');
-              this.getTripDetails(this.id);
-
-            } else {
-
+          .deliveredTrip(orderId, payload)
+          .subscribe({
+            next: (response) => {
+              if (response.code == 200) {
+                this.toastr.success('Successfully Updated...!');
+                this.location.back();
+              } else {
+                this.toastr.error('Could not mark order as delivered. Please try again.');
+              }
+            },
+            error: (err) => {
+              this.toastr.error('Could not mark order as delivered. Please try again.');
+              console.error(err);
             }
-          }),
-          (err) => {
-            // this.fileuploadstatus = false;
-          };
+          });
       }
     });
   }

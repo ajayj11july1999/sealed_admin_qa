@@ -4,6 +4,13 @@ import { ApiServiceService } from '../service/api-service.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
+/** Must match the orderStatus query we send for active B2C trips. */
+const ACTIVE_B2C_ORDER_STATUSES = new Set([
+  'orderassigned',
+  'orderinprogress',
+  'orderpickeduped',
+]);
+
 @Component({
   selector: 'app-mobile-app-trips',
   templateUrl: './mobile-app-trips.component.html',
@@ -59,6 +66,21 @@ export class MobileAppTripsComponent implements OnInit {
     this.getListConsumerActivetrip();
     this.getallActiveDeliveryman();
   }
+
+  /**
+   * The list API sometimes still returns completed orders (e.g. delivered). Only show true in-progress rows.
+   */
+  private filterActiveB2COrders(orders: any[] | null | undefined): any[] {
+    if (!Array.isArray(orders)) {
+      return [];
+    }
+    return orders.filter((o) => {
+      const key = String(o?.orderStatus ?? '')
+        .trim()
+        .toLowerCase();
+      return ACTIVE_B2C_ORDER_STATUSES.has(key);
+    });
+  }
   searchTrip() {
     this.submitted = true;
     if (!this.DateFilterForm?.valid) {
@@ -113,9 +135,9 @@ export class MobileAppTripsComponent implements OnInit {
     this.apiService
       .getconsumerActiveTrip(this.usertype, this.orderStatus, this.Fromdate, this.Todate)
       .then((res) => {
-        this.Consumeractivetrip = res?.data?.data ? res.data.data : [];
-        this.activetotalCount = res?.data.totalCount;
-        // console.log(this.Consumeractivetrip.newAt);
+        const raw = res?.data?.data ? res.data.data : [];
+        this.Consumeractivetrip = this.filterActiveB2COrders(raw);
+        this.activetotalCount = this.Consumeractivetrip.length;
         this.searchLoad = false;
       })
       .catch((err) => { });
