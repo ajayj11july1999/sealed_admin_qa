@@ -1,4 +1,5 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogueComponent } from '../dialogue/dialogue.component';
@@ -30,8 +31,9 @@ interface Page {
 })
 export class ReviewsComponent implements OnInit {
 
+  @ViewChild('myPaginator') myPaginator!: MatPaginator;
+
   reviewList: any[] = [];
-  allReviewList: any[] = [];
   selectedReviewerType: string = '';
   selectedRating: string = '';
   modalRef!: BsModalRef;
@@ -41,12 +43,10 @@ export class ReviewsComponent implements OnInit {
   showDelete: any;
   userInfo: any;
   userrole: any;
-  limit: any = 15;
-  offset: any = 0;
+  limit: number = 15;
+  offset: number = 0;
   value: any;
-  currentPage: any;
-  totalCount: any;
-  serverTotalCount: number = 0;
+  totalCount: number = 0;
 
   constructor(private dialog: MatDialog, private apiservice: ApiServiceService,
     private modalService: BsModalService, private toastr: ToastrService, private spinner: NgxSpinnerService,
@@ -88,18 +88,24 @@ export class ReviewsComponent implements OnInit {
 
   }
   searchUserList(e: any) {
-    this.offset = 0;
     this.value = e?.target?.value;
-    this.currentPage = 0;
-    this.getReviewList();
+    this.resetPagination();
   }
 
   onReviewerTypeChange() {
-    this.applyReviewFilters();
+    this.resetPagination();
   }
 
   onRatingChange() {
-    this.applyReviewFilters();
+    this.resetPagination();
+  }
+
+  resetPagination() {
+    this.offset = 0;
+    if (this.myPaginator) {
+      this.myPaginator.firstPage();
+    }
+    this.getReviewList();
   }
 
   getReviewFlow(reviewerType: string): string {
@@ -125,50 +131,25 @@ export class ReviewsComponent implements OnInit {
     return starCount ? '⭐'.repeat(starCount) : '-';
   }
 
-  applyReviewFilters() {
-    let filtered = [...(this.allReviewList || [])];
-
-    if (this.selectedReviewerType) {
-      filtered = filtered.filter((item: any) =>
-        (item?.reviewer_type || '').toLowerCase() === this.selectedReviewerType.toLowerCase()
-      );
-    }
-
-    if (this.selectedRating !== '') {
-      filtered = filtered.filter((item: any) => Number(item?.rating) === Number(this.selectedRating));
-    }
-
-    this.reviewList = filtered;
-    this.totalCount = this.selectedReviewerType || this.selectedRating ? filtered.length : this.serverTotalCount;
-  }
-
   getReviewList() {
     this.spinner.show();
 
     this.apiservice
-      .getReviewList(this.limit, this.offset, this.value)
+      .getReviewList(this.limit, this.offset, this.value, this.selectedReviewerType, this.selectedRating)
       .then((res: any) => {
         this.spinner.hide();
-
         if (res?.code == 200) {
-          const list = Array.isArray(res?.data) ? res.data : res?.data?.data || [];
-          this.allReviewList = list;
-          this.serverTotalCount = res?.totalCount ?? res?.data?.totalCount ?? list.length;
-          this.applyReviewFilters();
-          console.log('Review list:', this.reviewList);
+          this.reviewList = Array.isArray(res?.data) ? res.data : res?.data?.data || [];
+          this.totalCount = res?.totalCount ?? res?.data?.totalCount ?? this.reviewList.length;
         } else {
           this.reviewList = [];
-          this.allReviewList = [];
           this.totalCount = 0;
-          this.serverTotalCount = 0;
         }
       })
       .catch((err: any) => {
         this.spinner.hide();
         this.reviewList = [];
-        this.allReviewList = [];
         this.totalCount = 0;
-        this.serverTotalCount = 0;
 
         if (err?.status === 401 || err?.error?.statusCode === 401) {
           this.toastr.error('Session expired. Please login again.');
@@ -179,14 +160,10 @@ export class ReviewsComponent implements OnInit {
         this.toastr.error(err?.error?.message || 'Failed to load reviews');
       });
   }
-  pageSize: any;
-  pageEvent: any;
+
   pageChange(e: any): void {
-    console.log(e)
-    let pagNo = e.pageIndex
-    this.pageSize = e.pageSize;
-    this.limit = this.pageSize;
-    this.offset = pagNo;
+    this.limit = e.pageSize;
+    this.offset = e.pageIndex * e.pageSize;
     this.getReviewList();
   }
 

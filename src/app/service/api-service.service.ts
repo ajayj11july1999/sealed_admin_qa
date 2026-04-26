@@ -1009,23 +1009,17 @@ assignDeliveryManUpdate(orderId: any, payload: any) {
     });
   }
 
-  getReviewList(limit?: any, offset?: any, value?: any): Promise<any> {
+  getReviewList(limit?: any, offset?: any, value?: any, reviewer_type?: string, rating?: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      let url = '';
-      if (value) {
-        url = `main/review?limit=${limit}&offset=${offset}&value=${value}`;
-      } else {
-        url = `main/review?limit=${limit ? limit : ''}&offset=${offset ? offset : ''}`;
-      }
-
+      let params = `limit=${limit || ''}&offset=${offset || 0}`;
+      if (value) params += `&value=${value}`;
+      if (reviewer_type) params += `&reviewer_type=${reviewer_type}`;
+      if (rating) params += `&rating=${rating}`;
+      const url = `main/review?${params}`;
       this.auth
         .guestAuthGetapi(url)
-        .then((resp: any) => {
-          resolve(resp);
-        })
-        .catch((err: any) => {
-          reject(err);
-        });
+        .then((resp: any) => resolve(resp))
+        .catch((err: any) => reject(err));
     });
   }
 
