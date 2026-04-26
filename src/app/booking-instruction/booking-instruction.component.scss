@@ -97,6 +97,23 @@ p {
   margin-bottom: 0px !important;
 }
 
+.ellip {
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0 !important;
+}
+
+.checkname {
+  max-width: 250px;
+}
+
+table {
+  table-layout: fixed;
+  word-break: break-word;
+}
+
 .samebutton {
   color: #fff;
   background-color: #6c757d;

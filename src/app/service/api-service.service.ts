@@ -1091,6 +1091,11 @@ assignDeliveryManUpdate(orderId: any, payload: any) {
     });
   }
 
+  deleteBookingInstruction(id: any): Observable<any> {
+    let url = `main/bookingInstructions/${id}`;
+    return this.auth.deleteGuestAuthApiData(url).pipe(map((res) => res));
+  }
+
   createBookingInstruction(postData: any, id: any): Observable<any> {
     if (id) {
       let url = `main/bookingInstructions/${id}`;

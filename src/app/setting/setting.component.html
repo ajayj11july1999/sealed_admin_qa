@@ -28,7 +28,7 @@
                         <div class=" text-end p-1">
 
                           <button class="file-upload-button1">
-                            <input type="file" #fileInput
+                            <input type="file" #fileInput accept="image/*"
                               (change)="onChange($event?.target?.files,'mobile',items?._id)" />
                           </button>
 
@@ -51,7 +51,7 @@
                         <img src={{items.imgUrl}} class="p-2" alt="img">
                         <div class="card-body text-center">
                           <button class="file-upload-button">
-                            <input type="file" #fileInput (change)="onChange($event.target.files,'mobile')" />
+                            <input type="file" #fileInput accept="image/*" (change)="onChange($event.target.files,'mobile')" />
                           </button>
                         </div>
                       </div>
@@ -77,7 +77,7 @@
                         <div class=" text-end p-1">
 
                           <button class="file-upload-button1">
-                            <input type="file" #fileInput (change)="onChange($event?.target?.files,'web',items?._id)" />
+                            <input type="file" #fileInput accept="image/*" (change)="onChange($event?.target?.files,'web',items?._id)" />
                           </button>
 
                           <button mat-fab color="danger" (click)="deleteBanner(i,bannerWebList,'web')">
@@ -97,7 +97,7 @@
                         <img src={{items.imgUrl}} class="p-2" alt="img">
                         <div class="card-body text-center">
                           <button class="file-upload-button">
-                            <input type="file" #fileInput (change)="onChange($event.target.files,'web')" />
+                            <input type="file" #fileInput accept="image/*" (change)="onChange($event.target.files,'web')" />
                           </button>
                         </div>
                       </div>
@@ -123,7 +123,7 @@
                         <div class=" text-end p-1">
 
                           <button class="file-upload-button1">
-                            <input type="file" #fileInput
+                            <input type="file" #fileInput accept="image/*"
                               (change)="onChange($event?.target?.files,'notary',items?._id)" />
                           </button>
                           <button mat-fab color="danger" (click)="deleteBanner(i,bannerNotaryList,'notary')">
@@ -143,7 +143,7 @@
                         <img src={{items.imgUrl}} class="p-2" alt="img">
                         <div class="card-body text-center">
                           <button class="file-upload-button">
-                            <input type="file" #fileInput (change)="onChange($event.target.files,'notary')" />
+                            <input type="file" #fileInput accept="image/*" (change)="onChange($event.target.files,'notary')" />
                           </button>
                         </div>
                       </div>
@@ -174,7 +174,7 @@
                         </div>
                         <div class=" text-end p-1">
                           <button class="file-upload-button1">
-                            <input type="file" #fileInput
+                            <input type="file" #fileInput accept="image/*"
                               (change)="onChange($event?.target?.files,'advertise',items?._id)" />
                           </button>
 
@@ -196,7 +196,7 @@
                         <img src={{items.imgUrl}} class="p-2" alt="img">
                         <div class="card-body text-center">
                           <button class="file-upload-button">
-                            <input type="file" #fileInput (change)="onChange($event.target.files,'advertise')" />
+                            <input type="file" #fileInput accept="image/*" (change)="onChange($event.target.files,'advertise')" />
                           </button>
                         </div>
                       </div>

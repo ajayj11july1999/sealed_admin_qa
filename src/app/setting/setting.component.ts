@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiServiceService } from '../service/api-service.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-setting',
@@ -30,7 +31,8 @@ export class SettingComponent implements OnInit {
   searchLoad: boolean = false;
   constructor(
     private apiService: ApiServiceService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {
@@ -49,15 +51,9 @@ export class SettingComponent implements OnInit {
       let ext =
         file.name.substring(file.name.lastIndexOf('.') + 1, file.name.length) ||
         file.name;
-      if (
-        ext == 'png' ||
-        ext == 'jpg' ||
-        ext == 'pdf' ||
-        ext == 'doc' ||
-        ext == 'docx' ||
-        ext == 'jpeg' ||
-        ext == 'gif'
-      ) {
+      const allowedExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
+      const allowedMimeTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/webp'];
+      if (allowedExtensions.includes(ext.toLowerCase()) && allowedMimeTypes.includes(file.type)) {
         console.log('hgdjjsda1111');
         if (!(file.size > 2097152)) {
           let x: any;
@@ -80,9 +76,13 @@ export class SettingComponent implements OnInit {
           this.filebase = splitted;
         } else {
           this.fileuploadstatus = false;
-
+          this.searchLoad = false;
+          this.toastr.warning('File size must not exceed 2 MB.');
         }
       } else {
+        this.fileuploadstatus = false;
+        this.searchLoad = false;
+        this.toastr.warning('Only image files (JPG, JPEG, PNG, GIF, WEBP) are allowed.');
       }
     }
   }

@@ -4,6 +4,7 @@ import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogueComponent } from '../dialogue/dialogue.component';
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { ToastrService } from 'ngx-toastr';
 import { ExcelService } from '../service/exportService/excelService';
@@ -29,6 +30,11 @@ interface Page {
 export class BookingInstructionComponent implements OnInit {
 
   instructionform: any = {
+    "name": "",
+    "status": "",
+    "_id": null
+  }
+  tempForm: any = {
     "name": "",
     "status": "",
     "_id": null
@@ -165,6 +171,15 @@ export class BookingInstructionComponent implements OnInit {
   //   });
   // }
 
+  sanitizeNameInput(e: any) {
+    const raw: string = e?.target?.value ?? '';
+    const sanitized = raw.replace(/[^a-zA-Z0-9\s]/g, '').slice(0, 100);
+    if (raw !== sanitized) {
+      (e.target as HTMLInputElement).value = sanitized;
+      this.tempForm.name = sanitized;
+    }
+  }
+
   searchUserList(e: any) {
     const raw: string = e?.target?.value ?? '';
     const sanitized = raw.replace(/[^a-zA-Z0-9\s]/g, '');
@@ -188,6 +203,7 @@ export class BookingInstructionComponent implements OnInit {
   }
 
   AddModal(template: TemplateRef<any>) {
+    this.clear();
     var aa: any = {
       backdrop: 'static', class: 'custm_modal gray modal-lg', keyboard: false, ignoreBackdropClick: true
     }
@@ -198,7 +214,7 @@ export class BookingInstructionComponent implements OnInit {
   }
   editInstruction(item: any) {
     this.isedit = true;
-    this.instructionform = item;
+    this.tempForm = { ...item };
   }
   cancel() {
     // this.isedit = false;
@@ -210,6 +226,7 @@ export class BookingInstructionComponent implements OnInit {
 
 
     if (f.form.valid) {
+      this.instructionform = { ...this.tempForm };
       this.apiservice.createBookingInstruction(this.instructionform, this.instructionform._id).subscribe((res) => {
 
         let result = res;
@@ -226,8 +243,9 @@ export class BookingInstructionComponent implements OnInit {
 
         this.spinner.hide();
 
-      }, err => {
+      }, (err: any) => {
         this.spinner.hide();
+        this.toastr.error(err?.error?.message || 'Something went wrong. Please try again.');
       })
     }
     else {
@@ -237,10 +255,8 @@ export class BookingInstructionComponent implements OnInit {
   }
   clear() {
     this.isedit = false;
-    this.instructionform.name = '';
-    this.instructionform.status = '';
-    this.instructionform._id = null
-
+    this.tempForm = { name: '', status: '', _id: null };
+    this.instructionform = { name: '', status: '', _id: null };
   }
 
   getBookingInstruction() {
@@ -257,7 +273,24 @@ export class BookingInstructionComponent implements OnInit {
       })
       .catch((err: any) => { });
   }
-  deleteInstruction() {
-
+  deleteInstruction(item: any) {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: { status: 'Delete' },
+      disableClose: true,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.apiservice.deleteBookingInstruction(item._id).subscribe((res: any) => {
+          if (res?.code == 200) {
+            this.toastr.success(res?.message || 'Deleted successfully');
+          } else {
+            this.toastr.error(res?.message || 'Failed to delete');
+          }
+          this.getBookingInstruction();
+        }, (err: any) => {
+          this.toastr.error(err?.error?.message || 'Failed to delete');
+        });
+      }
+    });
   }
 }
