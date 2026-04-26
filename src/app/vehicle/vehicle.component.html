@@ -128,7 +128,9 @@
 
         <div class="col-md-4">
           <label>Vehicle Name</label>
-          <input class="form-control" [(ngModel)]="form.name" name="name" required>
+          <input class="form-control" [(ngModel)]="form.name" name="name" required
+                 maxlength="100"
+                 (keypress)="allowOnlyAlphaSpace($event)">
         </div>
         <div class="col-md-4 mt-3">
   <label>Vehicle Image</label>
@@ -155,17 +157,23 @@
 
         <div class="col-md-4">
           <label>Base Price</label>
-          <input type="number" class="form-control" [(ngModel)]="form.basePrice" name="basePrice" required>
+          <input type="number" class="form-control" [(ngModel)]="form.basePrice" name="basePrice" required
+                 min="0" max="999999" step="0.01"
+                 (keydown)="blockInvalidNumKeys($event)">
         </div>
 
         <div class="col-md-4">
           <label>Per KM Price</label>
-          <input type="number" class="form-control" [(ngModel)]="form.perkm" name="perkm" required>
+          <input type="number" class="form-control" [(ngModel)]="form.perkm" name="perkm" required
+                 min="0" max="99999" step="0.01"
+                 (keydown)="blockInvalidNumKeys($event)">
         </div>
 
         <div class="col-md-4 mt-3">
           <label>Base KM</label>
-          <input type="number" class="form-control" [(ngModel)]="form.basekm" name="basekm" required>
+          <input type="number" class="form-control" [(ngModel)]="form.basekm" name="basekm" required
+                 min="0" max="99999" step="1"
+                 (keydown)="blockInvalidNumKeys($event)">
         </div>
 
         <div class="col-md-4 mt-3">
@@ -179,12 +187,16 @@
       </div>
        <div class="col-md-4 mt-3">
           <label>Weight Limit (kg)</label>
-          <input type="number" class="form-control" [(ngModel)]="form.weightWarning" name="weightWarning" placeholder="e.g. 50" min="0" step="1">
+          <input type="number" class="form-control" [(ngModel)]="form.weightWarning" name="weightWarning"
+                 placeholder="e.g. 50" min="0" max="99999" step="1"
+                 (keydown)="blockInvalidNumKeys($event)">
         </div>
 
         <div class="col-md-4 mt-3">
           <label>Length Limit (cm)</label>
-          <input type="number" class="form-control" [(ngModel)]="form.lengthWarning" name="lengthWarning" placeholder="e.g. 150" min="0" step="1">
+          <input type="number" class="form-control" [(ngModel)]="form.lengthWarning" name="lengthWarning"
+                 placeholder="e.g. 150" min="0" max="99999" step="1"
+                 (keydown)="blockInvalidNumKeys($event)">
         </div>
 
 

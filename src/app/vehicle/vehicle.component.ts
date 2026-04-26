@@ -148,9 +148,51 @@ removeImage() {
 
   saveVehicle() {
 
-    if (!this.form.name || !this.form.basePrice || !this.form.perkm || !this.form.basekm) {
-      this.toastr.warning("Please fill all required fields");
+    const name = (this.form.name || '').trim();
+    if (!name) {
+      this.toastr.warning("Please enter a vehicle name");
       return;
+    }
+
+    const namePattern = /^[a-zA-Z\s]+$/;
+    if (!namePattern.test(name)) {
+      this.toastr.warning("Vehicle name must contain only letters and spaces");
+      return;
+    }
+
+    const basePrice = Number(this.form.basePrice);
+    const perkm = Number(this.form.perkm);
+    const basekm = Number(this.form.basekm);
+
+    if (this.form.basePrice === null || this.form.basePrice === '' || isNaN(basePrice) || basePrice < 0 || basePrice > 999999) {
+      this.toastr.warning("Base Price must be a valid number between 0 and 999999");
+      return;
+    }
+
+    if (this.form.perkm === null || this.form.perkm === '' || isNaN(perkm) || perkm < 0 || perkm > 99999) {
+      this.toastr.warning("Per KM Price must be a valid number between 0 and 99999");
+      return;
+    }
+
+    if (this.form.basekm === null || this.form.basekm === '' || isNaN(basekm) || basekm < 0 || basekm > 99999) {
+      this.toastr.warning("Base KM must be a valid number between 0 and 99999");
+      return;
+    }
+
+    if (this.form.weightWarning !== null && this.form.weightWarning !== '') {
+      const w = Number(this.form.weightWarning);
+      if (isNaN(w) || w < 0 || w > 99999) {
+        this.toastr.warning("Weight Limit must be a valid number between 0 and 99999");
+        return;
+      }
+    }
+
+    if (this.form.lengthWarning !== null && this.form.lengthWarning !== '') {
+      const l = Number(this.form.lengthWarning);
+      if (isNaN(l) || l < 0 || l > 99999) {
+        this.toastr.warning("Length Limit must be a valid number between 0 and 99999");
+        return;
+      }
     }
 
     let req = this.api.saveVehicle(this.form, this.form._id);
@@ -202,6 +244,19 @@ removeImage() {
 
   cancel() {
     this.modalRef.hide();
+  }
+
+  allowOnlyAlphaSpace(event: KeyboardEvent) {
+    const pattern = /^[a-zA-Z\s]$/;
+    if (!pattern.test(event.key)) {
+      event.preventDefault();
+    }
+  }
+
+  blockInvalidNumKeys(event: KeyboardEvent) {
+    if (['e', 'E', '+', '-'].includes(event.key)) {
+      event.preventDefault();
+    }
   }
 
 }
