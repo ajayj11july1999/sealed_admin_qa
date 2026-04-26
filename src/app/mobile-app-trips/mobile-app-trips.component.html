@@ -59,6 +59,9 @@
                     {{items?.selectedPackage}}
                   </div>
                   <div class="txt-details">
+                    Booked vehicle: <span class="type">{{ orderBookedVehicleLabel(items) }}</span>
+                  </div>
+                  <div class="txt-details">
                     Customer Name : <span class="type">{{ customerNameLabel(items) }}</span>
                   </div>
                   <div class="txt-details">
@@ -123,6 +126,9 @@
                     {{items?.selectedPackage}}
                   </div>
                   <div class="txt-details">
+                    Booked vehicle: <span class="type">{{ orderBookedVehicleLabel(items) }}</span>
+                  </div>
+                  <div class="txt-details">
                     Customer Name : <span class="type">{{ customerNameLabel(items) }}</span>
                   </div>
                   <div class="txt-details">
@@ -152,10 +158,23 @@
                         </mat-option>
                       </mat-select>
                     </mat-form-field> -->
-                      <ng-select [items]="deliveryman" [clearable]="false" bindValue="id"
+                      <ng-select [items]="items._eligibleDrivers || emptyDriverList" [clearable]="false"
+                        [compareWith]="compareDrivers"
                         (change)="onSelectionChange($event,items?.pickupAddress,i)" [searchable]="true" bindLabel="name"
-                        placeholder="Select deliveryman">
+                        placeholder="Select driver (vehicle must match booking)">
+                        <ng-template ng-label-tmp let-item="item">
+                          <span>{{ driverAssignOptionCaption(item) }}</span>
+                        </ng-template>
+                        <ng-template ng-option-tmp let-item="item">
+                          <div class="assign-option">
+                            <span class="assign-option-name">{{ item.name }}</span>
+                            <span class="assign-option-vehicle">{{ courierVehicleLabel(item) || 'Vehicle N/A' }}</span>
+                          </div>
+                        </ng-template>
                       </ng-select>
+                      <small *ngIf="!(items._eligibleDrivers?.length)" class="text-muted d-block mt-1">
+                        No drivers match this order&rsquo;s vehicle type.
+                      </small>
 
                       <div class="text-center mt-3">
                         <button mat-raised-button class="assign-btn" (click)="assigncourier(items,'consumer')"
@@ -199,6 +218,10 @@
         </card-header>
 
         <mat-card-content>
+
+          <div class="txt-details">
+            Booked vehicle: <span class="type">{{ orderBookedVehicleLabel(items) }}</span>
+          </div>
 
           <div class="txt-details">
             Customer Name: <span class="type">{{ customerNameLabel(items) }}</span>

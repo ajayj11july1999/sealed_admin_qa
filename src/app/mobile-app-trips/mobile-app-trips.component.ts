@@ -27,6 +27,10 @@ export class MobileAppTripsComponent implements OnInit {
   _id: any;
   orderId: any;
   deliveryman: any;
+  /** Full active courier list from API; used to build per-order filtered dropdowns. */
+  allActiveDeliveryMen: any[] = [];
+  /** Stable empty list for ng-select when eligibility not yet computed. */
+  readonly emptyDriverList: any[] = [];
   pickuplatvalue: any;
   pickuplongvalue: any;
   searchLoad: boolean = false;
@@ -93,8 +97,9 @@ export class MobileAppTripsComponent implements OnInit {
         // this.orderId = this.Consumernewtrip?.tripDetails.orderd;
         // console.log(this.orderId)
         // this._id=this.Consumernewtrip?._id
-        for (let value of this.Consumernewtrip) {
+        for (const value of this.Consumernewtrip) {
           value.disable = true;
+          value._eligibleDrivers = this.filterEligibleDrivers(value);
         }
         console.log(this.Consumernewtrip);
       })
@@ -140,21 +145,198 @@ moredetails(i: any) {
     this.apiService
       .getListAllActiveDeliveryMan()
       .then((res) => {
-        this.deliveryman = res?.data ? res.data : [];
+        const list = res?.data ? res.data : [];
+        this.allActiveDeliveryMen = Array.isArray(list) ? list : [];
+        this.deliveryman = this.allActiveDeliveryMen;
+        this.rebuildEligibleDriversForNewTrips();
         console.log(this.deliveryman);
       })
       .catch((err) => { });
   }
+
+  orderDeliveryTypeLabel(order: any): string {
+    if (!order) {
+      return '';
+    }
+    const t = order.deliveryType ?? order.tripDetails?.deliveryType ?? '';
+    return t != null ? String(t).trim() : '';
+  }
+
+  /**
+   * Vehicle the customer booked (from API `orderVehicleDetails` after vehicleId lookup, else delivery type).
+   */
+  orderBookedVehicleLabel(order: any): string {
+    if (!order) {
+      return '';
+    }
+    const fromApi =
+      order.orderVehicleDetails?.name ??
+      order.tripDetails?.orderVehicleDetails?.name;
+    if (fromApi != null && String(fromApi).trim() !== '') {
+      return String(fromApi).trim();
+    }
+    return this.orderDeliveryTypeLabel(order);
+  }
+
+  /** Vehicle display / type from courier profile (matches courier-view template). */
+  courierVehicleLabel(dm: any): string {
+    if (!dm) {
+      return '';
+    }
+    const parts = [
+      dm.vehicleDetails?.name,
+      dm.vehicleDetails?.vehicleType,
+      dm.vehicle?.name,
+      dm.deliveryType,
+    ].filter((p) => p != null && String(p).trim() !== '');
+    return parts.length ? String(parts[0]).trim() : '';
+  }
+
+  /** Driver row in assign dropdown: name + vehicle. */
+  driverAssignOptionCaption(dm: any): string {
+    if (!dm) {
+      return '';
+    }
+    const v = this.courierVehicleLabel(dm);
+    return v ? `${dm.name} — ${v}` : `${dm.name} — Vehicle N/A`;
+  }
+
+  /**
+   * Coarse vehicle class for matching order deliveryType to courier vehicle.
+   */
+  vehicleCategory(label: string): '2w' | '4w' | 'unknown' {
+    const s = (label || '').toLowerCase();
+    if (
+      /four|4\s*wheel|car|suv|sedan|hatchback|van|truck|auto\s*rickshaw/.test(s)
+    ) {
+      return '4w';
+    }
+    if (
+      /bike|bicycle|two|2\s*wheel|scooter|motorcycle|cycle/.test(s)
+    ) {
+      return '2w';
+    }
+    return 'unknown';
+  }
+
+  /** Basic vehicle label match (e.g. "Four Wheeler" vs "4 Wheeler"). */
+  vehicleNamesLooselyMatch(a: string, b: string): boolean {
+    const strip = (s: string) =>
+      (s || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '')
+        .trim();
+    const na = strip(a);
+    const nb = strip(b);
+    if (!na || !nb) {
+      return true;
+    }
+    return na === nb || na.includes(nb) || nb.includes(na);
+  }
+
+  /**
+   * Returns an error message if Assign should be blocked, or null if OK.
+   */
+  validateAssignSelection(order: any, driver: any): string | null {
+    if (!driver) {
+      return 'Selected driver was not found. Refresh the list and try again.';
+    }
+    const driverName =
+      driver.name != null ? String(driver.name).trim() : '';
+    if (!driverName) {
+      return 'Selected driver has no valid name.';
+    }
+    const booked = this.orderBookedVehicleLabel(order);
+    const driverVehicle = this.courierVehicleLabel(driver);
+    const orderCat = this.vehicleCategory(booked);
+    const driverCat = this.vehicleCategory(driverVehicle);
+
+    if (orderCat !== 'unknown' && driverCat === 'unknown') {
+      return `This order requires "${booked}". The selected driver has no vehicle on file.`;
+    }
+    if (
+      orderCat !== 'unknown' &&
+      driverCat !== 'unknown' &&
+      orderCat !== driverCat
+    ) {
+      return `Vehicle mismatch: booked "${booked}" but ${driverName}'s vehicle is "${driverVehicle || 'unknown'}".`;
+    }
+    const apiBookedName =
+      order?.orderVehicleDetails?.name != null
+        ? String(order.orderVehicleDetails.name).trim()
+        : '';
+    if (
+      apiBookedName &&
+      driverVehicle &&
+      !this.vehicleNamesLooselyMatch(apiBookedName, driverVehicle)
+    ) {
+      return `Vehicle must match the booking: "${apiBookedName}" vs driver "${driverVehicle}".`;
+    }
+    return null;
+  }
+
+  /**
+   * Drivers eligible for this order (vehicle class match). Prefer `order._eligibleDrivers`
+   * in the template so ng-select does not get a new array every change-detection tick.
+   */
+  filterEligibleDrivers(order: any): any[] {
+    if (!this.allActiveDeliveryMen?.length || !order) {
+      return [];
+    }
+    const orderType = this.orderBookedVehicleLabel(order);
+    const orderCat = this.vehicleCategory(orderType);
+
+    return this.allActiveDeliveryMen.filter((dm) => {
+      const courierLabel = this.courierVehicleLabel(dm);
+      const courierCat = this.vehicleCategory(courierLabel);
+
+      if (orderCat !== 'unknown' && courierCat === 'unknown') {
+        return false;
+      }
+      if (orderCat === 'unknown') {
+        return true;
+      }
+      return courierCat === orderCat;
+    });
+  }
+
+  rebuildEligibleDriversForNewTrips(): void {
+    if (!Array.isArray(this.Consumernewtrip)) {
+      return;
+    }
+    for (const order of this.Consumernewtrip) {
+      order._eligibleDrivers = this.filterEligibleDrivers(order);
+    }
+  }
+
+  /** ng-select: same driver from refreshed list is still the same option. */
+  compareDrivers = (a: any, b: any): boolean => {
+    if (a == null || b == null) {
+      return a === b;
+    }
+    const idA = a._id ?? a.id;
+    const idB = b._id ?? b.id;
+    if (idA != null && idB != null) {
+      return String(idA) === String(idB);
+    }
+    return a === b;
+  };
 
   onSelectionChange(value: any, pickup, i) {
     console.log(pickup[0]?.latitude, 'ryyyfki');
     this.pickuplatvalue = pickup[0]?.latitude;
     this.pickuplongvalue = pickup[0]?.longitude;
 
-    // this.test(value, value.primaryAddress);
-    this.acceptedbyId = value._id;
-    this.pick1 = value?.primaryAddress?.latitude;
-    this.pick2 = value?.primaryAddress?.longitude;
+    const dm = value && typeof value === 'object' ? value : null;
+    const id = dm?._id ?? dm?.id ?? dm?.deliveryManId;
+    if (id == null || id === '') {
+      this.toastr.error('Could not resolve selected driver');
+      return;
+    }
+
+    this.acceptedbyId = id;
+    this.pick1 = dm?.primaryAddress?.latitude;
+    this.pick2 = dm?.primaryAddress?.longitude;
     this.uneffectiveDistance(i);
   }
   // test(e: any, pickup: any) {
@@ -266,7 +448,7 @@ moredetails(i: any) {
     this._id = i?.tripDetails?._id;
     this.orderId = i?._id;   // ✅ THIS IS ORDER ID
     console.log(this.orderId);
-    let payload = {
+    const payload = {
       _id: this._id,
       orderId: this.orderId,
       assignedToId: this.acceptedbyId,
@@ -276,25 +458,29 @@ moredetails(i: any) {
       assignedAt: new Date(),
       baseKm: this.uneffectiveDist,
     };
-    if (!this.acceptedbyId && this.acceptedbyId != '') {
+    if (this.acceptedbyId == null || this.acceptedbyId === '') {
       this.toastr.error('Please Select Assignee');
-    } else {
-      this.apiService.assignDeliveryManUpdate(this.orderId, payload).subscribe(
-        (res) => {
-          this.deliveryman = res?.data?.data;
-          this.toastr.success('Successfully Updated...!');
-          // if (type == 'consumer') {
-          this.getListConsumerNewtrip();
-          this.getListConsumerActivetrip();
-          this.getallActiveDeliveryman();
-          // } else {
-          // }
-        },
-        (err) => {
-          this.toastr.error('Failed to update!!!');
-        }
-      );
+      return;
     }
+    const dm = this.allActiveDeliveryMen.find(
+      (d) => String(d._id) === String(this.acceptedbyId)
+    );
+    const validationError = this.validateAssignSelection(i, dm);
+    if (validationError) {
+      this.toastr.error(validationError);
+      return;
+    }
+    this.apiService.assignDeliveryManUpdate(this.orderId, payload).subscribe(
+      (res) => {
+        this.toastr.success('Successfully Updated...!');
+        this.getListConsumerNewtrip();
+        this.getListConsumerActivetrip();
+        this.getallActiveDeliveryman();
+      },
+      (err) => {
+        this.toastr.error('Failed to update!!!');
+      }
+    );
   }
 }
 
