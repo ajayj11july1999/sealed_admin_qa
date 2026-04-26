@@ -44,22 +44,18 @@ export class VehicleComponent implements OnInit {
     this.getVehicleList();
   }
 
- getVehicleList() {
-  this.api.getVehicleList(this.limit, this.offset, this.value)
-    .then((res: any) => {
-      if (res.code === 200) {
-         
-    console.log('API RESPONSE:', res);     // DEBUG
-    console.log('VEHICLES:', res.data);    // DEBUG
-
-    this.vehicleList = res.data; 
-
-        // Vehicle API gives: data: []
-        this.vehicleList = res.data;
-        this.totalCount = res.data.length;
-      }
-    });
-}
+  getVehicleList() {
+    this.api.getVehicleList(this.limit, this.offset, this.value)
+      .then((res: any) => {
+        if (res.code === 200) {
+          this.vehicleList = res.data?.data || [];
+          this.totalCount = res.data?.totalCount || 0;
+        } else {
+          this.vehicleList = [];
+          this.totalCount = 0;
+        }
+      });
+  }
 
 
   searchVehicle(event: any) {
