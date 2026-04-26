@@ -694,15 +694,12 @@ loadZones() {
 // ---------------- TOGGLE ACTIVE / INACTIVE ----------------
 toggleZone(zone: any) {
 
-  const payload = {
-    ...zone,
-    isActive: !zone.isActive
-  };
+  const payload = { isActive: !zone.isActive };
 
   this.api.updateZone(zone._id, payload).subscribe({
     next: () => {
       zone.isActive = !zone.isActive;
-      this.drawSavedZones(); // refresh map color
+      this.drawSavedZones();
     },
     error: (err: unknown) => {
       console.error('Failed to update zone', err);

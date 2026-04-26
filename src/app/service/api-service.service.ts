@@ -58,10 +58,7 @@ getZones(limit: number = 10, offset: number = 0, value: string = ''): Promise<an
 
 // UPDATE ZONE
 updateZone(id: string, payload: any) {
-  return this.http.put(
-    `${this.baseUrl}realtime/zones/${id}`,
-    payload
-  );
+  return this.auth.putGuestAuthApiData(`realtime/zones/${id}`, payload);
 }
 
 // DELETE ZONE

@@ -216,7 +216,8 @@ export class AuthService {
   putGuestAuthApiData(url: string, body: any): Observable<any> {
     const token = sessionStorage.getItem('tokenA') || '';
     const rawUserId = localStorage.getItem('useridA') || '';
-    const userId = rawUserId ? JSON.parse(rawUserId) : '';
+    let userId = '';
+    try { userId = rawUserId ? JSON.parse(rawUserId) : ''; } catch { userId = rawUserId.trim(); }
 
     url = environment?.baseUrl + url;
     const options = {
