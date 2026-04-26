@@ -1028,6 +1028,19 @@ assignDeliveryManUpdate(orderId: any, payload: any) {
         });
     });
   }
+
+  getReviewExport(type: 'excel' | 'pdf', filters?: { reviewer_type?: string; rating?: string; value?: string }): Promise<any> {
+    return new Promise((resolve, reject) => {
+      let url = `main/review/excelReport/generate?type=${type}`;
+      if (filters?.reviewer_type) url += `&reviewer_type=${filters.reviewer_type}`;
+      if (filters?.rating) url += `&rating=${filters.rating}`;
+      if (filters?.value) url += `&value=${filters.value}`;
+      this.auth
+        .guestAuthGetapi(url)
+        .then((resp: any) => resolve(resp))
+        .catch((err: any) => reject(err));
+    });
+  }
   createCategory(postData: any,): Observable<any> {
     let url = `main/categories`;
     return this.auth.guestpost(url, postData).pipe(map(res => res));

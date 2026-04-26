@@ -195,10 +195,46 @@ export class ReviewsComponent implements OnInit {
   }
 
   exportAsXLSX() {
-    // Export functionality not implemented
+    this.spinner.show();
+    const filters = {
+      reviewer_type: this.selectedReviewerType || undefined,
+      rating: this.selectedRating || undefined,
+      value: this.value || undefined,
+    };
+    this.apiservice.getReviewExport('excel', filters)
+      .then((res: any) => {
+        this.spinner.hide();
+        if (res?.code === 200 && res?.data) {
+          this.excelService.downloadBase64ExcelFile(res.data, 'Review_Rating_Report');
+        } else {
+          this.toastr.error(res?.message || 'No data to export');
+        }
+      })
+      .catch((err: any) => {
+        this.spinner.hide();
+        this.toastr.error(err?.error?.message || 'Failed to export CSV');
+      });
   }
 
   exportAsPdf() {
-    // Export functionality not implemented
+    this.spinner.show();
+    const filters = {
+      reviewer_type: this.selectedReviewerType || undefined,
+      rating: this.selectedRating || undefined,
+      value: this.value || undefined,
+    };
+    this.apiservice.getReviewExport('pdf', filters)
+      .then((res: any) => {
+        this.spinner.hide();
+        if (res?.code === 200 && res?.data) {
+          this.pdfService.downloadBase64File(res.data, 'Review_Rating_Report.pdf');
+        } else {
+          this.toastr.error(res?.message || 'No data to export');
+        }
+      })
+      .catch((err: any) => {
+        this.spinner.hide();
+        this.toastr.error(err?.error?.message || 'Failed to export PDF');
+      });
   }
 }
