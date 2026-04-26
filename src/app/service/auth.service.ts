@@ -38,7 +38,9 @@ export class AuthService {
     // Normalize token so we don't send Bearer twice
     const rawToken = (sessionStorage.getItem('tokenA') || '').toString().trim();
     const token = rawToken.replace(/^Bearer\s+/i, '');
-    const userId = (localStorage.getItem('useridA') || '').toString().trim();
+    const rawUserId = localStorage.getItem('useridA') || '';
+    let userId = '';
+    try { userId = rawUserId ? JSON.parse(rawUserId) : ''; } catch { userId = rawUserId.trim(); }
 
     const headers: any = {
       'Content-Type': 'application/json',
@@ -95,7 +97,9 @@ export class AuthService {
   }
   getGuestAuthApiData(url: string): Observable<any> {
     const token = sessionStorage.getItem('tokenA') || '';
-    const userId = localStorage.getItem('useridA') || '';
+    const rawUserId = localStorage.getItem('useridA') || '';
+    let userId = '';
+    try { userId = rawUserId ? JSON.parse(rawUserId) : ''; } catch { userId = rawUserId; }
 
     url = environment?.baseUrl + url;
     const options = {
@@ -146,7 +150,9 @@ export class AuthService {
 
   guestpost(url: string, body: any): Observable<any> {
     const token = sessionStorage.getItem('tokenA') || '';
-    const userId = localStorage.getItem('useridA') || '';
+    const rawUserId = localStorage.getItem('useridA') || '';
+    let userId = '';
+    try { userId = rawUserId ? JSON.parse(rawUserId) : ''; } catch { userId = rawUserId; }
 
     url = environment.baseUrl + url;
 
@@ -187,7 +193,9 @@ export class AuthService {
   // }
   postGuestAuthApiData(url: string, body: any): Observable<any> {
     const token = sessionStorage.getItem('tokenA') || '';
-    const userId = localStorage.getItem('useridA') || '';
+    const rawUserId = localStorage.getItem('useridA') || '';
+    let userId = '';
+    try { userId = rawUserId ? JSON.parse(rawUserId) : ''; } catch { userId = rawUserId; }
 
     url = environment.baseUrl + url;
 
@@ -207,7 +215,8 @@ export class AuthService {
 
   putGuestAuthApiData(url: string, body: any): Observable<any> {
     const token = sessionStorage.getItem('tokenA') || '';
-    const userId = localStorage.getItem('useridA') || '';
+    const rawUserId = localStorage.getItem('useridA') || '';
+    const userId = rawUserId ? JSON.parse(rawUserId) : '';
 
     url = environment?.baseUrl + url;
     const options = {
@@ -225,7 +234,9 @@ export class AuthService {
 
   deleteGuestAuthApiData(url: string): Observable<any> {
     const token = sessionStorage.getItem('tokenA') || '';
-    const userId = localStorage.getItem('useridA') || '';
+    const rawUserId = localStorage.getItem('useridA') || '';
+    let userId = '';
+    try { userId = rawUserId ? JSON.parse(rawUserId) : ''; } catch { userId = rawUserId; }
 
     url = environment?.baseUrl + url;
     const options = {

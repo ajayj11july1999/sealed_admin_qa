@@ -18,7 +18,13 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const rawToken = (sessionStorage.getItem('tokenA') || '').toString().trim();
     const token = rawToken.replace(/^Bearer\s+/i, '');
-    const userId = (localStorage.getItem('useridA') || '').toString().trim();
+    const rawUserId = localStorage.getItem('useridA') || '';
+    let userId = '';
+    try {
+      userId = rawUserId ? JSON.parse(rawUserId) : '';
+    } catch {
+      userId = rawUserId.trim();
+    }
 
     let authReq = req;
 
