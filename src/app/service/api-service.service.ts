@@ -1114,7 +1114,7 @@ assignDeliveryManUpdate(orderId: any, payload: any) {
   getPdfExcelDownload(path, type): Promise<any> {
     return new Promise((resolve, reject) => {
       let url = '';
-      url = `${path ? path : ''}main/excelReport/generate?type=${type ? type : ""}`;
+      url = `main/${path ? path : ''}/excelReport/generate?type=${type ? type : ""}`;
       this.auth
         .guestAuthGetapi(url)
         .then((resp: any) => {

@@ -134,6 +134,10 @@
                       <small *ngIf="f['name'].errors?.required">
                         Name is required
                       </small>
+
+                      <small *ngIf="f['name'].errors?.pattern">
+                        Name must not contain special characters
+                      </small>
                     </div>
                   </div>
 
@@ -160,6 +164,10 @@
 
                       <small *ngIf="f['deliveryCharge'].errors?.min">
                         Cannot be negative
+                      </small>
+
+                      <small *ngIf="f['deliveryCharge'].errors?.max">
+                        Amount cannot exceed 300
                       </small>
                     </div>
                   </div>

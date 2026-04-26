@@ -97,6 +97,29 @@ p {
   margin-bottom: 0px !important;
 }
 
+.ellip {
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.faq-textarea {
+  width: 100%;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 14px;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: #21aa47;
+    box-shadow: 0 0 0 2px rgba(33, 170, 71, 0.15);
+  }
+}
+
 .samebutton {
   color: #fff;
   background-color: #6c757d;

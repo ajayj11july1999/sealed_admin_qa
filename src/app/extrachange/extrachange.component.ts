@@ -44,8 +44,8 @@ export class ExtrachangeComponent implements OnInit {
 
   initForm() {
     this.deliveryChargeForm = this.fb.group({
-      name: ['', Validators.required],
-      deliveryCharge: ['', [Validators.required, Validators.min(0)]]
+      name: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9 ]+$')]],
+      deliveryCharge: ['', [Validators.required, Validators.min(0), Validators.max(300)]]
     });
   }
 

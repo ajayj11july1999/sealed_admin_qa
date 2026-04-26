@@ -280,6 +280,15 @@ export class FaqComponent implements OnInit {
     this.isedit = true;
     this.faqForm = item;
   }
+
+  allowedChars(event: KeyboardEvent): boolean {
+    const pattern = /^[a-zA-Z0-9 .,?!'\-]$/;
+    if (!pattern.test(event.key)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
   // editFaq(template: TemplateRef<any>, user: any) {
   //   this.isAddMode = false;
   //   this.user = { ...user }; // Populate the category object with the selected item
@@ -304,10 +313,12 @@ export class FaqComponent implements OnInit {
         let name = 'FaqList' + '_' + Date.now();
         this.excelService.downloadBase64ExcelFile(data, name)
       } else {
-        this.faqList = [];
+        this.toastr.error(res.message || 'Failed to download CSV file');
       }
     })
-      .catch((err: any) => { });
+      .catch((err: any) => {
+        this.toastr.error('Failed to download CSV file');
+      });
 
 
   }
@@ -323,10 +334,12 @@ export class FaqComponent implements OnInit {
         let name = 'FaqList' + '_' + Date.now();
         this.pdfService.downloadBase64File(data, name)
       } else {
-        this.faqList = [];
+        this.toastr.error(res.message || 'Failed to download PDF file');
       }
     })
-      .catch((err: any) => { });
+      .catch((err: any) => {
+        this.toastr.error('Failed to download PDF file');
+      });
 
 
     // this.pdfService.exportToPDF(this.categoryList, 'categoryList')

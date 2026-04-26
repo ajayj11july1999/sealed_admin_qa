@@ -78,7 +78,7 @@
 
                         </td>
                         <td class="checkname ">
-                          <p> {{item?.answer}} </p>
+                          <p class="ellip" data-toggle="tooltip" title="{{item?.answer}}"> {{item?.answer}} </p>
 
                         </td>
                         <td class="checkname ">
@@ -165,28 +165,37 @@
 
           <div class="">
             <label>Question</label><br>
-            <textarea type="text" name="question" [(ngModel)]="faqForm.question" rows="4" cols="95" required
-              #question="ngModel">
-              </textarea>
-            <!-- <div *ngIf="submitted && f['question'].errors" class="invalid-feedback" required>
-              <div style="font-size: 10px;" *ngIf="createForm.get('question').errors ">
-                Question is required</div>
-            </div> -->
-            <!-- <div class="new" *ngIf="userNameCheck">
-              Username doesn't have numbers </div> -->
+            <textarea name="question" [(ngModel)]="faqForm.question" rows="4" cols="95" required
+              maxlength="300"
+              pattern="^[a-zA-Z0-9 .,?!'\-]*$"
+              #question="ngModel"
+              (keypress)="allowedChars($event)"
+              class="faq-textarea"></textarea>
+            <div class="d-flex justify-content-between">
+              <div>
+                <small class="text-danger" *ngIf="question.touched && question.errors?.['required']">Question is required.</small>
+                <small class="text-danger" *ngIf="question.touched && question.errors?.['pattern']">Only letters, numbers and basic punctuation ( . , ? ! ' - ) are allowed.</small>
+                <small class="text-danger" *ngIf="question.touched && question.errors?.['maxlength']">Question cannot exceed 300 characters.</small>
+              </div>
+              <small class="text-muted">{{faqForm.question?.length || 0}}/300</small>
+            </div>
           </div>
-          <div class="">
+          <div class="mt-2">
             <label>Answer</label><br>
-            <textarea type="text" name="answer" [(ngModel)]="faqForm.answer" rows="4" cols="95" required
-              #answer="ngModel">
-                          </textarea>
-            <!-- <input type="text" formControlName="answer" class="form-control mt-2 mb-2"> -->
-            <!-- <div *ngIf="submitted && f['answer'].errors" class="invalid-feedback" required>
-              <div style="font-size: 10px;" *ngIf="createForm.get('answer').errors ">
-                Answer is required</div>
-            </div> -->
-            <!-- <div class="new" *ngIf="userNameCheck">
-                            Username doesn't have numbers </div> -->
+            <textarea name="answer" [(ngModel)]="faqForm.answer" rows="4" cols="95" required
+              maxlength="1000"
+              pattern="^[a-zA-Z0-9 .,?!'\-]*$"
+              #answer="ngModel"
+              (keypress)="allowedChars($event)"
+              class="faq-textarea"></textarea>
+            <div class="d-flex justify-content-between">
+              <div>
+                <small class="text-danger" *ngIf="answer.touched && answer.errors?.['required']">Answer is required.</small>
+                <small class="text-danger" *ngIf="answer.touched && answer.errors?.['pattern']">Only letters, numbers and basic punctuation ( . , ? ! ' - ) are allowed.</small>
+                <small class="text-danger" *ngIf="answer.touched && answer.errors?.['maxlength']">Answer cannot exceed 1000 characters.</small>
+              </div>
+              <small class="text-muted">{{faqForm.answer?.length || 0}}/1000</small>
+            </div>
           </div>
           <div class="">
             <label>Status</label><br>
