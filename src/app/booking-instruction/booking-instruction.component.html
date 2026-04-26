@@ -25,7 +25,7 @@
                   </div>
                   <div class="col-lg-4 col-md-4 col-8 text-end">
                     <div class="search-box">
-                      <input type="text" (input)="searchUserList($event)" class="search-input" placeholder="Search..">
+                      <input type="text" (input)="searchUserList($event)" class="search-input" placeholder="Search.." pattern="[a-zA-Z0-9\s]*">
 
                       <button class="search-button" type="submit" value="search">
                         <i class="fa fa-search"></i>

@@ -103,7 +103,7 @@ export class BookingInstructionComponent implements OnInit {
     })
       .catch((err: any) => {
         console.error(err);
-        this.toastr.error(err?.error?.message);
+        this.toastr.error(err?.error?.message || err?.message || 'Failed to download CSV. Please try again.');
       });
   }
 
@@ -124,10 +124,8 @@ export class BookingInstructionComponent implements OnInit {
     })
       .catch((err: any) => {
         console.error(err);
+        this.toastr.error(err?.error?.message || err?.message || 'Failed to download PDF. Please try again.');
       });
-
-
-    // this.pdfService.exportToPDF(this.categoryList, 'categoryList')
   }
 
   async printTable(): Promise<void> {
@@ -168,10 +166,15 @@ export class BookingInstructionComponent implements OnInit {
   // }
 
   searchUserList(e: any) {
+    const raw: string = e?.target?.value ?? '';
+    const sanitized = raw.replace(/[^a-zA-Z0-9\s]/g, '');
+    if (raw !== sanitized) {
+      (e.target as HTMLInputElement).value = sanitized;
+    }
     this.offset = 0;
-    this.value = e?.target?.value;
+    this.value = sanitized;
     this.currentPage = 0;
-    // this.getB2bUserList();
+    this.getBookingInstruction();
   }
   pageSize: any;
   pageEvent: any;
