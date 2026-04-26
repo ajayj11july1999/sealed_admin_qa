@@ -59,8 +59,7 @@
                     {{items?.selectedPackage}}
                   </div>
                   <div class="txt-details">
-                    Customer Name : <span class="type">{{items?.userDetails?.name}}</span>
-
+                    Customer Name : <span class="type">{{ customerNameLabel(items) }}</span>
                   </div>
                   <div class="txt-details">
                     Time: {{items?.createdAt|date:'mediumTime'}}
@@ -69,8 +68,7 @@
                     Date: {{items?.createdAt|date}}
                   </div>
                   <div class="txt-details ">
-                    payment method : <span class="type">{{items?.paymentDetails?.paymentMode}}</span>
-
+                    Payment Mode: <span class="type">{{ paymentModeLabel(items) | uppercase }}</span>
                   </div>
                   <div class="d-flex justify-content-between">
                     <!-- <div class="span-txt ">Status: <span class="Status">{{items?.orderStatus}}</span> -->
@@ -125,8 +123,7 @@
                     {{items?.selectedPackage}}
                   </div>
                   <div class="txt-details">
-                    Customer Name : <span class="type">{{items?.userDetails?.name}}</span>
-
+                    Customer Name : <span class="type">{{ customerNameLabel(items) }}</span>
                   </div>
                   <div class="txt-details">
                     Time: {{items?.createdAt|date:'mediumTime'}}
@@ -135,10 +132,7 @@
                     Date: {{items?.createdAt|date}}
                   </div>
                   <div class="txt-details">
-                    <p>Payment Mode: {{tripDetails?.paymentMode | uppercase}}</p>
-
-                   
-
+                    Payment Mode: <span class="type">{{ paymentModeLabel(items) | uppercase }}</span>
                   </div>
                   <div class="d-flex justify-content-between">
                     <div class="span-txt">Status: {{items?.orderStatus}}
@@ -207,7 +201,7 @@
         <mat-card-content>
 
           <div class="txt-details">
-            Customer: <span class="type">{{items?.userDetails?.name}}</span>
+            Customer Name: <span class="type">{{ customerNameLabel(items) }}</span>
           </div>
 
           <div class="txt-details">
@@ -230,7 +224,7 @@
           </div>
 
           <div class="txt-details">
-            <p>Payment Mode: {{tripDetails?.paymentMode | uppercase}}</p>
+            Payment Mode: <span class="type">{{ paymentModeLabel(items) | uppercase }}</span>
           </div>
 
           <!-- 🔥 IMPORTANT INDICATOR -->

@@ -216,6 +216,35 @@ moredetails(i: any) {
 
   cancelledTrips: any[] = [];
 
+  /**
+   * List API returns `paymentMode` / `paymentStatus` on the order; older payloads used `paymentDetails`.
+   */
+  paymentModeLabel(order: any): string {
+    if (!order) {
+      return '';
+    }
+    const v =
+      order.paymentDetails?.paymentMode ||
+      order.paymentMode ||
+      order.paymentDetails?.paymentStatus ||
+      order.paymentStatus;
+    return v != null && v !== '' ? String(v) : '';
+  }
+
+  /** User name, phone, or pickup contact — template cannot use `?.[0]` on Angular 12. */
+  customerNameLabel(order: any): string {
+    if (!order) {
+      return '';
+    }
+    const fromPickup =
+      Array.isArray(order.pickupAddress) && order.pickupAddress.length
+        ? order.pickupAddress[0]?.contactPerson
+        : '';
+    const s =
+      order.userDetails?.name || order.userDetails?.mobileNo || fromPickup;
+    return s != null && s !== '' ? String(s) : '';
+  }
+
   getCancelledTrips() {
     this.apiService
       .getconsumerActiveTrip('consumer', 'cancelled', this.Fromdate, this.Todate)
