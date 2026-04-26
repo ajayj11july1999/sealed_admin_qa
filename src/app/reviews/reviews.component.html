@@ -70,7 +70,7 @@
                           {{i+1+ (myPaginator.pageIndex * myPaginator.pageSize)}}
                         </td>
                         <td>
-                          <p>{{item?.order_id || '-'}}</p>
+                          <p>{{item?.order_details?.orderCode || '-'}}</p>
                         </td>
                         <td>
                           <span class="review-badge">{{getDisplayUserType(item?.reviewer_type)}}</span>

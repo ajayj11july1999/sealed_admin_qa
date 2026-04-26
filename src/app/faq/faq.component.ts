@@ -1,4 +1,5 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogueComponent } from '../dialogue/dialogue.component';
 import { ApiServiceService } from '../service/api-service.service';
@@ -28,6 +29,8 @@ interface Page {
   styleUrls: ['./faq.component.scss']
 })
 export class FaqComponent implements OnInit {
+
+  @ViewChild('myPaginator') paginator!: MatPaginator;
 
   faqForm: any = {
     type: '',
@@ -102,9 +105,11 @@ export class FaqComponent implements OnInit {
   }
   searchUserList(e: any) {
     this.offset = 0;
-    this.limit = this.pageSize || 15;
     this.value = e?.target?.value || '';
     this.currentPage = 0;
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
     this.getFaqList();
   }
   // async downloadExport() {
@@ -229,7 +234,7 @@ export class FaqComponent implements OnInit {
               ? res.data
               : [];
 
-          this.totalCount = res?.data?.totalCount ?? this.faqList.length;
+          this.totalCount = res?.data?.totalCount || 0;
           console.log(this.faqList)
           // this.searchLoad = false;
         } else {
@@ -245,11 +250,9 @@ export class FaqComponent implements OnInit {
   pageSize: any;
   pageEvent: any;
   pageChange(e: any): void {
-    console.log(e)
-    const pagNo = e.pageIndex;
     this.pageSize = e.pageSize;
-    this.limit = this.pageSize;
-    this.offset = pagNo * this.pageSize;
+    this.limit = e.pageSize;
+    this.offset = e.pageIndex;
     this.getFaqList();
   }
 

@@ -100,8 +100,9 @@
                     </tbody>
                   </table>
                   <div>
-                    <mat-paginator (page)="pageChange($event)" [pageSize]="limit" aria-label="Select page"
-                      [length]="totalCount" #myPaginator>
+                    <mat-paginator (page)="pageChange($event)" [pageSize]="limit"
+                      [pageSizeOptions]="[10, 15, 25, 50]" [length]="totalCount"
+                      aria-label="Select page" #myPaginator>
                     </mat-paginator>
                   </div>
                 </div>
