@@ -117,7 +117,7 @@
 <ng-template #addtemplate>
   <div class="modal-header">
     <mat-card-title>{{isedit ? 'Edit' : 'Add'}} FAQ</mat-card-title>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="cancel()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
@@ -173,9 +173,9 @@
               class="faq-textarea"></textarea>
             <div class="d-flex justify-content-between">
               <div>
-                <small class="text-danger" *ngIf="question.touched && question.errors?.['required']">Question is required.</small>
-                <small class="text-danger" *ngIf="question.touched && question.errors?.['pattern']">Only letters, numbers and basic punctuation ( . , ? ! ' - ) are allowed.</small>
-                <small class="text-danger" *ngIf="question.touched && question.errors?.['maxlength']">Question cannot exceed 300 characters.</small>
+                <small class="text-danger" *ngIf="question.touched && question.errors?.required">Question is required.</small>
+                <small class="text-danger" *ngIf="question.touched && question.errors?.pattern">Only letters, numbers and basic punctuation ( . , ? ! ' - ) are allowed.</small>
+                <small class="text-danger" *ngIf="question.touched && question.errors?.maxlength">Question cannot exceed 300 characters.</small>
               </div>
               <small class="text-muted">{{faqForm.question?.length || 0}}/300</small>
             </div>
@@ -190,9 +190,9 @@
               class="faq-textarea"></textarea>
             <div class="d-flex justify-content-between">
               <div>
-                <small class="text-danger" *ngIf="answer.touched && answer.errors?.['required']">Answer is required.</small>
-                <small class="text-danger" *ngIf="answer.touched && answer.errors?.['pattern']">Only letters, numbers and basic punctuation ( . , ? ! ' - ) are allowed.</small>
-                <small class="text-danger" *ngIf="answer.touched && answer.errors?.['maxlength']">Answer cannot exceed 1000 characters.</small>
+                <small class="text-danger" *ngIf="answer.touched && answer.errors?.required">Answer is required.</small>
+                <small class="text-danger" *ngIf="answer.touched && answer.errors?.pattern">Only letters, numbers and basic punctuation ( . , ? ! ' - ) are allowed.</small>
+                <small class="text-danger" *ngIf="answer.touched && answer.errors?.maxlength">Answer cannot exceed 1000 characters.</small>
               </div>
               <small class="text-muted">{{faqForm.answer?.length || 0}}/1000</small>
             </div>

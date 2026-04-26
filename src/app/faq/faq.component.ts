@@ -96,9 +96,9 @@ export class FaqComponent implements OnInit {
     return this.createForm.controls;
   }
   cancel() {
+    this.clear();
     this.modalRef.hide();
     this.getFaqList();
-
   }
   searchUserList(e: any) {
     this.offset = 0;
@@ -139,6 +139,7 @@ export class FaqComponent implements OnInit {
   //   return (offset = offset < 0 ? offset : offset - 1);
   // }
   AddModal(template: TemplateRef<any>,) {
+    this.clear();
     var aa: any = {
       backdrop: 'static', class: 'custm_modal gray modal-lg', keyboard: false, ignoreBackdropClick: true
     }
@@ -278,7 +279,7 @@ export class FaqComponent implements OnInit {
   }
   editFaq(item: any) {
     this.isedit = true;
-    this.faqForm = item;
+    this.faqForm = { ...item };
   }
 
   allowedChars(event: KeyboardEvent): boolean {
