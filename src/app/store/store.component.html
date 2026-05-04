@@ -12,6 +12,8 @@
   <div class="text-end mb-2">
     <input type="text" class="form-control w-25 d-inline-block"
       placeholder="Search store..."
+      maxlength="50"
+      (keypress)="preventSpecialChars($event)"
       (input)="searchUserList($event)">
   </div>
 
@@ -115,8 +117,13 @@
       <div class="row mt-4">
 
         <div class="col-md-4">
-          <label>Store Name</label>
-          <input class="form-control" [(ngModel)]="createForm.storeName" name="storeName">
+          <label>Store Name <span class="text-danger">*</span></label>
+          <input class="form-control"
+            [class.is-invalid]="submitted && !createForm.storeName?.trim()"
+            [(ngModel)]="createForm.storeName" name="storeName">
+          <div class="invalid-feedback" *ngIf="submitted && !createForm.storeName?.trim()">
+            Store Name is required.
+          </div>
         </div>
 
         <div class="col-md-4">
@@ -126,46 +133,63 @@
         </div>
 
         <div class="col-md-4">
-          <label>Color Print Price</label>
+          <label>Color Print Price <span class="text-danger">*</span></label>
           <input type="number" class="form-control"
+            [class.is-invalid]="submitted && (createForm.colorPrice === null || createForm.colorPrice === undefined || createForm.colorPrice === '')"
             [(ngModel)]="createForm.colorPrice" name="colorPrice">
+          <div class="invalid-feedback"
+            *ngIf="submitted && (createForm.colorPrice === null || createForm.colorPrice === undefined || createForm.colorPrice === '')">
+            Color Print Price is required.
+          </div>
         </div>
 
         <div class="col-md-4 mt-3">
-          <label>Black Print Price</label>
+          <label>Black Print Price <span class="text-danger">*</span></label>
           <input type="number" class="form-control"
+            [class.is-invalid]="submitted && (createForm.blackPrice === null || createForm.blackPrice === undefined || createForm.blackPrice === '')"
             [(ngModel)]="createForm.blackPrice" name="blackPrice">
+          <div class="invalid-feedback"
+            *ngIf="submitted && (createForm.blackPrice === null || createForm.blackPrice === undefined || createForm.blackPrice === '')">
+            Black Print Price is required.
+          </div>
         </div>
-
-        <!-- <div class="col-md-4 mt-3">
-          <label>Latitude</label>
-          <input class="form-control"
-            [(ngModel)]="createForm.latitude" name="latitude" readonly>
-        </div>
-
-        <div class="col-md-4 mt-3">
-          <label>Longitude</label>
-          <input class="form-control"
-            [(ngModel)]="createForm.longitude" name="longitude" readonly>
-        </div> -->
 
         <div class="col-md-12 mt-3">
-          <label>Full Address</label>
+          <label>Full Address <span class="text-danger">*</span></label>
           <textarea class="form-control" rows="2"
+            [class.is-invalid]="submitted && !createForm.fullAddress?.trim()"
             [(ngModel)]="createForm.fullAddress"
             name="fullAddress"></textarea>
+          <div class="invalid-feedback" *ngIf="submitted && !createForm.fullAddress?.trim()">
+            Full Address is required.
+          </div>
         </div>
 
         <div class="col-md-4 mt-3">
-          <label>Contact Person</label>
-          <input class="form-control" [(ngModel)]="createForm.contactPerson"
+          <label>Contact Person <span class="text-danger">*</span></label>
+          <input class="form-control"
+            [class.is-invalid]="submitted && !createForm.contactPerson?.trim()"
+            [(ngModel)]="createForm.contactPerson"
             name="contactPerson" placeholder="Store contact name">
+          <div class="invalid-feedback" *ngIf="submitted && !createForm.contactPerson?.trim()">
+            Contact Person is required.
+          </div>
         </div>
 
         <div class="col-md-4 mt-3">
           <label>Contact Number <span class="text-danger">*</span></label>
-          <input class="form-control" [(ngModel)]="createForm.contactPersonNumber"
-            name="contactPersonNumber" placeholder="Used for store login">
+          <input class="form-control"
+            [class.is-invalid]="submitted && (!(createForm.contactPersonNumber || '').trim() || !isPhoneValid())"
+            [(ngModel)]="createForm.contactPersonNumber"
+            name="contactPersonNumber" placeholder="10-digit mobile number">
+          <div class="invalid-feedback"
+            *ngIf="submitted && !(createForm.contactPersonNumber || '').trim()">
+            Contact Number is required.
+          </div>
+          <div class="invalid-feedback"
+            *ngIf="submitted && (createForm.contactPersonNumber || '').trim() && !isPhoneValid()">
+            Enter a valid 10-digit mobile number.
+          </div>
           <small class="text-muted">Phone number used for store app login</small>
         </div>
 
@@ -178,9 +202,20 @@
         </div>
 
         <div class="col-md-4 mt-3">
-          <label>Store Login Password</label>
-          <input type="password" class="form-control" [(ngModel)]="createForm.password"
-            name="password" placeholder="{{ isedit ? 'Leave blank to keep current' : 'Set password for store login' }}">
+          <label>Store Login Password <span class="text-danger" *ngIf="!isedit">*</span></label>
+          <input type="password" class="form-control"
+            [class.is-invalid]="submitted && ((!isedit && !createForm.password) || (createForm.password && createForm.password.length < 6))"
+            [(ngModel)]="createForm.password"
+            name="password"
+            placeholder="{{ isedit ? 'Leave blank to keep current' : 'Set password for store login' }}">
+          <div class="invalid-feedback"
+            *ngIf="submitted && !isedit && !createForm.password">
+            Password is required for new store.
+          </div>
+          <div class="invalid-feedback"
+            *ngIf="submitted && createForm.password && createForm.password.length < 6">
+            Password must be at least 6 characters.
+          </div>
           <small class="text-muted">{{ isedit ? 'Only fill to change password' : 'Required for store app login' }}</small>
         </div>
 

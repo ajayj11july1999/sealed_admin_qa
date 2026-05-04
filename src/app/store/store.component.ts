@@ -22,6 +22,7 @@ export class StoreComponent implements OnInit {
   modalRef!: BsModalRef;
 
   isedit = false;
+  submitted = false;
   selectedPlaceName = "";
 
   map: any;
@@ -57,7 +58,7 @@ export class StoreComponent implements OnInit {
 
   //📌 LOAD TABLE LIST
   getStoreList() {
-    this.apiservice.getStoreList(this.limit, this.offset, this.value)
+    this.apiservice.getStoreList(this.limit, this.offset * this.limit, this.value)
       .then((res: any) => {
         if (res.code == 200) {
           this.databaseList = res.data.data;
@@ -66,8 +67,18 @@ export class StoreComponent implements OnInit {
       });
   }
 
+  isPhoneValid(): boolean {
+    return /^\d{10}$/.test((this.createForm.contactPersonNumber || '').trim());
+  }
+
+  preventSpecialChars(event: KeyboardEvent): boolean {
+    return /^[a-zA-Z0-9 ]$/.test(event.key);
+  }
+
   searchUserList(e: any) {
-    this.value = e.target.value;
+    const sanitized = e.target.value.replace(/[^a-zA-Z0-9 ]/g, '');
+    e.target.value = sanitized;
+    this.value = sanitized;
     this.offset = 0;
     this.getStoreList();
   }
@@ -176,6 +187,11 @@ initializeMap() {
 
     console.log("🟢 Map loaded — initializing Autocomplete");
 
+    // Auto-set default coordinates for new stores so Save is never blocked by null lat/lng
+    if (!this.createForm.latitude || !this.createForm.longitude) {
+      this.updatePosition(defaultLat, defaultLng);
+    }
+
     const input = document.getElementById("searchInput") as HTMLInputElement;
 
     if (!input) {
@@ -242,45 +258,63 @@ initializeMap() {
 
 
   //📌 SAVE STORE
- saveStore() {
-  if (!this.createForm.storeName ||
-      !this.createForm.fullAddress ||
-      !this.createForm.latitude ||
-      !this.createForm.longitude) {
-    this.toastr.warning("Please fill all required fields");
-    return;
-  }
+  saveStore() {
+    this.submitted = true;
 
-  this.createForm.location = {
-    type: "Point",
-    coordinates: [this.createForm.longitude, this.createForm.latitude]
-  };
+    const f = this.createForm;
+    const isNew = !f._id;
 
-  const payload = { ...this.createForm };
-  if (!payload.password) {
-    delete payload.password;
-  }
+    const phoneValid = /^\d{10}$/.test((f.contactPersonNumber || '').trim());
+    const passwordValid = !f.password || f.password.length >= 6;
+    const passwordRequiredMet = !isNew || !!f.password;
 
-  const req = this.apiservice.createStore(
-    payload,
-    this.createForm._id ? this.createForm._id : null
-  );
-
-  req.subscribe((res: any) => {
-    if (res.code == 200) {
-      this.toastr.success(res.message);
-      this.modalRef.hide();
-      this.clear();
-      this.getStoreList();
-    } else {
-      this.toastr.error(res.message);
+    if (
+      !f.storeName?.trim() ||
+      !f.fullAddress?.trim() ||
+      !f.contactPerson?.trim() ||
+      !(f.contactPersonNumber || '').trim() ||
+      !phoneValid ||
+      f.colorPrice === null || f.colorPrice === undefined || f.colorPrice === '' ||
+      f.blackPrice === null || f.blackPrice === undefined || f.blackPrice === '' ||
+      !passwordRequiredMet ||
+      !passwordValid ||
+      !f.latitude || !f.longitude
+    ) {
+      this.toastr.warning("Please fix the highlighted errors before saving");
+      return;
     }
-  });
-}
+
+    this.createForm.location = {
+      type: "Point",
+      coordinates: [f.longitude, f.latitude]
+    };
+
+    const payload = { ...f };
+    if (!payload.password) {
+      delete payload.password;
+    }
+
+    const req = this.apiservice.createStore(
+      payload,
+      f._id ? f._id : null
+    );
+
+    req.subscribe((res: any) => {
+      if (res.code == 200) {
+        this.toastr.success(res.message);
+        this.modalRef.hide();
+        this.clear();
+        this.getStoreList();
+      } else {
+        this.toastr.error(res.message);
+      }
+    });
+  }
 
   //📌 CLEAR FORM
   clear() {
     this.isedit = false;
+    this.submitted = false;
     this.createForm = {
       storeName: '',
       fullAddress: '',

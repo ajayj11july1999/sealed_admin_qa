@@ -81,8 +81,8 @@
         <mat-card-content>
 
           <div class="row" *ngIf="courier_list?.length">
-            <div class="col-md-4 col-sm-12  mb-4" *ngFor="let items of courier_list ">
-              <div class="card card-courier">
+            <div class="col-md-4 col-sm-12 mb-4 d-flex" *ngFor="let items of courier_list ">
+              <div class="card card-courier w-100">
                 <div class="card-head" style="padding: 0;">
 
                   <div class="row">
@@ -128,8 +128,8 @@
                 </div>
 
 
-                <div class="card-body  p-2">
-                  <div class="row h-40">
+                <div class="card-body p-2 d-flex flex-column">
+                  <div class="row courier-info-row">
                     <div class="col-6">
                       <p class="font mt-2 px-2">
                         {{items.name | titlecase}}<br>

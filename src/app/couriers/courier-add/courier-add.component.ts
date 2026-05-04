@@ -49,6 +49,22 @@ export class CourierAddComponent implements OnInit {
   create(f) {
 
     if (f.form?.valid) {
+      if (!this.createForm.imgUrl) {
+        this.toastr.error('Please upload Profile Image');
+        return;
+      }
+      if (!this.createForm.drivingLicense) {
+        this.toastr.error('Please upload Driving License');
+        return;
+      }
+      if (!this.createForm.rcBook) {
+        this.toastr.error('Please upload RC Book');
+        return;
+      }
+      if (!this.createForm.insurance) {
+        this.toastr.error('Please upload Bike Insurance');
+        return;
+      }
       // this.createForm.pageAccess = this.displayDetailpages;
       this.apiservice.createAdmin(this.createForm, "").subscribe((res) => {
         console.log(res)
@@ -57,6 +73,7 @@ export class CourierAddComponent implements OnInit {
 
           // this.toastr.success(this.userId ? 'Updated Successfully' : 'Registered Successfully');
           this.clear();
+          sessionStorage.setItem('deliveryman', 'All');
           this.router.navigate([
             '/couriers/master',
           ]);
@@ -113,16 +130,7 @@ export class CourierAddComponent implements OnInit {
       let ext =
         file.name.substring(file.name.lastIndexOf('.') + 1, file.name.length) ||
         file.name;
-      //.png,.jpg,.pdf,.doc,.docx,.jpeg
-      // console.log("file.size",file.size)
-      if (
-        ext == 'png' ||
-        ext == 'jpg' ||
-        ext == 'pdf' ||
-        ext == 'doc' ||
-        ext == 'docx' ||
-        ext == 'jpeg'
-      ) {
+      if (ext == 'png' || ext == 'jpg' || ext == 'jpeg') {
         if (!(file.size > 2097152)) {
           // console.log(files)
           let x: any;
@@ -183,8 +191,16 @@ export class CourierAddComponent implements OnInit {
 
   }
 
-  removeImage() {
-    this.createForm.imgUrl = '';
+  removeImage(type?: string) {
+    if (!type || type === 'profile') {
+      this.createForm.imgUrl = '';
+    } else if (type === 'driving') {
+      this.createForm.drivingLicense = '';
+    } else if (type === 'rcbook') {
+      this.createForm.rcBook = '';
+    } else if (type === 'insurance') {
+      this.createForm.insurance = '';
+    }
   }
 
 }

@@ -24,7 +24,9 @@
                       <div class="col-sm-12 col-md-10">
                         <mat-form-field>
                           <input matInput placeholder="Enter Name" [(ngModel)]="createForm.name" name="name" required
-                            #name="ngModel">
+                            pattern="^[a-zA-Z ]+$" maxlength="50" #name="ngModel">
+                          <mat-error *ngIf="name.errors?.required">Name is required</mat-error>
+                          <mat-error *ngIf="name.errors?.pattern">Name should contain only letters</mat-error>
                         </mat-form-field>
                       </div>
                     </div>
@@ -35,7 +37,9 @@
                       <div class="col-sm-12 col-md-10">
                         <mat-form-field>
                           <input matInput placeholder="Enter Mobile" [(ngModel)]="createForm.mobileNo" name="mobileNo"
-                            required #mobileNo="ngModel">
+                            required pattern="^[0-9]{10}$" maxlength="10" #mobileNo="ngModel">
+                          <mat-error *ngIf="mobileNo.errors?.required">Mobile number is required</mat-error>
+                          <mat-error *ngIf="mobileNo.errors?.pattern">Enter a valid 10-digit mobile number</mat-error>
                         </mat-form-field>
                       </div>
                     </div>
@@ -46,7 +50,9 @@
                       <div class="col-sm-12 col-md-10">
                         <mat-form-field>
                           <input type="email" matInput placeholder="Enter Email" [(ngModel)]="createForm.email"
-                            name="email" required #email="ngModel">
+                            name="email" required email #email="ngModel">
+                          <mat-error *ngIf="email.errors?.required">Email is required</mat-error>
+                          <mat-error *ngIf="email.errors?.email">Enter a valid email address</mat-error>
                         </mat-form-field>
                       </div>
                     </div>
@@ -68,7 +74,10 @@
                       <div class="col-sm-12 col-md-10">
                         <mat-form-field>
                           <input matInput placeholder="Enter Address" [(ngModel)]="createForm.address.fullAddress"
-                            name="fullAddress" required #fullAddress="ngModel">
+                            name="fullAddress" required pattern="^[a-zA-Z0-9 ,.\-#/]+$" maxlength="200"
+                            #fullAddress="ngModel">
+                          <mat-error *ngIf="fullAddress.errors?.required">Address is required</mat-error>
+                          <mat-error *ngIf="fullAddress.errors?.pattern">Address contains invalid characters</mat-error>
                         </mat-form-field>
                       </div>
                     </div>
@@ -79,7 +88,8 @@
                       <div class="col-sm-12 col-md-10">
                         <mat-form-field>
                           <input matInput placeholder="Enter landMark" [(ngModel)]="createForm.address.landMark"
-                            name="landMark" #landMark="ngModel">
+                            name="landMark" pattern="^[a-zA-Z0-9 ,.\-#/]*$" maxlength="100" #landMark="ngModel">
+                          <mat-error *ngIf="landMark.errors?.pattern">Landmark contains invalid characters</mat-error>
                         </mat-form-field>
                       </div>
                     </div>
@@ -91,7 +101,9 @@
                       <div class="col-sm-12 col-md-10">
                         <mat-form-field>
                           <input matInput placeholder="Enter Pincode" [(ngModel)]="createForm.address.postalCode"
-                            name="postalCode" required #postalCode="ngModel">
+                            name="postalCode" required pattern="^[0-9]{6}$" maxlength="6" #postalCode="ngModel">
+                          <mat-error *ngIf="postalCode.errors?.required">Pincode is required</mat-error>
+                          <mat-error *ngIf="postalCode.errors?.pattern">Enter a valid 6-digit pincode</mat-error>
                         </mat-form-field>
                       </div>
                     </div>
@@ -102,7 +114,9 @@
                       <div class="col-sm-12 col-md-10">
                         <mat-form-field>
                           <input matInput placeholder="Enter City" [(ngModel)]="createForm.address.city" name="city"
-                            required #city="ngModel">
+                            required pattern="^[a-zA-Z ]+$" maxlength="50" #city="ngModel">
+                          <mat-error *ngIf="city.errors?.required">City is required</mat-error>
+                          <mat-error *ngIf="city.errors?.pattern">City should contain only letters</mat-error>
                         </mat-form-field>
                       </div>
                     </div>
@@ -113,7 +127,9 @@
                       <div class="col-sm-12 col-md-10">
                         <mat-form-field>
                           <input matInput placeholder="Enter State" [(ngModel)]="createForm.address.state" name="state"
-                            required #state="ngModel">
+                            required pattern="^[a-zA-Z ]+$" maxlength="50" #state="ngModel">
+                          <mat-error *ngIf="state.errors?.required">State is required</mat-error>
+                          <mat-error *ngIf="state.errors?.pattern">State should contain only letters</mat-error>
                         </mat-form-field>
                       </div>
                     </div>
@@ -124,7 +140,9 @@
                       <div class="col-sm-12 col-md-10">
                         <mat-form-field>
                           <input matInput placeholder="Enter Country" [(ngModel)]="createForm.address.country"
-                            name="country" required #country="ngModel">
+                            name="country" required pattern="^[a-zA-Z ]+$" maxlength="50" #country="ngModel">
+                          <mat-error *ngIf="country.errors?.required">Country is required</mat-error>
+                          <mat-error *ngIf="country.errors?.pattern">Country should contain only letters</mat-error>
                         </mat-form-field>
                       </div>
                     </div>
@@ -139,7 +157,7 @@
                           <input matInput [value]="selectedFile?.name || ''" readonly>
                           <button mat-raised-button matSuffix (click)="fileInput.click()">Browse</button>
                           <input type="file" #fileInput (change)="onChange($event.target.files,'profile')"
-                            style="display:none">
+                            style="display:none" accept=".png,.jpg,.jpeg">
                         </mat-form-field>
 
                         <div class="upload-images image_div file_btn" *ngIf="createForm.imgUrl"
@@ -164,7 +182,7 @@
                           <input matInput [value]="selectedFile?.name || ''" readonly>
                           <button mat-raised-button matSuffix (click)="fileInput.click()">Browse</button>
                           <input type="file" #fileInput (change)="onChange($event.target.files,'driving')"
-                            style="display:none">
+                            style="display:none" accept=".png,.jpg,.jpeg">
                         </mat-form-field>
 
                         <div class="upload-images image_div file_btn" *ngIf="createForm.drivingLicense"
@@ -194,7 +212,7 @@
                           <input matInput [value]="selectedFile?.name || ''" readonly>
                           <button mat-raised-button matSuffix (click)="fileInput.click()">Browse</button>
                           <input type="file" #fileInput (change)="onChange($event.target.files,'rcbook')"
-                            style="display:none">
+                            style="display:none" accept=".png,.jpg,.jpeg">
                         </mat-form-field>
 
                         <div class="upload-images image_div file_btn" *ngIf="createForm.rcBook"
@@ -224,14 +242,14 @@
                           <input matInput [value]="selectedFile?.name || ''" readonly>
                           <button mat-raised-button matSuffix (click)="fileInput.click()">Browse</button>
                           <input type="file" #fileInput (change)="onChange($event.target.files,'insurance')"
-                            style="display:none">
+                            style="display:none" accept=".png,.jpg,.jpeg">
                         </mat-form-field>
 
                         <div class="upload-images image_div file_btn" *ngIf="createForm.insurance"
                           style="position: relative;">
                           <i class="fa-solid fa-circle-xmark text-danger"
                             style="position: absolute;right: -8px;top: -4px;cursor: pointer;font-size: 14px;background: #fff;border-radius: 12px;"
-                            (click)="removeImage()"></i>
+                            (click)="removeImage('insurance')"></i>
                           <img [src]="createForm.insurance" width="80px">
                         </div>
 

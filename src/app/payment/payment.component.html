@@ -157,16 +157,16 @@
                 </td>
                 <td class="checkname ">
                   <p class="ellip" data-toggle="tooltip" title={{item?.ordersDetails[0]?.orderCode}}>
-                    {{item?.ordersDetails[0]?.orderCode}}</p>
+                    {{item?.ordersDetails[0]?.orderCode || '-'}}</p>
 
                 </td>
                 <td class="checkname ">
-                  <p> {{item?.userDetails?.name}} </p>
+                  <p> {{item?.userDetails?.name || '-'}} </p>
 
                 </td>
                 <td class="checkname ">
-                  <p class="ellip" data-toggle="tooltip" title={{item?.ordersDetails[0].orderStatus}}>
-                    {{item?.ordersDetails[0]?.orderStatus |titlecase}} </p>
+                  <p class="ellip" data-toggle="tooltip" title={{item?.ordersDetails[0]?.orderStatus}}>
+                    {{(item?.ordersDetails[0]?.orderStatus | titlecase) || '-'}} </p>
 
                 </td>
                 <td class="checkname ">

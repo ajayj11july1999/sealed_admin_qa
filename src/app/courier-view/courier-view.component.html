@@ -70,9 +70,7 @@
                   <div class="row mt-3">
                     <div class="col-lg-6 col-md-6 col-sm-12">
                       <p><b>Address</b><br>
-                        <span>
-                          {{courierdetails?.addressDetails[0]?.address.fullAddress ?? '-'}}
-                        </span>
+                        <span>{{driverAddress}}</span>
                       </p>
                     </div>
                     <div class="col-6"></div>
@@ -366,7 +364,7 @@
                   <div class="">
                     <form class="mt-3">
                       <input *ngIf="!courierdetails?.imgUrl" type="file" name="myfile" class="form-control"
-                        (change)="onChange($event.target.files,'profile')">
+                        accept=".png,.jpg,.jpeg" (change)="onChange($event.target.files,'profile')">
                     </form>
                     <div class="d-flex" *ngIf="courierdetails?.imgUrl">
                       <div class=" upload_attachement">
@@ -418,7 +416,7 @@
           <button *ngIf="courierdetails?.drivingLicense?.front" class="btn btn-sm" (click)="removeDocumentSide('driving','front')">Remove Front</button>
           <button *ngIf="courierdetails?.drivingLicense?.front" class="btn btn-sm" (click)="downloadImage(courierdetails?.drivingLicense?.front)">Download Front</button>
         </div>
-        <input *ngIf="!courierdetails?.drivingLicense?.front" type="file" class="form-control" accept="application/pdf,image/*" (change)="onChange($event.target.files,'driving-front')">
+        <input *ngIf="!courierdetails?.drivingLicense?.front" type="file" class="form-control" accept=".png,.jpg,.jpeg" (change)="onChange($event.target.files,'driving-front')">
       </div>
       <div class="mt-3">
         <p>Back</p>
@@ -427,7 +425,7 @@
           <button *ngIf="courierdetails?.drivingLicense?.back" class="btn btn-sm" (click)="removeDocumentSide('driving','back')">Remove Back</button>
           <button *ngIf="courierdetails?.drivingLicense?.back" class="btn btn-sm" (click)="downloadImage(courierdetails?.drivingLicense?.back)">Download Back</button>
         </div>
-        <input *ngIf="!courierdetails?.drivingLicense?.back" type="file" class="form-control" accept="application/pdf,image/*" (change)="onChange($event.target.files,'driving-back')">
+        <input *ngIf="!courierdetails?.drivingLicense?.back" type="file" class="form-control" accept=".png,.jpg,.jpeg" (change)="onChange($event.target.files,'driving-back')">
       </div>
     </div>
 
@@ -446,7 +444,7 @@
           <button *ngIf="courierdetails?.rcBook?.front" class="btn btn-sm" (click)="removeDocumentSide('rcbook','front')">Remove Front</button>
           <button *ngIf="courierdetails?.rcBook?.front" class="btn btn-sm" (click)="downloadImage(courierdetails?.rcBook?.front)">Download Front</button>
         </div>
-        <input *ngIf="!courierdetails?.rcBook?.front" type="file" class="form-control" accept="application/pdf,image/*" (change)="onChange($event.target.files,'rcbook-front')">
+        <input *ngIf="!courierdetails?.rcBook?.front" type="file" class="form-control" accept=".png,.jpg,.jpeg" (change)="onChange($event.target.files,'rcbook-front')">
       </div>
       <div class="mt-3">
         <p>Back</p>
@@ -455,7 +453,7 @@
           <button *ngIf="courierdetails?.rcBook?.back" class="btn btn-sm" (click)="removeDocumentSide('rcbook','back')">Remove Back</button>
           <button *ngIf="courierdetails?.rcBook?.back" class="btn btn-sm" (click)="downloadImage(courierdetails?.rcBook?.back)">Download Back</button>
         </div>
-        <input *ngIf="!courierdetails?.rcBook?.back" type="file" class="form-control" accept="application/pdf,image/*" (change)="onChange($event.target.files,'rcbook-back')">
+        <input *ngIf="!courierdetails?.rcBook?.back" type="file" class="form-control" accept=".png,.jpg,.jpeg" (change)="onChange($event.target.files,'rcbook-back')">
       </div>
     </div>
     <div class="mt-2">
@@ -472,7 +470,7 @@
           <button *ngIf="courierdetails?.insurance?.front" class="btn btn-sm" (click)="removeDocumentSide('insurance','front')">Remove Front</button>
           <button *ngIf="courierdetails?.insurance?.front" class="btn btn-sm" (click)="downloadImage(courierdetails?.insurance?.front)">Download Front</button>
         </div>
-        <input *ngIf="!courierdetails?.insurance?.front" type="file" class="form-control" accept="application/pdf,image/*" (change)="onChange($event.target.files,'insurance-front')">
+        <input *ngIf="!courierdetails?.insurance?.front" type="file" class="form-control" accept=".png,.jpg,.jpeg" (change)="onChange($event.target.files,'insurance-front')">
       </div>
       <div class="mt-3">
         <p>Back</p>
@@ -481,7 +479,7 @@
           <button *ngIf="courierdetails?.insurance?.back" class="btn btn-sm" (click)="removeDocumentSide('insurance','back')">Remove Back</button>
           <button *ngIf="courierdetails?.insurance?.back" class="btn btn-sm" (click)="downloadImage(courierdetails?.insurance?.back)">Download Back</button>
         </div>
-        <input *ngIf="!courierdetails?.insurance?.back" type="file" class="form-control" accept="application/pdf,image/*" (change)="onChange($event.target.files,'insurance-back')">
+        <input *ngIf="!courierdetails?.insurance?.back" type="file" class="form-control" accept=".png,.jpg,.jpeg" (change)="onChange($event.target.files,'insurance-back')">
       </div>
     </div>
     <div class="mt-2">
@@ -498,7 +496,7 @@
           <button *ngIf="courierdetails?.panCard?.front" class="btn btn-sm" (click)="removeDocumentSide('pan','front')">Remove Front</button>
           <button *ngIf="courierdetails?.panCard?.front" class="btn btn-sm" (click)="downloadImage(courierdetails?.panCard?.front)">Download Front</button>
         </div>
-        <input *ngIf="!courierdetails?.panCard?.front" type="file" class="form-control" accept="application/pdf,image/*" (change)="onChange($event.target.files,'pan-front')">
+        <input *ngIf="!courierdetails?.panCard?.front" type="file" class="form-control" accept=".png,.jpg,.jpeg" (change)="onChange($event.target.files,'pan-front')">
       </div>
       <div class="mt-3">
         <p>Back</p>
@@ -507,7 +505,7 @@
           <button *ngIf="courierdetails?.panCard?.back" class="btn btn-sm" (click)="removeDocumentSide('pan','back')">Remove Back</button>
           <button *ngIf="courierdetails?.panCard?.back" class="btn btn-sm" (click)="downloadImage(courierdetails?.panCard?.back)">Download Back</button>
         </div>
-        <input *ngIf="!courierdetails?.panCard?.back" type="file" class="form-control" accept="application/pdf,image/*" (change)="onChange($event.target.files,'pan-back')">
+        <input *ngIf="!courierdetails?.panCard?.back" type="file" class="form-control" accept=".png,.jpg,.jpeg" (change)="onChange($event.target.files,'pan-back')">
       </div>
     </div>
     <div class="mt-2">

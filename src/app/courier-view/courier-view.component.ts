@@ -265,16 +265,7 @@ export class CourierViewComponent implements OnInit {
       let ext =
         file.name.substring(file.name.lastIndexOf('.') + 1, file.name.length) ||
         file.name;
-      //.png,.jpg,.pdf,.doc,.docx,.jpeg
-      // console.log("file.size",file.size)
-      if (
-        ext == 'png' ||
-        ext == 'jpg' ||
-        ext == 'pdf' ||
-        ext == 'doc' ||
-        ext == 'docx' ||
-        ext == 'jpeg'
-      ) {
+      if (ext == 'png' || ext == 'jpg' || ext == 'jpeg') {
         if (!(file.size > 2097152)) {
 
           let x: any;
@@ -383,33 +374,47 @@ export class CourierViewComponent implements OnInit {
 downloadImage(url: string) {
   if (!url) return;
 
-  // If S3 URL → direct download
+  const fileName = this.splitFileName(url) || 'file';
+
   if (url.startsWith('http')) {
-    const a = document.createElement('a');
-    a.href = url;
-    a.target = '_blank';
-    a.download = this.splitFileName(url) || 'file';
-    a.click();
+    fetch(url)
+      .then(response => response.blob())
+      .then(blob => {
+        const objectUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = objectUrl;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(objectUrl);
+      })
+      .catch(() => {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      });
     return;
   }
 
-  // Else fallback to base64 API
   this.apiService.getimageDownload(url).subscribe(res => {
     const base64 = res?.data;
-
-    const fileName = this.splitFileName(url);
     let mimeType = 'image/png';
-
     if (fileName.endsWith('.jpg') || fileName.endsWith('.jpeg')) {
       mimeType = 'image/jpeg';
     } else if (fileName.endsWith('.pdf')) {
       mimeType = 'application/pdf';
     }
-
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = `data:${mimeType};base64,${base64}`;
     link.download = fileName;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
   });
 }
   splitFileName(url: string): string {
@@ -501,6 +506,12 @@ downloadImage(url: string) {
 
       })
       .catch((err) => { });
+  }
+
+  get driverAddress(): string {
+    return this.courierdetails?.addressDetails?.[0]?.address?.fullAddress
+      || this.courierdetails?.address?.fullAddress
+      || '-';
   }
 
   load = false;

@@ -7,6 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle/slide-toggle';
+import { ToastrService } from 'ngx-toastr';
 
 interface Action {
   name: string;
@@ -52,7 +53,8 @@ export class CouriersComponent implements OnInit {
     private router: Router,
     private apiService: ApiServiceService,
     private dialog: MatDialog,
-    public spinner: NgxSpinnerService
+    public spinner: NgxSpinnerService,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {
@@ -95,25 +97,20 @@ export class CouriersComponent implements OnInit {
     this.router.navigate(['couriers/master/courier-add'])
   }
   onStatusChange(event: MatSlideToggleChange, item: any) {
-    let payload: any;
+    const newStatus = event.checked;
+    const previousStatus = item.status;
+    item.status = newStatus;
 
-    if (event.checked) {
-      payload = {
-        status: true
-      };
-      this.apiService.updateStatus(item._id, payload).subscribe(response => {
-        console.log('Status updated:', response);
-        this.getListCourier()
-      });
-    } else {
-      payload = {
-        status: false
-      };
-      this.apiService.updateStatus(item._id, payload).subscribe(response => {
-        console.log('Status updated:', response);
-        this.getListCourier()
-      });
-    }
+    const payload = { status: newStatus };
+    this.apiService.updateStatus(item._id, payload).subscribe(
+      response => {
+        this.toastr.success(`Status ${newStatus ? 'activated' : 'deactivated'} successfully`);
+      },
+      err => {
+        item.status = previousStatus;
+        this.toastr.error('Failed to update status. Please try again.');
+      }
+    );
   }
 //   onActiveChange(event: MatSlideToggleChange, item: any) {
 //   const payload = { isActive: event.checked };
