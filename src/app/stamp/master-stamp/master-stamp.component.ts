@@ -85,7 +85,7 @@ export class MasterStampComponent implements OnInit {
 
   editTerms(item: any) {
     this.isedit = true;
-    this.createForm = item;
+    this.createForm = { ...item };
     console.log(item)
   }
   searchUserList(e: any) {
@@ -103,7 +103,7 @@ export class MasterStampComponent implements OnInit {
     let pagNo = e.pageIndex
     this.pageSize = e.pageSize;
     this.limit = this.pageSize;
-    this.offset = pagNo;
+    this.offset = pagNo * this.pageSize;
     this.getlistMasterStamp();
   }
   paginationOffset(currentPage: any, itemsPerPage: any) {
@@ -121,10 +121,10 @@ export class MasterStampComponent implements OnInit {
     );
   }
 
-  getlistMasterStamp() {
+  getlistMasterStamp(): Promise<void> {
     // this.limit = 9;
     // this.offset = 0;
-    this.apiservice.getlistMasterStamp(this.limit, this.offset, this.value)
+    return this.apiservice.getlistMasterStamp(this.limit, this.offset, this.value)
       .then((res: any) => {
         if (res.code == 200) {
           this.databaseList = res.data?.data;
@@ -179,20 +179,21 @@ export class MasterStampComponent implements OnInit {
 
   clear() {
     this.isedit = false;
-    this.createForm.name = '';
-    this.createForm.amount = '',
-      this.createForm.type = '';
-    this.createForm.description = '';
-    this.createForm.status = '';
-    this.createForm._id = null;
-    this.createForm.image = '';
-
+    this.createForm = {
+      name: '',
+      amount: '',
+      type: '',
+      smallDescription: '',
+      description: '',
+      status: '',
+      image: '',
+      _id: null
+    };
   }
   cancel() {
     // this.isedit = false;
     // this.clear();
     this.modalRef.hide();
-    this.getlistMasterStamp();
   }
 
 
@@ -289,6 +290,16 @@ export class MasterStampComponent implements OnInit {
     this.createForm.image = '';
   }
 
+  allowNumbersOnly(event: KeyboardEvent): boolean {
+    const char = event.key;
+    const input = event.target as HTMLInputElement;
+    // Allow digits; allow a single decimal point only if one isn't already present
+    if (/^[0-9]$/.test(char)) return true;
+    if (char === '.' && !input.value.includes('.')) return true;
+    event.preventDefault();
+    return false;
+  }
+
   exportAsXLSX(): void {
     // this.excelService.exportAsExcelFile(this.categoryList, 'categoryList');
     this.path = 'stamp';
@@ -329,28 +340,32 @@ export class MasterStampComponent implements OnInit {
 
 
   async printTable(): Promise<void> {
+    const savedLimit = this.limit;
+    const savedList = [...this.databaseList];
+
     this.limit = this.totalCount;
     await this.getlistMasterStamp();
 
-    setTimeout(() => {
-      const tableElement = document.querySelector('#table') as HTMLElement;
-      if (tableElement) {
-        this.printService.printElement(tableElement);
-      }
+    const tableElement = document.querySelector('#table') as HTMLElement;
+    if (tableElement) {
+      this.printService.printElement(tableElement);
+    }
 
-      this.limit = 10;
-      this.getlistMasterStamp();
-    }, 1000);
+    this.limit = savedLimit;
+    this.databaseList = savedList;
   }
+
   async copyTable(): Promise<void> {
+    const savedLimit = this.limit;
+    const savedList = [...this.databaseList];
+
     this.limit = this.totalCount;
     await this.getlistMasterStamp();
-    setTimeout(async () => {
-      await this.copyService.copyTableText('#table');
-      this.limit = 9;
-      this.getlistMasterStamp();
-    }, 1000);
 
+    await this.copyService.copyTableText('#table');
+
+    this.limit = savedLimit;
+    this.databaseList = savedList;
   }
 }
 

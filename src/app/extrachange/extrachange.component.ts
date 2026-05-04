@@ -1,10 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { ToastrService } from 'ngx-toastr';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { TemplateRef } from '@angular/core';
 import { ApiServiceService } from '../service/api-service.service';
+import { CopyService } from '../service/exportService/copyService';
+import { ExcelService } from '../service/exportService/excelService';
+import { PrintService } from '../service/exportService/printService';
+import { PdfService } from '../service/exportService/pdfService';
 
 @Component({
   selector: 'app-extrachange',
@@ -13,7 +16,7 @@ import { ApiServiceService } from '../service/api-service.service';
 })
 export class ExtrachangeComponent implements OnInit {
 
-  @ViewChild('modalTemplate') modalTemplate!: TemplateRef<any>;
+  @ViewChild('myPaginator') myPaginator: any;
   modalRef!: BsModalRef;
 
   offset = 0;
@@ -28,11 +31,18 @@ export class ExtrachangeComponent implements OnInit {
   extrachargeid: string | null = null;
   updataform = false;
 
+  type: any;
+  path: any;
+
   constructor(
     private fb: FormBuilder,
     private apiservice: ApiServiceService,
     private toastrService: ToastrService,
-    private modalService: BsModalService
+    private modalService: BsModalService,
+    private copyService: CopyService,
+    private excelService: ExcelService,
+    private printService: PrintService,
+    private pdfService: PdfService
   ) {}
 
   ngOnInit(): void {
@@ -53,13 +63,16 @@ export class ExtrachangeComponent implements OnInit {
     return this.deliveryChargeForm.controls;
   }
 
-  /* ---------- MODAL HELPERS ---------- */
+  /* ---------- MODAL ---------- */
 
-  openModal() {
-    this.modalRef = this.modalService.show(this.modalTemplate);
+  AddModal(template: TemplateRef<any>) {
+    const config: any = {
+      backdrop: 'static', class: 'custm_modal gray modal-lg', keyboard: false, ignoreBackdropClick: true
+    };
+    this.modalRef = this.modalService.show(template, Object.assign({}, config));
   }
 
-  closeModal() {
+  cancel() {
     if (this.modalRef) {
       this.modalRef.hide();
     }
@@ -97,7 +110,7 @@ export class ExtrachangeComponent implements OnInit {
         if (res.code === 200 && res.status === true) {
           this.toastrService.success("Added Successfully");
           this.getextracharges();
-          this.closeModal();
+          this.cancel();
           this.resetForm();
         } else {
           this.toastrService.error(res.message);
@@ -136,7 +149,7 @@ export class ExtrachangeComponent implements OnInit {
         if (res.code === 200 && res.status === true) {
           this.toastrService.success("Updated Successfully");
           this.getextracharges();
-          this.closeModal();
+          this.cancel();
           this.resetForm();
         } else {
           this.toastrService.error(res.message);
@@ -190,5 +203,60 @@ export class ExtrachangeComponent implements OnInit {
     this.value = e.target.value;
     this.offset = 0;
     this.getextracharges();
+  }
+
+  /* ---------- EXPORT ---------- */
+
+  exportAsXLSX(): void {
+    this.path = 'extraChargeMaster';
+    this.type = 'excel';
+    this.apiservice.getPdfExcelDownload(this.path, this.type).then((res: any) => {
+      if (res.code === 200) {
+        const name = 'extraChargeList' + '_' + Date.now();
+        this.excelService.downloadBase64ExcelFile(res.data, name);
+      }
+    }).catch(() => {});
+  }
+
+  exportAsPdf(): void {
+    this.path = 'extraChargeMaster';
+    this.type = 'pdf';
+    this.apiservice.getPdfExcelDownload(this.path, this.type).then((res: any) => {
+      if (res.code === 200) {
+        const name = 'extraChargeList' + '_' + Date.now();
+        this.pdfService.downloadBase64File(res.data, name);
+      }
+    }).catch(() => {});
+  }
+
+  async printTable(): Promise<void> {
+    const savedLimit = this.limit;
+    this.limit = this.totalCount;
+    this.offset = 0;
+    await this.getextracharges();
+
+    setTimeout(() => {
+      const tableElement = document.querySelector('#table') as HTMLElement;
+      if (tableElement) {
+        this.printService.printElement(tableElement);
+      }
+      this.limit = savedLimit;
+      this.offset = 0;
+      this.getextracharges();
+    }, 1000);
+  }
+
+  async copyTable(): Promise<void> {
+    const savedLimit = this.limit;
+    this.limit = this.totalCount;
+    this.offset = 0;
+    await this.getextracharges();
+
+    setTimeout(async () => {
+      await this.copyService.copyTableText('#table');
+      this.limit = savedLimit;
+      this.offset = 0;
+      this.getextracharges();
+    }, 1000);
   }
 }

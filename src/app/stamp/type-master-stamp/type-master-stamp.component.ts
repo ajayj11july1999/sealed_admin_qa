@@ -80,9 +80,14 @@ export class TypeMasterStampComponent implements OnInit {
     }
   }
 
+  allowOnlyAlphabets(event: KeyboardEvent): boolean {
+    const pattern = /^[A-Za-z\s]$/;
+    return pattern.test(event.key);
+  }
+
   editTerms(item: any) {
     this.isedit = true;
-    this.createForm = item;
+    this.createForm = { ...item };
   }
   searchUserList(e: any) {
     this.offset = 0;
@@ -98,7 +103,7 @@ export class TypeMasterStampComponent implements OnInit {
     let pagNo = e.pageIndex;
     this.pageSize = e.pageSize;
     this.limit = this.pageSize;
-    this.offset = pagNo;
+    this.offset = pagNo * this.pageSize;
     this.getlistTypeStamp();
   }
 
@@ -131,6 +136,19 @@ export class TypeMasterStampComponent implements OnInit {
 
   createTypeStamp(f) {
     if (f.form.valid) {
+      const trimmedName = this.createForm.name?.trim().toLowerCase();
+      const namePattern = /^[A-Za-z\s]+$/;
+      if (!namePattern.test(this.createForm.name?.trim())) {
+        this.toastr.error('Type Name should contain only alphabets.');
+        return;
+      }
+      const isDuplicate = this.databaseList.some((item: any) =>
+        item.name?.trim().toLowerCase() === trimmedName && item._id !== this.createForm._id
+      );
+      if (isDuplicate) {
+        this.toastr.error('Type Name already exists. Duplicate entries are not allowed.');
+        return;
+      }
       this.apiservice.createTypeStamp(this.createForm, this.createForm._id).subscribe((res) => {
 
         let result = res;
@@ -168,8 +186,8 @@ export class TypeMasterStampComponent implements OnInit {
 
   }
   cancel() {
-    // this.isedit = false;
-    // this.clear();
+    this.isedit = false;
+    this.clear();
     this.modalRef.hide();
     this.getlistTypeStamp();
   }

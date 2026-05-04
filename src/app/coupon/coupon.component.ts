@@ -30,11 +30,16 @@ interface Page {
 export class CouponComponent implements OnInit {
 
 
-  limit: any;
-  offset: any;
+  limit: any = 9;
+  offset: any = 0;
   value: any;
   currentPage: any;
   totalCount: any;
+  today: Date = new Date();
+
+  get minEndDate(): Date {
+    return this.couponform.startDate ? new Date(this.couponform.startDate) : this.today;
+  }
   databaseList: any = []
   modalRef!: BsModalRef;
   isedit = false;
@@ -124,8 +129,6 @@ export class CouponComponent implements OnInit {
   }
 
   getlistCoupon() {
-    this.limit = 9;
-    this.offset = 0;
     this.apiservice.getlistCoupon(this.limit, this.offset, this.value)
       .then((res: any) => {
         if (res.code == 200) {
@@ -250,6 +253,7 @@ export class CouponComponent implements OnInit {
 
   async printTable(): Promise<void> {
     this.limit = this.totalCount;
+    this.offset = 0;
     await this.getlistCoupon();
 
     setTimeout(() => {
@@ -258,16 +262,19 @@ export class CouponComponent implements OnInit {
         this.printService.printElement(tableElement);
       }
 
-      this.limit = 10;
+      this.limit = 9;
+      this.offset = 0;
       this.getlistCoupon();
     }, 1000);
   }
   async copyTable(): Promise<void> {
     this.limit = this.totalCount;
+    this.offset = 0;
     await this.getlistCoupon();
     setTimeout(async () => {
       await this.copyService.copyTableText('#table');
       this.limit = 9;
+      this.offset = 0;
       this.getlistCoupon();
     }, 1000);
 

@@ -78,7 +78,7 @@
 
                         </td>
                         <td class="checkname ">
-                          <p class="ellip" data-toggle="tooltip" title={{item?.description}}> {{item?.description}}</p>
+                          <p class="ellip" data-toggle="tooltip" title={{item?.smallDescription}}> {{item?.smallDescription}}</p>
 
                         </td>
                         <td class="checkname ">
@@ -136,26 +136,47 @@
 
         <div class="col-md-4 col-sm-12">
           <mat-form-field>
-            <input matInput placeholder="Stamp Name" [(ngModel)]="createForm.name" name="name" required #name="ngModel">
+            <input matInput placeholder="Stamp Name" [(ngModel)]="createForm.name" name="name" required
+              #name="ngModel" maxlength="100" pattern="^[a-zA-Z0-9\s]+$">
+            <mat-hint align="end">{{createForm.name?.length || 0}}/100</mat-hint>
+            <mat-error *ngIf="name.invalid && name.touched">
+              <span *ngIf="name.errors?.required">Stamp Name is required.</span>
+              <span *ngIf="name.errors?.pattern">Special characters are not allowed.</span>
+              <span *ngIf="name.errors?.maxlength">Maximum 100 characters allowed.</span>
+            </mat-error>
           </mat-form-field>
         </div>
         <div class="col-md-4 col-sm-12">
           <mat-form-field>
             <input matInput placeholder="Small Description" [(ngModel)]="createForm.smallDescription"
-              name="smallDescription" required #smallDescription="ngModel">
+              name="smallDescription" required #smallDescription="ngModel" maxlength="200">
+            <mat-hint align="end">{{createForm.smallDescription?.length || 0}}/200</mat-hint>
+            <mat-error *ngIf="smallDescription.invalid && smallDescription.touched">
+              <span *ngIf="smallDescription.errors?.required">Small Description is required.</span>
+              <span *ngIf="smallDescription.errors?.maxlength">Maximum 200 characters allowed.</span>
+            </mat-error>
           </mat-form-field>
         </div>
         <div class="col-md-4 col-sm-12">
           <mat-form-field>
             <input matInput placeholder="Stamp Amount" [(ngModel)]="createForm.amount" name="amount" required
-              #amount="ngModel">
+              #amount="ngModel" pattern="^[0-9]+(\.[0-9]{1,2})?$" (keypress)="allowNumbersOnly($event)">
+            <mat-error *ngIf="amount.invalid && amount.touched">
+              <span *ngIf="amount.errors?.required">Amount is required.</span>
+              <span *ngIf="amount.errors?.pattern">Enter a valid number (e.g. 10 or 10.50).</span>
+            </mat-error>
           </mat-form-field>
         </div>
         <div class="col-md-4 col-sm-12">
           <mat-form-field>
             <!-- <input matInput placeholder="Description"> -->
             <textarea name="description" id="" matInput placeholder="Description" [(ngModel)]="createForm.description"
-              description="name" required #description="ngModel"></textarea>
+              description="name" required #description="ngModel" maxlength="500"></textarea>
+            <mat-hint align="end">{{createForm.description?.length || 0}}/500</mat-hint>
+            <mat-error *ngIf="description.invalid && description.touched">
+              <span *ngIf="description.errors?.required">Description is required.</span>
+              <span *ngIf="description.errors?.maxlength">Maximum 500 characters allowed.</span>
+            </mat-error>
           </mat-form-field>
         </div>
 

@@ -137,30 +137,39 @@
         <div class="col-md-4 col-sm-12">
           <mat-form-field>
             <input matInput placeholder="Coupon Name" [(ngModel)]="couponform.name" name="name" required
-              #name="ngModel">
+              #name="ngModel" maxlength="50" pattern="^[a-zA-Z0-9]+( [a-zA-Z0-9]+)*$">
+            <mat-error *ngIf="name.errors?.required">Coupon name is required.</mat-error>
+            <mat-error *ngIf="name.errors?.maxlength">Coupon name must not exceed 50 characters.</mat-error>
+            <mat-error *ngIf="name.errors?.pattern">Coupon name must not start or end with spaces, contain special characters, or be blank.</mat-error>
           </mat-form-field>
         </div>
         <div class="col-md-4 col-sm-12">
           <mat-form-field>
             <input matInput [(ngModel)]="couponform.startDate" name="startDate" required #startDate="ngModel"
-              [matDatepicker]="picker1" placeholder="" placeholder="Start Date">
+              [matDatepicker]="picker1" placeholder="Start Date" [min]="today">
             <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
             <mat-datepicker #picker1></mat-datepicker>
+            <mat-error *ngIf="startDate.errors?.required">Start date is required.</mat-error>
+            <mat-error *ngIf="startDate.errors?.matDatepickerMin">Start date cannot be in the past.</mat-error>
           </mat-form-field>
         </div>
         <div class="col-md-4 col-sm-12">
           <mat-form-field>
             <input matInput [(ngModel)]="couponform.endDate" name="endDate" required #endDate="ngModel"
-              [matDatepicker]="picker2" placeholder="" placeholder="End Date">
+              [matDatepicker]="picker2" placeholder="End Date" [min]="minEndDate">
             <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
             <mat-datepicker #picker2></mat-datepicker>
+            <mat-error *ngIf="endDate.errors?.required">End date is required.</mat-error>
+            <mat-error *ngIf="endDate.errors?.matDatepickerMin">End date cannot be before the start date or in the past.</mat-error>
           </mat-form-field>
         </div>
         <div class="col-md-4 col-sm-12">
           <mat-form-field>
             <input type="number" [(ngModel)]="couponform.amount" name="amount" required #amount="ngModel" matInput
-              placeholder="Coupon  Amount">
-
+              placeholder="Coupon Amount" min="1" max="99999" step="1">
+            <mat-error *ngIf="amount.errors?.required">Coupon amount is required.</mat-error>
+            <mat-error *ngIf="amount.errors?.min">Amount must be at least 1.</mat-error>
+            <mat-error *ngIf="amount.errors?.max">Amount must not exceed 99999.</mat-error>
           </mat-form-field>
         </div>
 
