@@ -166,7 +166,9 @@
                   <div class="row mt-3 mb-3">
                     <div class="col-6 text-center">
                       <button mat-stroked-button type="button" class="btn btn-primary1"
-                        (click)="generatePayout(items?._id)">GENARATE<br> PAYOUT</button>
+                        (click)="generatePayout(items?._id)"
+                        matTooltip="View completed COD/COP trips for this driver within a date range and mark the total amount as paid to generate a payout."
+                        matTooltipPosition="above">GENERATE<br> PAYOUT</button>
                     </div>
                     <div class="col-6 text-center">
                       <button mat-stroked-button type="button" class="btn btn-primary1"

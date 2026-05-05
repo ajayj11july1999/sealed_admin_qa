@@ -92,12 +92,12 @@ export class VerticalAppSidebarComponent implements OnDestroy {
           type: 'link',
           icon: 'support',
         },
-        {
-          state: 'trip_amount',
-          name: ' Wage Amount',
-          type: 'link',
-          icon: 'support',
-        },
+        // {
+        //   state: 'trip_amount',
+        //   name: ' Wage Amount',
+        //   type: 'link',
+        //   icon: 'support',
+        // },
         // {
         //   state: 'payouts',
         //   name: ' PayOuts',
@@ -352,12 +352,12 @@ export class VerticalAppSidebarComponent implements OnDestroy {
           type: 'link',
           icon: 'support',
         },
-        {
-          state: 'trip_amount',
-          name: ' Wage Amount',
-          type: 'link',
-          icon: 'support',
-        },
+        // {
+        //   state: 'trip_amount',
+        //   name: ' Wage Amount',
+        //   type: 'link',
+        //   icon: 'support',
+        // },
         {
           state: 'payouts',
           name: ' PayOuts',

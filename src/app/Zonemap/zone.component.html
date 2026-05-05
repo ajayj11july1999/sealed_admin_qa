@@ -19,6 +19,16 @@
     />
   </div>
 
+  <!-- OVERLAP WARNING -->
+  <div *ngIf="previewZone && overlapWarning.length > 0" class="alert alert-warning d-flex align-items-start gap-2 mb-3" role="alert">
+    <i class="fa fa-exclamation-triangle mt-1"></i>
+    <div>
+      <strong>Overlapping zone detected.</strong>
+      This zone overlaps with: <strong>{{ overlapWarning.join(', ') }}</strong>.
+      You will be asked to confirm before saving.
+    </div>
+  </div>
+
   <!-- PREVIEW ACTION -->
   <div *ngIf="previewZone" class="mb-3">
     <div class="d-flex flex-wrap align-items-end gap-3 justify-content-end">

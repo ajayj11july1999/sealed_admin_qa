@@ -709,6 +709,16 @@ assignDeliveryManUpdate(orderId: any, payload: any) {
   // --------dashboard end-----------
 
   // --------get all trips---------
+  getListTripByDriver(courierId: string, limit: any, offset: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const url = `main/orders/admin/list?initiated=1&assignedToId=${courierId}&limit=${limit}&offset=${offset}`;
+      this.auth
+        .guestAuthGetapi(url)
+        .then((resp: any) => resolve(resp))
+        .catch((err: any) => reject(err));
+    });
+  }
+
   getListAllTrip(limit: any, offset: any): Promise<any> {
     return new Promise((resolve, reject) => {
       let url = '';
@@ -1140,7 +1150,7 @@ assignDeliveryManUpdate(orderId: any, payload: any) {
   getPdfExcelHistoryDownload(path, type, id): Promise<any> {
     return new Promise((resolve, reject) => {
       let url = '';
-      url = `${path ? path : ''}/excelReport/generate/history?type=${type ? type : ""}&deliverymanId=${id ? id : ''}`;
+      url = `main/${path ? path : ''}/excelReport/generate/history?type=${type ? type : ""}&deliveryManId=${id ? id : ''}`;
       this.auth
         .guestAuthGetapi(url)
         .then((resp: any) => {

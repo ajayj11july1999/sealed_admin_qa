@@ -92,12 +92,12 @@ const MENUITEMS = [
         type: 'link',
         icon: 'support',
       },
-      {
-        state: 'trip_amount',
-        name: ' Wage Amount',
-        type: 'link',
-        icon: 'support',
-      },
+      // {
+      //   state: 'trip_amount',
+      //   name: ' Wage Amount',
+      //   type: 'link',
+      //   icon: 'support',
+      // },
       {
         state: 'payouts',
         name: ' PayOuts',

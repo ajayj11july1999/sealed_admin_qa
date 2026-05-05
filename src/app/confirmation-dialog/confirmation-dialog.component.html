@@ -82,6 +82,24 @@
 </div>
 
 
+<div *ngIf="status == 'OverlapWarning'">
+  <mat-dialog-content style="max-width:360px">
+    <div class="d-flex align-items-start gap-2 mb-2">
+      <mat-icon style="color:#f59e0b;margin-top:2px">warning</mat-icon>
+      <strong>Overlapping Zone Warning</strong>
+    </div>
+    <p>This zone overlaps with:</p>
+    <ul style="padding-left:1.2rem;margin-bottom:0.5rem">
+      <li *ngFor="let name of data.overlappingZones"><strong>{{ name }}</strong></li>
+    </ul>
+    <p class="mb-0">Overlapping zones can cause operational conflicts. Are you sure you want to save?</p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="center">
+    <button mat-raised-button color="warn" tabindex="1" (click)="onNoClick()">Save Anyway</button>
+    <button mat-raised-button mat-dialog-close tabindex="-1">Cancel</button>
+  </mat-dialog-actions>
+</div>
+
 <div *ngIf="data?.login">
 
 

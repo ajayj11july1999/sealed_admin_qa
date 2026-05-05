@@ -13,6 +13,10 @@
     <mat-card class="" *ngIf="!searchLoad">
 
       <mat-card-content>
+        <div *ngIf="courierFilterActive" class="alert alert-info d-flex align-items-center justify-content-between mb-3" role="alert">
+          <span><strong>Showing trips for selected driver only.</strong> Remove the filter to view all trips.</span>
+          <button mat-stroked-button color="warn" (click)="clearDriverFilter()">Clear Driver Filter</button>
+        </div>
         <div class="row">
           <div class="text-end">
             <button mat-raised-button class="mb-1 export-btn me-2" (click)="cpReportsExport('summaryCP')">Summary Report

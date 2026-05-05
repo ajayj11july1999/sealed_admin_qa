@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ApiServiceService } from '../service/api-service.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import {
@@ -67,7 +67,9 @@ export class SearchComponent implements OnInit, OnDestroy {
   ]
   constructor(
     private apiService: ApiServiceService,
-    private router: Router, private excelService: ExcelService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private excelService: ExcelService,
     private formBuilder: FormBuilder,
     private toastr: ToastrService,
     public spinner: NgxSpinnerService
@@ -88,6 +90,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   userrole: any;
   showSubAdmin: boolean = true;
   selectedStatus = '';
+  courierId: string = '';
+  courierFilterActive: boolean = false;
 
   ngOnInit(): void {
     this.userInfo = JSON.parse(localStorage.getItem('userInfoA') as never);
@@ -97,7 +101,15 @@ export class SearchComponent implements OnInit, OnDestroy {
     } else {
       this.showSubAdmin = true;
     }
-    this.getListAllTrip();
+    this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+      this.courierId = params['courierId'] || '';
+      this.courierFilterActive = !!this.courierId;
+      if (this.courierFilterActive) {
+        this.getListTripByDriver();
+      } else {
+        this.getListAllTrip();
+      }
+    });
     this.getListbyB2bcustomer();
     this.searchtripDateForm
       .get('fromdate')
@@ -179,6 +191,22 @@ export class SearchComponent implements OnInit, OnDestroy {
   get tripDateRangeInvalid(): boolean {
     return this.searchtripDateForm.hasError('dateRangeOrder');
   }
+  getListTripByDriver() {
+    this.searchLoad = true;
+    this.apiService
+      .getListTripByDriver(this.courierId, this.limit, this.offset)
+      .then((res) => {
+        this.alltripdetails = res?.data?.data ? res.data.data : [];
+        this.totalCount = res?.data?.totalCount;
+        this.searchLoad = false;
+      })
+      .catch(() => { this.searchLoad = false; });
+  }
+
+  clearDriverFilter() {
+    this.router.navigate(['/search']);
+  }
+
   getListAllTrip() {
     this.searchLoad = true;
     this.apiService
@@ -233,7 +261,11 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.searchtripidForm.reset();
     this.searchtripDateForm.reset();
     this.selectedStatus = '';
-    this.getListAllTrip();
+    if (this.courierFilterActive) {
+      this.router.navigate(['/search']);
+    } else {
+      this.getListAllTrip();
+    }
   }
   ordertype
   onSelectionStatusChange(i) {

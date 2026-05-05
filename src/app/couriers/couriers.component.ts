@@ -188,15 +188,14 @@ export class CouriersComponent implements OnInit {
   }
 
   courierPayout(id: any) {
-    // Navigate to courier-specific payout history page
-    this.router.navigate(['/couriers/payouts', id]);
+    this.router.navigate(['/couriers/history', { id: id }]);
   }
   generatePayout(id: any) {
     // Navigate to generate payout page for selected courier
     this.router.navigate(['/courier-generate-payout', id]);
   }
   searchtrip(id: any) {
-    this.router.navigate(['/search']);
+    this.router.navigate(['/search'], { queryParams: { courierId: id } });
   }
 
   couriersView(i: any) {

@@ -57,6 +57,9 @@ searchValue = '';
   selectedZoneName: string = '';
   infoWindow: google.maps.InfoWindow | null = null;
 
+  /** Names of existing zones that overlap the current preview zone. */
+  overlapWarning: string[] = [];
+
   /** Minimum edge length (width and height) for a drawn zone, in meters. */
   private readonly minZoneSideMeters = 3000;
 
@@ -330,6 +333,8 @@ mapDeliveryPartnersToZones() {
         isActive: true,
       };
 
+      this.overlapWarning = this.checkOverlappingZones(this.previewZone.bounds);
+
       this.map.fitBounds(place.geometry.viewport);
     });
   }
@@ -438,6 +443,31 @@ mapDeliveryPartnersToZones() {
     return null;
   }
 
+  // ---------------- OVERLAP DETECTION ----------------
+
+  /**
+   * Returns true when two axis-aligned bounding boxes share any area.
+   * Touching edges (lat/lng exactly equal) are NOT considered overlapping.
+   */
+  private boundsOverlap(
+    b1: { northeast: { lat: number; lng: number }; southwest: { lat: number; lng: number } },
+    b2: { northeast: { lat: number; lng: number }; southwest: { lat: number; lng: number } }
+  ): boolean {
+    if (b1.northeast.lat <= b2.southwest.lat) return false;
+    if (b1.southwest.lat >= b2.northeast.lat) return false;
+    if (b1.northeast.lng <= b2.southwest.lng) return false;
+    if (b1.southwest.lng >= b2.northeast.lng) return false;
+    return true;
+  }
+
+  /** Returns the names of all saved zones whose bounds overlap with `newBounds`. */
+  private checkOverlappingZones(newBounds: any): string[] {
+    if (!newBounds?.northeast || !newBounds?.southwest) return [];
+    return this.allZones
+      .filter(z => z.bounds && this.boundsOverlap(newBounds, z.bounds))
+      .map(z => z.zoneName || 'Unknown Zone');
+  }
+
   // ---------------- MANUAL DRAW RECTANGLE ----------------
   initDrawing() {
     this.drawingManager = new google.maps.drawing.DrawingManager({
@@ -519,6 +549,8 @@ mapDeliveryPartnersToZones() {
           isActive: true,
         };
 
+        this.overlapWarning = this.checkOverlappingZones(this.previewZone.bounds);
+
         this.drawingManager.setDrawingMode(null);
       }
     );
@@ -567,6 +599,28 @@ mapDeliveryPartnersToZones() {
   }
 
   this.previewZone.zoneName = name;
+
+  if (this.overlapWarning.length > 0) {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        status: 'OverlapWarning',
+        overlappingZones: this.overlapWarning,
+      },
+      disableClose: true,
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.persistZone();
+      }
+    });
+    return;
+  }
+
+  this.persistZone();
+}
+
+private persistZone() {
   this.loading = true;
 
   this.api.createZone(this.previewZone).subscribe({
@@ -592,6 +646,7 @@ mapDeliveryPartnersToZones() {
   clearPreview() {
     this.previewZone = null;
     this.pendingZoneName = '';
+    this.overlapWarning = [];
 
     if (this.previewPolyline) {
       this.previewPolyline.setMap(null);
