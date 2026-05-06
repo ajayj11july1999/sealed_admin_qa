@@ -1,4 +1,5 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, TemplateRef } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { ApiServiceService } from '../service/api-service.service';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
@@ -29,6 +30,9 @@ interface Page {
 })
 export class BookingInstructionComponent implements OnInit {
 
+  /** Max length for Instruction Name (must match template maxlength / pattern rules). */
+  readonly instructionNameMaxLength = 100;
+
   instructionform: any = {
     "name": "",
     "status": "",
@@ -55,7 +59,8 @@ export class BookingInstructionComponent implements OnInit {
   constructor(private dialog: MatDialog, public spinner: NgxSpinnerService,
     private excelService: ExcelService, private pdfService: PdfService,
     private toastr: ToastrService, private apiservice: ApiServiceService,
-    private modalService: BsModalService, private copyService: CopyService, private printService: PrintService) { }
+    private modalService: BsModalService, private copyService: CopyService, private printService: PrintService,
+    private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.getBookingInstruction();
@@ -171,13 +176,15 @@ export class BookingInstructionComponent implements OnInit {
   //   });
   // }
 
-  sanitizeNameInput(e: any) {
-    const raw: string = e?.target?.value ?? '';
-    const sanitized = raw.replace(/[^a-zA-Z0-9\s]/g, '').slice(0, 100);
-    if (raw !== sanitized) {
-      (e.target as HTMLInputElement).value = sanitized;
-      this.tempForm.name = sanitized;
-    }
+  /** Letters, digits, spaces only; capped at instructionNameMaxLength. */
+  sanitizeInstructionName(raw: string | null | undefined): string {
+    return String(raw ?? '')
+      .replace(/[^a-zA-Z0-9\s]/g, '')
+      .slice(0, this.instructionNameMaxLength);
+  }
+
+  onInstructionNameChange(value: string | null | undefined): void {
+    this.tempForm.name = this.sanitizeInstructionName(value);
   }
 
   searchUserList(e: any) {
@@ -215,6 +222,7 @@ export class BookingInstructionComponent implements OnInit {
   editInstruction(item: any) {
     this.isedit = true;
     this.tempForm = { ...item };
+    this.tempForm.name = this.sanitizeInstructionName(this.tempForm.name);
   }
   cancel() {
     // this.isedit = false;
@@ -222,8 +230,10 @@ export class BookingInstructionComponent implements OnInit {
     this.modalRef.hide();
     this.getBookingInstruction();
   }
-  addBookingInstructions(f) {
-
+  addBookingInstructions(f: NgForm) {
+    this.tempForm.name = this.sanitizeInstructionName(String(this.tempForm?.name ?? ''));
+    this.cdr.detectChanges();
+    f.form.markAllAsTouched();
 
     if (f.form.valid) {
       this.instructionform = { ...this.tempForm };

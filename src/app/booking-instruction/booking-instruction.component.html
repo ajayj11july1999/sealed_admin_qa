@@ -114,9 +114,12 @@
         <div class="col-md-4 col-sm-12">
 
           <mat-form-field subscriptSizing="fixed">
-            <input matInput placeholder="Instruction Name" [(ngModel)]="tempForm.name" name="name" required
-              #name="ngModel" maxlength="100" pattern="[a-zA-Z0-9\s]*" (input)="sanitizeNameInput($event)">
-            <mat-error *ngIf="name.invalid && name.touched">Only letters, numbers and spaces are allowed</mat-error>
+            <input matInput placeholder="Instruction Name" [ngModel]="tempForm.name"
+              (ngModelChange)="onInstructionNameChange($event)" name="name" required
+              #name="ngModel" [maxlength]="instructionNameMaxLength" pattern="[a-zA-Z0-9\s]*">
+            <mat-error *ngIf="name.invalid && name.touched && name.errors?.required">Instruction Name is required</mat-error>
+            <mat-error *ngIf="name.invalid && name.touched && !name.errors?.required">
+              Alphanumeric and spaces only, max {{ instructionNameMaxLength }} characters</mat-error>
           </mat-form-field>
         </div>
         <div class="col-md-4 col-sm-12">
