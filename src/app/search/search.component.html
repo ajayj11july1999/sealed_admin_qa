@@ -65,12 +65,22 @@
             <label for="text" class="text">ENTER TRIP DATE RANGE</label>
 
             <div class="col-md-6 col-lg-2 col-sm-12 mt-2 ">
-              <input type="date" class="form-control" formControlName='fromdate' [max]="fromDateInputMax"
-                (blur)="onTripDateInputBlur()">
+              <mat-form-field appearance="fill" class="admin-mat-date-field">
+                <mat-label>From date</mat-label>
+                <input matInput [matDatepicker]="searchFromPicker" formControlName="fromdate"
+                  [max]="fromPickerMax" (dateChange)="normalizeTripDateRange()">
+                <mat-datepicker-toggle matSuffix [for]="searchFromPicker"></mat-datepicker-toggle>
+                <mat-datepicker #searchFromPicker></mat-datepicker>
+              </mat-form-field>
             </div>
             <div class="col-md-6 col-lg-2 col-sm-12 mt-2 ">
-              <input type="date" class="form-control" formControlName='todate' [min]="toDateInputMin"
-                [max]="tripDateRangeMax" (blur)="onTripDateInputBlur()">
+              <mat-form-field appearance="fill" class="admin-mat-date-field">
+                <mat-label>To date</mat-label>
+                <input matInput [matDatepicker]="searchToPicker" formControlName="todate"
+                  [min]="toPickerMin" [max]="tripDateRangeMaxDate" (dateChange)="normalizeTripDateRange()">
+                <mat-datepicker-toggle matSuffix [for]="searchToPicker"></mat-datepicker-toggle>
+                <mat-datepicker #searchToPicker></mat-datepicker>
+              </mat-form-field>
             </div>
 
             <div class="col-md-6 col-lg-2 col-sm-12 ">

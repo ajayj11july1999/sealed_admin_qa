@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ApiServiceService } from '../service/api-service.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { adminDateToYmd, startOfLocalDay } from '../utils/admin-date.util';
 
 /** Must match the orderStatus query we send for active B2C trips. */
 const ACTIVE_B2C_ORDER_STATUSES = new Set([
@@ -53,9 +54,35 @@ export class MobileAppTripsComponent implements OnInit {
       deliverymanname: ['', [Validators.required]],
     });
     this.DateFilterForm = this.fb.group({
-      fromDate: ['', [Validators.required]],
-      toDate: ['', [Validators.required]],
+      fromDate: [null, [Validators.required]],
+      toDate: [null, [Validators.required]],
     })
+  }
+
+  get mobileFiltersToday(): Date {
+    return startOfLocalDay(new Date());
+  }
+
+  get mobileFromPickerMax(): Date {
+    const toVal = this.DateFilterForm?.get('toDate')?.value;
+    const today = this.mobileFiltersToday;
+    if (!toVal) {
+      return today;
+    }
+    const toDay = startOfLocalDay(
+      toVal instanceof Date ? toVal : new Date(toVal)
+    );
+    return toDay.getTime() < today.getTime() ? toDay : today;
+  }
+
+  get mobileToPickerMin(): Date | null {
+    const fromVal = this.DateFilterForm?.get('fromDate')?.value;
+    if (!fromVal) {
+      return null;
+    }
+    return startOfLocalDay(
+      fromVal instanceof Date ? fromVal : new Date(fromVal)
+    );
   }
   submitted: any;
   Fromdate: any = '';
@@ -86,8 +113,10 @@ export class MobileAppTripsComponent implements OnInit {
     if (!this.DateFilterForm?.valid) {
       this.toastr.warning('Please select all the fields');
     } else {
-      this.Fromdate = this.DateFilterForm?.controls['fromDate'].value;
-      this.Todate = this.DateFilterForm?.controls['toDate'].value;
+      this.Fromdate =
+        adminDateToYmd(this.DateFilterForm?.controls['fromDate'].value) ?? '';
+      this.Todate =
+        adminDateToYmd(this.DateFilterForm?.controls['toDate'].value) ?? '';
       console.log(this.Fromdate, this.Todate)
       this.getListConsumerActivetrip();
       this.getListConsumerNewtrip();

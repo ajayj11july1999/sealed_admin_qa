@@ -11,10 +11,22 @@
                 <label for="text" class="text">ENTER TRIP DATE RANGE</label>
 
                 <div class="col-md-6 col-lg-4 col-sm-12 mt-2 ">
-                  <input type="date" class="form-control" formControlName="fromdate" />
+                  <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>From date</mat-label>
+                    <input matInput [matDatepicker]="payoutFromPicker" formControlName="fromdate"
+                      [max]="payoutFromPickerMax">
+                    <mat-datepicker-toggle matSuffix [for]="payoutFromPicker"></mat-datepicker-toggle>
+                    <mat-datepicker #payoutFromPicker></mat-datepicker>
+                  </mat-form-field>
                 </div>
                 <div class="col-md-6 col-lg-4 col-sm-12 mt-2 ">
-                  <input type="date" class="form-control" formControlName="todate" />
+                  <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>To date</mat-label>
+                    <input matInput [matDatepicker]="payoutToPicker" formControlName="todate"
+                      [min]="payoutToPickerMin" [max]="payoutFiltersToday">
+                    <mat-datepicker-toggle matSuffix [for]="payoutToPicker"></mat-datepicker-toggle>
+                    <mat-datepicker #payoutToPicker></mat-datepicker>
+                  </mat-form-field>
                 </div>
                 <div class="col-md-6 col-lg-3 col-sm-12 mt-2">
                   <div class="searchbtn ">

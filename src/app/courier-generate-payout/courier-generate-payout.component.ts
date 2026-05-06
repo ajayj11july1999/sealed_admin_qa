@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ExcelService } from '../service/exportService/excelService';
 import { PdfService } from '../service/exportService/pdfService';
+import { adminDateToYmd, startOfLocalDay } from '../utils/admin-date.util';
 
 @Component({
   selector: 'app-courier-generate-payout',
@@ -37,16 +38,43 @@ export class CourierGeneratePayoutComponent implements OnInit {
     private pdfService: PdfService
   ) {
     this.searchtripDateForm = this.formBuilder.group({
-      fromdate: ['', [Validators.required]],
-      todate: ['', [Validators.required]],
+      fromdate: [null, [Validators.required]],
+      todate: [null, [Validators.required]],
     });
   }
 
+  get payoutFiltersToday(): Date {
+    return startOfLocalDay(new Date());
+  }
+
+  get payoutFromPickerMax(): Date {
+    const toVal = this.searchtripDateForm?.get('todate')?.value;
+    const today = this.payoutFiltersToday;
+    if (!toVal) {
+      return today;
+    }
+    const toDay = startOfLocalDay(
+      toVal instanceof Date ? toVal : new Date(toVal)
+    );
+    return toDay.getTime() < today.getTime() ? toDay : today;
+  }
+
+  get payoutToPickerMin(): Date | null {
+    const fromVal = this.searchtripDateForm?.get('fromdate')?.value;
+    if (!fromVal) {
+      return null;
+    }
+    return startOfLocalDay(
+      fromVal instanceof Date ? fromVal : new Date(fromVal)
+    );
+  }
+
   private formatDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return adminDateToYmd(date) ?? '';
+  }
+
+  private controlToYmd(val: unknown): string {
+    return adminDateToYmd(val) ?? '';
   }
 
   private setDefaultDateRange(): void {
@@ -54,16 +82,16 @@ export class CourierGeneratePayoutComponent implements OnInit {
     const last30Days = new Date();
     last30Days.setDate(today.getDate() - 30);
 
-    const from = this.formatDate(last30Days);
-    const to = this.formatDate(today);
+    const from = last30Days;
+    const to = today;
 
     this.searchtripDateForm.patchValue({
       fromdate: from,
       todate: to,
     });
 
-    this.fromDate = from;
-    this.toDate = to;
+    this.fromDate = this.formatDate(from);
+    this.toDate = this.formatDate(to);
   }
 
   ngOnInit(): void {
@@ -80,8 +108,12 @@ export class CourierGeneratePayoutComponent implements OnInit {
   getCompletedTripList() {
     this.paymentMode = 'cash on delivery,cash on pickup';
     this.paymentStatus = 'CODcompleted,COPcompleted';
-    this.fromDate = this.searchtripDateForm.controls['fromdate'].value || this.fromDate;
-    this.toDate = this.searchtripDateForm.controls['todate'].value || this.toDate;
+    this.fromDate =
+      this.controlToYmd(this.searchtripDateForm.controls['fromdate'].value) ||
+      this.fromDate;
+    this.toDate =
+      this.controlToYmd(this.searchtripDateForm.controls['todate'].value) ||
+      this.toDate;
     this.tripidarray = [];
     this.apiService
       .getCompletedTripList(

@@ -35,6 +35,7 @@
                     <thead>
                       <tr>
                         <th>Sl.NO</th>
+                        <th>Transaction Type</th>
                         <th>Paid Amount</th>
                         <th>Wage Amount</th>
                         <th>Payout Type</th>
@@ -53,14 +54,28 @@
                         <td>
                           {{i+1+ (myPaginator.pageIndex * myPaginator.pageSize)}}
                         </td>
+                        <td class="checkname">
+                          <span
+                            [ngStyle]="{
+                              'background-color': (item?.transactionType === 'debit') ? '#ffe5e5' : '#e5f9ee',
+                              'color':            (item?.transactionType === 'debit') ? '#c0392b'  : '#1a7a4a',
+                              'padding': '3px 10px',
+                              'border-radius': '12px',
+                              'font-weight': '600',
+                              'font-size': '12px',
+                              'white-space': 'nowrap'
+                            }">
+                            {{ (item?.transactionType === 'debit') ? 'Debited' : 'Credited' }}
+                          </span>
+                        </td>
                         <td class="checkname ">
                           <p class="ellip" data-toggle="tooltip" title={{item?.currentAmountPaid}}>
-                            {{item?.currentAmountPaid}}</p>
+                            {{ (item?.transactionType === 'debit' ? '-' : '+') }}₹{{item?.currentAmountPaid}}</p>
 
                         </td>
                         <td class="checkname ">
                           <p class="ellip" data-toggle="tooltip" title={{item?.wageForCurrentOrder}}>
-                            {{item?.wageForCurrentOrder}}</p>
+                            {{ (item?.transactionType === 'debit' ? '-' : '+') }}₹{{item?.wageForCurrentOrder}}</p>
 
                         </td>
                         <td class="checkname ">

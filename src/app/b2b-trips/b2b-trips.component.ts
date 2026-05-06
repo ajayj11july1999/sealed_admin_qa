@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiServiceService } from '../service/api-service.service';
 import { Router } from '@angular/router';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { adminDateToYmd, startOfLocalDay } from '../utils/admin-date.util';
 
 @Component({
   selector: 'app-b2b-trips',
@@ -47,9 +48,35 @@ export class B2bTripsComponent implements OnInit {
       deliverymans2bname: ['', [Validators.required]],
     });
     this.DateFilterForm = this.fb.group({
-      fromDate: ['', [Validators.required]],
-      toDate: ['', [Validators.required]],
+      fromDate: [null, [Validators.required]],
+      toDate: [null, [Validators.required]],
     })
+  }
+
+  get b2bFiltersToday(): Date {
+    return startOfLocalDay(new Date());
+  }
+
+  get b2bFromPickerMax(): Date {
+    const toVal = this.DateFilterForm?.get('toDate')?.value;
+    const today = this.b2bFiltersToday;
+    if (!toVal) {
+      return today;
+    }
+    const toDay = startOfLocalDay(
+      toVal instanceof Date ? toVal : new Date(toVal)
+    );
+    return toDay.getTime() < today.getTime() ? toDay : today;
+  }
+
+  get b2bToPickerMin(): Date | null {
+    const fromVal = this.DateFilterForm?.get('fromDate')?.value;
+    if (!fromVal) {
+      return null;
+    }
+    return startOfLocalDay(
+      fromVal instanceof Date ? fromVal : new Date(fromVal)
+    );
   }
 
   ngOnInit(): void {
@@ -62,8 +89,10 @@ export class B2bTripsComponent implements OnInit {
     if (!this.DateFilterForm?.valid) {
       this.toastr.warning('Please select all the fields');
     } else {
-      this.Fromdate = this.DateFilterForm?.controls['fromDate'].value;
-      this.Todate = this.DateFilterForm?.controls['toDate'].value;
+      this.Fromdate =
+        adminDateToYmd(this.DateFilterForm?.controls['fromDate'].value) ?? '';
+      this.Todate =
+        adminDateToYmd(this.DateFilterForm?.controls['toDate'].value) ?? '';
       console.log(this.Fromdate, this.Todate)
       this.getLists2bActivetrip();
       this.getLists2bNewtrip();

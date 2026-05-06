@@ -14,13 +14,14 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { ExcelService } from '../service/exportService/excelService';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { adminDateToYmd, startOfLocalDay } from '../utils/admin-date.util';
 
-/** End date must be >= start date (yyyy-MM-dd from native date inputs). */
+/** End date must be >= start date (Material datepicker or yyyy-MM-dd string). */
 function tripDateRangeOrderValidator(
   group: AbstractControl
 ): ValidationErrors | null {
-  const from = group.get('fromdate')?.value;
-  const to = group.get('todate')?.value;
+  const from = adminDateToYmd(group.get('fromdate')?.value);
+  const to = adminDateToYmd(group.get('todate')?.value);
   if (!from || !to) {
     return null;
   }
@@ -79,8 +80,8 @@ export class SearchComponent implements OnInit, OnDestroy {
     });
     this.searchtripDateForm = this.formBuilder.group(
       {
-        fromdate: ['', [Validators.required]],
-        todate: ['', [Validators.required]],
+        fromdate: [null, [Validators.required]],
+        todate: [null, [Validators.required]],
         orderstatus: [''],
       },
       { validators: tripDateRangeOrderValidator }
@@ -117,8 +118,14 @@ export class SearchComponent implements OnInit, OnDestroy {
       .subscribe((fromVal) => {
         const toCtrl = this.searchtripDateForm.get('todate');
         const toVal = toCtrl?.value;
-        if (fromVal && toVal && fromVal > toVal) {
-          toCtrl?.patchValue(fromVal, { emitEvent: false });
+        if (fromVal && toVal) {
+          const f = startOfLocalDay(
+            fromVal instanceof Date ? fromVal : new Date(fromVal)
+          );
+          const t = startOfLocalDay(toVal instanceof Date ? toVal : new Date(toVal));
+          if (t.getTime() < f.getTime()) {
+            toCtrl?.patchValue(f, { emitEvent: false });
+          }
         }
         this.searchtripDateForm.updateValueAndValidity({ emitEvent: false });
       });
@@ -129,8 +136,14 @@ export class SearchComponent implements OnInit, OnDestroy {
         const fromCtrl = this.searchtripDateForm.get('fromdate');
         const toCtrl = this.searchtripDateForm.get('todate');
         const fromVal = fromCtrl?.value;
-        if (fromVal && toVal && toVal < fromVal) {
-          toCtrl?.patchValue(fromVal, { emitEvent: false });
+        if (fromVal && toVal) {
+          const f = startOfLocalDay(
+            fromVal instanceof Date ? fromVal : new Date(fromVal)
+          );
+          const t = startOfLocalDay(toVal instanceof Date ? toVal : new Date(toVal));
+          if (t.getTime() < f.getTime()) {
+            toCtrl?.patchValue(f, { emitEvent: false });
+          }
         }
         this.searchtripDateForm.updateValueAndValidity({ emitEvent: false });
       });
@@ -141,49 +154,55 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /** Latest calendar day allowed (local) — matches “today” in the date picker. */
-  get tripDateRangeMax(): string {
-    return this.formatLocalYmd(new Date());
+  /** Latest calendar day allowed (local) for Material datepicker. */
+  get tripDateRangeMaxDate(): Date {
+    return startOfLocalDay(new Date());
   }
 
-  /** From date cannot be after to date or after max day. */
-  get fromDateInputMax(): string {
-    const to = this.searchtripDateForm?.get('todate')?.value;
-    if (!to) {
-      return this.tripDateRangeMax;
+  /** From date cannot be after “to” or after today. */
+  get fromPickerMax(): Date {
+    const toVal = this.searchtripDateForm?.get('todate')?.value;
+    const today = this.tripDateRangeMaxDate;
+    if (!toVal) {
+      return today;
     }
-    return this.minYmd(to, this.tripDateRangeMax);
+    const toDay = startOfLocalDay(
+      toVal instanceof Date ? toVal : new Date(toVal)
+    );
+    return toDay.getTime() < today.getTime() ? toDay : today;
   }
 
   /** To date cannot be before from date. */
-  get toDateInputMin(): string | null {
-    const from = this.searchtripDateForm?.get('fromdate')?.value;
-    return from || null;
+  get toPickerMin(): Date | null {
+    const fromVal = this.searchtripDateForm?.get('fromdate')?.value;
+    if (!fromVal) {
+      return null;
+    }
+    return startOfLocalDay(
+      fromVal instanceof Date ? fromVal : new Date(fromVal)
+    );
   }
 
-  private formatLocalYmd(d: Date): string {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
+  private isRangeInvalid(from: unknown, to: unknown): boolean {
+    const fy = adminDateToYmd(from);
+    const ty = adminDateToYmd(to);
+    return !!(fy && ty && fy > ty);
   }
 
-  private minYmd(a: string, b: string): string {
-    return a <= b ? a : b;
-  }
-
-  private isRangeInvalid(from: string, to: string): boolean {
-    return !!(from && to && from > to);
-  }
-
-  /** Runs when a date field loses focus — enforces end >= start even if the browser ignored min/max. */
-  onTripDateInputBlur(): void {
+  /** Keeps end >= start when the overlay closes. */
+  normalizeTripDateRange(): void {
     const fromCtrl = this.searchtripDateForm.get('fromdate');
     const toCtrl = this.searchtripDateForm.get('todate');
     const fromVal = fromCtrl?.value;
     const toVal = toCtrl?.value;
-    if (fromVal && toVal && fromVal > toVal) {
-      toCtrl.patchValue(fromVal, { emitEvent: true });
+    if (fromVal && toVal) {
+      const f = startOfLocalDay(
+        fromVal instanceof Date ? fromVal : new Date(fromVal)
+      );
+      const t = startOfLocalDay(toVal instanceof Date ? toVal : new Date(toVal));
+      if (t.getTime() < f.getTime()) {
+        toCtrl.patchValue(f, { emitEvent: true });
+      }
     }
     this.searchtripDateForm.updateValueAndValidity();
   }
@@ -315,8 +334,10 @@ export class SearchComponent implements OnInit, OnDestroy {
 
     this.tripId = this.searchtripidForm?.controls['tripid'].value;
     this.searchtripDateForm.updateValueAndValidity();
-    this.fromDate = this.searchtripDateForm?.controls['fromdate'].value;
-    this.toDate = this.searchtripDateForm?.controls['todate'].value;
+    this.fromDate =
+      adminDateToYmd(this.searchtripDateForm?.controls['fromdate'].value) ?? '';
+    this.toDate =
+      adminDateToYmd(this.searchtripDateForm?.controls['todate'].value) ?? '';
     if (this.isRangeInvalid(this.fromDate, this.toDate)) {
       this.searchtripDateForm.markAllAsTouched();
       this.toastr.warning('End date cannot be before start date.');
@@ -408,8 +429,10 @@ export class SearchComponent implements OnInit, OnDestroy {
   data: any;
   type: any;
   async cpReportsExport(item) {
-    this.fromDate = this.searchtripDateForm?.controls['fromdate'].value;
-    this.toDate = this.searchtripDateForm?.controls['todate'].value;
+    this.fromDate =
+      adminDateToYmd(this.searchtripDateForm?.controls['fromdate'].value) ?? '';
+    this.toDate =
+      adminDateToYmd(this.searchtripDateForm?.controls['todate'].value) ?? '';
     console.log(this.fromDate, this.toDate, this.selectedStatus)
 
     if (!this.fromDate && !this.toDate) {

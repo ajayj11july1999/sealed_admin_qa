@@ -60,6 +60,9 @@ searchValue = '';
   /** Names of existing zones that overlap the current preview zone. */
   overlapWarning: string[] = [];
 
+  /** Page size when loading zones from the API (must load all rows for overlap checks). */
+  private readonly zoneApiPageSize = 200;
+
   /** Minimum edge length (width and height) for a drawn zone, in meters. */
   private readonly minZoneSideMeters = 3000;
 
@@ -460,12 +463,36 @@ mapDeliveryPartnersToZones() {
     return true;
   }
 
+  /**
+   * Normalizes API/stored bounds to { northeast, southwest } with numeric lat/lng.
+   */
+  private normalizeBounds(
+    raw: any
+  ): { northeast: { lat: number; lng: number }; southwest: { lat: number; lng: number } } | null {
+    if (!raw || typeof raw !== 'object') return null;
+    const pick = (pt: any): { lat: number; lng: number } | null => {
+      if (!pt || typeof pt !== 'object') return null;
+      const lat = Number(pt.lat);
+      const lng = Number(pt.lng);
+      if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+      return null;
+    };
+    const ne = pick(raw.northeast ?? raw.northEast);
+    const sw = pick(raw.southwest ?? raw.southWest);
+    if (!ne || !sw) return null;
+    return { northeast: ne, southwest: sw };
+  }
+
   /** Returns the names of all saved zones whose bounds overlap with `newBounds`. */
   private checkOverlappingZones(newBounds: any): string[] {
-    if (!newBounds?.northeast || !newBounds?.southwest) return [];
+    const nb = this.normalizeBounds(newBounds);
+    if (!nb) return [];
     return this.allZones
-      .filter(z => z.bounds && this.boundsOverlap(newBounds, z.bounds))
-      .map(z => z.zoneName || 'Unknown Zone');
+      .filter((z) => {
+        const zb = this.normalizeBounds(z.bounds);
+        return zb !== null && this.boundsOverlap(nb, zb);
+      })
+      .map((z) => z.zoneName || 'Unknown Zone');
   }
 
   // ---------------- MANUAL DRAW RECTANGLE ----------------
@@ -600,6 +627,9 @@ mapDeliveryPartnersToZones() {
 
   this.previewZone.zoneName = name;
 
+  // Recompute against the full zone list (avoids stale UI state or draw-before-load races).
+  this.overlapWarning = this.checkOverlappingZones(this.previewZone.bounds);
+
   if (this.overlapWarning.length > 0) {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: {
@@ -668,30 +698,48 @@ private persistZone() {
   //     },
   //   });
   // }
-loadZones() {
+loadZones(): void {
+  const mergeBatch = (res: any): any[] => {
+    if (Array.isArray(res?.data)) return res.data;
+    if (Array.isArray(res?.data?.data)) return res.data.data;
+    return [];
+  };
 
-  this.api.getZones().then((res: any) => {
-      this.allZones = res?.data?.data || []; 
-      console.log("ZONE API:", res);
+  const fetchPage = (offset: number, acc: any[]): void => {
+    this.api
+      .getZones(this.zoneApiPageSize, offset)
+      .then((res: any) => {
+        const batch = mergeBatch(res);
+        const next = acc.concat(batch);
+        if (batch.length < this.zoneApiPageSize) {
+          this.applyLoadedZones(next);
+        } else {
+          fetchPage(offset + this.zoneApiPageSize, next);
+        }
+      })
+      .catch((err: any) => {
+        console.error(err);
+      });
+  };
 
-    // ✅ HANDLE BOTH POSSIBLE STRUCTURES SAFELY
-    this.allZones = Array.isArray(res?.data)
-      ? res.data
-      : res?.data?.data || [];
+  fetchPage(0, []);
+}
 
-    // this.allZones = res?.data ?? res ?? [];
-    this.totalCount = this.allZones.length;
+/** Apply full zone list from API (all pages merged) to state and map. */
+private applyLoadedZones(all: any[]): void {
+  this.allZones = all;
+  this.totalCount = this.allZones.length;
 
-    const start = this.offset * this.limit;
-    const end = start + this.limit;
+  const start = this.offset * this.limit;
+  const end = start + this.limit;
+  this.zones = this.allZones.slice(start, end);
 
-    this.zones = this.allZones.slice(start, end);
+  this.drawSavedZones();
+  this.mapDeliveryPartnersToZones();
 
-    this.drawSavedZones();    this.mapDeliveryPartnersToZones();
-  }).catch((err: any) => {
-    console.error(err);
-  });
-
+  if (this.previewZone?.bounds) {
+    this.overlapWarning = this.checkOverlappingZones(this.previewZone.bounds);
+  }
 }
  pageChange(e: any) {
 
