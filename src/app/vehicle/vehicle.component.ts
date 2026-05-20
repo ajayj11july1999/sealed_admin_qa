@@ -12,6 +12,10 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation
 })
 export class VehicleComponent implements OnInit {
 
+  readonly maxVehicleNameLength = 25;
+  readonly maxBasePrice = 9999;
+  readonly maxNumericLimit = 99999;
+
   vehicleList: any[] = [];
   totalCount = 0;
   limit = 10;
@@ -23,13 +27,13 @@ export class VehicleComponent implements OnInit {
 
   form: any = {
     name: '',
-    basePrice: 0,
-    perkm: 0,
-    basekm: 0,
+    basePrice: '',
+    perkm: '',
+    basekm: '',
     status: 'active',
     _id: null,
-    weightWarning: null as number | null,
-    lengthWarning: null as number | null,
+    weightWarning: '',
+    lengthWarning: '',
     imageUrl: '' 
   };
 
@@ -140,6 +144,7 @@ removeImage() {
   editVehicle(v: any) {
     this.isedit = true;
     this.form = { ...v };
+    this.normalizeFormFields();
   }
 
   saveVehicle() {
@@ -150,46 +155,56 @@ removeImage() {
       return;
     }
 
+    if (name.length > this.maxVehicleNameLength) {
+      this.toastr.warning(`Vehicle name must not exceed ${this.maxVehicleNameLength} characters`);
+      return;
+    }
+
     const namePattern = /^[a-zA-Z\s]+$/;
     if (!namePattern.test(name)) {
       this.toastr.warning("Vehicle name must contain only letters and spaces");
       return;
     }
 
-    const basePrice = Number(this.form.basePrice);
-    const perkm = Number(this.form.perkm);
-    const basekm = Number(this.form.basekm);
-
-    if (this.form.basePrice === null || this.form.basePrice === '' || isNaN(basePrice) || basePrice < 0 || basePrice > 999999) {
-      this.toastr.warning("Base Price must be a valid number between 0 and 999999");
+    if (!this.isValidAmount(this.form.basePrice, this.maxBasePrice)) {
+      this.toastr.warning(`Base Price must be a valid number between 0 and ${this.maxBasePrice}`);
       return;
     }
 
-    if (this.form.perkm === null || this.form.perkm === '' || isNaN(perkm) || perkm < 0 || perkm > 99999) {
-      this.toastr.warning("Per KM Price must be a valid number between 0 and 99999");
+    if (!this.isValidAmount(this.form.perkm, this.maxNumericLimit)) {
+      this.toastr.warning(`Per KM Price must be a valid number between 0 and ${this.maxNumericLimit}`);
       return;
     }
 
-    if (this.form.basekm === null || this.form.basekm === '' || isNaN(basekm) || basekm < 0 || basekm > 99999) {
-      this.toastr.warning("Base KM must be a valid number between 0 and 99999");
+    if (!this.isValidWholeNumber(this.form.basekm, this.maxNumericLimit)) {
+      this.toastr.warning(`Base KM must be a valid number between 0 and ${this.maxNumericLimit}`);
       return;
     }
 
-    if (this.form.weightWarning !== null && this.form.weightWarning !== '') {
-      const w = Number(this.form.weightWarning);
-      if (isNaN(w) || w < 0 || w > 99999) {
-        this.toastr.warning("Weight Limit must be a valid number between 0 and 99999");
+    if (!this.isEmptyValue(this.form.weightWarning)) {
+      if (!this.isValidWholeNumber(this.form.weightWarning, this.maxNumericLimit)) {
+        this.toastr.warning(`Weight Limit must be a valid number between 0 and ${this.maxNumericLimit}`);
         return;
       }
     }
 
-    if (this.form.lengthWarning !== null && this.form.lengthWarning !== '') {
-      const l = Number(this.form.lengthWarning);
-      if (isNaN(l) || l < 0 || l > 99999) {
-        this.toastr.warning("Length Limit must be a valid number between 0 and 99999");
+    if (!this.isEmptyValue(this.form.lengthWarning)) {
+      if (!this.isValidWholeNumber(this.form.lengthWarning, this.maxNumericLimit)) {
+        this.toastr.warning(`Length Limit must be a valid number between 0 and ${this.maxNumericLimit}`);
         return;
       }
     }
+
+    this.form.name = name;
+    this.form.basePrice = Number(this.form.basePrice);
+    this.form.perkm = Number(this.form.perkm);
+    this.form.basekm = Number(this.form.basekm);
+    this.form.weightWarning = this.isEmptyValue(this.form.weightWarning)
+      ? null
+      : Number(this.form.weightWarning);
+    this.form.lengthWarning = this.isEmptyValue(this.form.lengthWarning)
+      ? null
+      : Number(this.form.lengthWarning);
 
     let req = this.api.saveVehicle(this.form, this.form._id);
 
@@ -228,31 +243,97 @@ removeImage() {
     this.isedit = false;
     this.form = {
       name: '',
-      basePrice: 0,
-      perkm: 0,
-      basekm: 0,
+      basePrice: '',
+      perkm: '',
+      basekm: '',
       status: 'active',
-      weightWarning: null as number | null,
-      lengthWarning: null as number | null,
-      _id: null
+      weightWarning: '',
+      lengthWarning: '',
+      _id: null,
+      imageUrl: ''
     };
   }
 
   cancel() {
     this.modalRef.hide();
+    this.clear();
   }
 
-  allowOnlyAlphaSpace(event: KeyboardEvent) {
-    const pattern = /^[a-zA-Z\s]$/;
-    if (!pattern.test(event.key)) {
-      event.preventDefault();
-    }
+  normalizeFormFields() {
+    this.sanitizeAmountField('basePrice');
+    this.sanitizeAmountField('perkm');
+    this.sanitizeWholeNumberField('basekm');
+    this.form.weightWarning = this.isEmptyValue(this.form.weightWarning)
+      ? ''
+      : this.sanitizeIntegerValue(this.form.weightWarning);
+    this.form.lengthWarning = this.isEmptyValue(this.form.lengthWarning)
+      ? ''
+      : this.sanitizeIntegerValue(this.form.lengthWarning);
   }
 
-  blockInvalidNumKeys(event: KeyboardEvent) {
+  sanitizeAmountField(field: 'basePrice' | 'perkm') {
+    const maxWholeDigits = field === 'basePrice' ? 6 : 5;
+    this.form[field] = this.sanitizeDecimalValue(this.form[field], maxWholeDigits, 2);
+  }
+
+  sanitizeWholeNumberField(field: 'basekm' | 'weightWarning' | 'lengthWarning') {
+    this.form[field] = this.sanitizeIntegerValue(this.form[field]);
+  }
+
+  blockInvalidAmountKeys(event: KeyboardEvent) {
     if (['e', 'E', '+', '-'].includes(event.key)) {
       event.preventDefault();
     }
+  }
+
+  private sanitizeDecimalValue(value: any, maxWholeDigits: number, decimalPlaces: number) {
+    const textValue = String(value || '');
+    const firstDotIndex = textValue.indexOf('.');
+    const withoutInvalidChars = textValue.replace(/[^0-9.]/g, '');
+    const wholePart = withoutInvalidChars.split('.')[0].slice(0, maxWholeDigits);
+
+    if (firstDotIndex === -1) {
+      return wholePart;
+    }
+
+    const decimalPart = withoutInvalidChars
+      .slice(withoutInvalidChars.indexOf('.') + 1)
+      .replace(/\./g, '')
+      .slice(0, decimalPlaces);
+
+    return `${wholePart}.${decimalPart}`;
+  }
+
+  private sanitizeIntegerValue(value: any) {
+    return String(value || '').replace(/\D/g, '');
+  }
+
+  private isValidAmount(value: any, max: number) {
+    if (this.isEmptyValue(value)) {
+      return false;
+    }
+
+    const textValue = String(value).trim();
+    const amountPattern = /^\d+(\.\d{1,2})?$/;
+    const numericValue = Number(textValue);
+
+    return amountPattern.test(textValue) && numericValue >= 0 && numericValue <= max;
+  }
+
+  private isValidWholeNumber(value: any, max: number) {
+    if (this.isEmptyValue(value)) {
+      return false;
+    }
+
+    const textValue = String(value).trim();
+    const wholeNumberPattern = /^\d+$/;
+    const numericValue = Number(textValue);
+
+    return wholeNumberPattern.test(textValue) && numericValue >= 0 && numericValue <= max;
+  }
+
+  private isEmptyValue(value: any) {
+    return value === null || value === undefined || value === '';
   }
 
 }

@@ -187,6 +187,38 @@ export class BookingInstructionComponent implements OnInit {
     this.tempForm.name = this.sanitizeInstructionName(value);
   }
 
+  private getApiErrorMessage(err: any, fallback: string): string {
+    const body = err?.error;
+    if (typeof body === 'string' && body.trim()) {
+      return body.trim();
+    }
+    if (body && typeof body === 'object') {
+      const message = body.message;
+      if (typeof message === 'string' && message.trim()) {
+        return message.trim();
+      }
+      const data = body.data;
+      if (typeof data === 'string' && data.trim()) {
+        return data.trim();
+      }
+    }
+    if (err?.status === 409) {
+      return 'Booking instruction with this name already exists';
+    }
+    return fallback;
+  }
+
+  private isDuplicateInstructionName(name: string, excludeId: any): boolean {
+    const normalized = String(name ?? '').trim().toLowerCase();
+    if (!normalized) {
+      return false;
+    }
+    return this.bookingInstruction.some(
+      (item: any) =>
+        item.name?.trim().toLowerCase() === normalized && item._id !== excludeId
+    );
+  }
+
   searchUserList(e: any) {
     const raw: string = e?.target?.value ?? '';
     const sanitized = raw.replace(/[^a-zA-Z0-9\s]/g, '');
@@ -237,6 +269,10 @@ export class BookingInstructionComponent implements OnInit {
 
     if (f.form.valid) {
       this.instructionform = { ...this.tempForm };
+      if (this.isDuplicateInstructionName(this.instructionform.name, this.instructionform._id)) {
+        this.toastr.error('Booking instruction with this name already exists');
+        return;
+      }
       this.apiservice.createBookingInstruction(this.instructionform, this.instructionform._id).subscribe((res) => {
 
         let result = res;
@@ -247,15 +283,19 @@ export class BookingInstructionComponent implements OnInit {
           this.clear();
           this.getBookingInstruction();
           this.modalRef.hide();
+        } else if (result.code == 409) {
+          this.toastr.error(result.message || 'Booking instruction with this name already exists');
         } else {
-          this.toastr.error(result.message);
+          this.toastr.error(result.message || 'Failed to save booking instruction');
         }
 
         this.spinner.hide();
 
       }, (err: any) => {
         this.spinner.hide();
-        this.toastr.error(err?.error?.message || 'Something went wrong. Please try again.');
+        const duplicateFallback = 'Booking instruction with this name already exists';
+        const fallback = err?.status === 409 ? duplicateFallback : 'Something went wrong. Please try again.';
+        this.toastr.error(this.getApiErrorMessage(err, fallback));
       })
     }
     else {

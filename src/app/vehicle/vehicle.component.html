@@ -128,9 +128,7 @@
 
         <div class="col-md-4">
           <label>Vehicle Name</label>
-          <input class="form-control" [(ngModel)]="form.name" name="name" required
-                 maxlength="100"
-                 (keypress)="allowOnlyAlphaSpace($event)">
+          <input class="form-control" [(ngModel)]="form.name" name="name" required>
         </div>
         <div class="col-md-4 mt-3">
   <label>Vehicle Image</label>
@@ -157,23 +155,26 @@
 
         <div class="col-md-4">
           <label>Base Price</label>
-          <input type="number" class="form-control" [(ngModel)]="form.basePrice" name="basePrice" required
-                 min="0" max="999999" step="0.01"
-                 (keydown)="blockInvalidNumKeys($event)">
+          <input type="text" inputmode="decimal" class="form-control" [(ngModel)]="form.basePrice" name="basePrice" required
+                 [attr.maxlength]="9"
+                 (input)="sanitizeAmountField('basePrice')"
+                 (keydown)="blockInvalidAmountKeys($event)">
         </div>
 
         <div class="col-md-4">
           <label>Per KM Price</label>
-          <input type="number" class="form-control" [(ngModel)]="form.perkm" name="perkm" required
-                 min="0" max="99999" step="0.01"
-                 (keydown)="blockInvalidNumKeys($event)">
+          <input type="text" inputmode="decimal" class="form-control" [(ngModel)]="form.perkm" name="perkm" required
+                 [attr.maxlength]="8"
+                 (input)="sanitizeAmountField('perkm')"
+                 (keydown)="blockInvalidAmountKeys($event)">
         </div>
 
         <div class="col-md-4 mt-3">
           <label>Base KM</label>
-          <input type="number" class="form-control" [(ngModel)]="form.basekm" name="basekm" required
-                 min="0" max="99999" step="1"
-                 (keydown)="blockInvalidNumKeys($event)">
+          <input type="text" inputmode="numeric" class="form-control" [(ngModel)]="form.basekm" name="basekm" required
+                 [attr.maxlength]="5"
+                 (input)="sanitizeWholeNumberField('basekm')"
+                 (keydown)="blockInvalidAmountKeys($event)">
         </div>
 
         <div class="col-md-4 mt-3">
@@ -187,21 +188,23 @@
       </div>
        <div class="col-md-4 mt-3">
           <label>Weight Limit (kg)</label>
-          <input type="number" class="form-control" [(ngModel)]="form.weightWarning" name="weightWarning"
-                 placeholder="e.g. 50" min="0" max="99999" step="1"
-                 (keydown)="blockInvalidNumKeys($event)">
+          <input type="text" inputmode="numeric" class="form-control" [(ngModel)]="form.weightWarning" name="weightWarning"
+                 placeholder="e.g. 50" [attr.maxlength]="5"
+                 (input)="sanitizeWholeNumberField('weightWarning')"
+                 (keydown)="blockInvalidAmountKeys($event)">
         </div>
 
         <div class="col-md-4 mt-3">
           <label>Length Limit (cm)</label>
-          <input type="number" class="form-control" [(ngModel)]="form.lengthWarning" name="lengthWarning"
-                 placeholder="e.g. 150" min="0" max="99999" step="1"
-                 (keydown)="blockInvalidNumKeys($event)">
+          <input type="text" inputmode="numeric" class="form-control" [(ngModel)]="form.lengthWarning" name="lengthWarning"
+                 placeholder="e.g. 150" [attr.maxlength]="5"
+                 (input)="sanitizeWholeNumberField('lengthWarning')"
+                 (keydown)="blockInvalidAmountKeys($event)">
         </div>
 
 
       <div class="mt-4 text-end">
-        <button class="btn btn-success" (click)="saveVehicle()">Save</button>
+        <button class="btn btn-success" (click)="saveVehicle()">{{ isedit ? 'Update' : 'Save' }}</button>
       </div>
 
     </form>

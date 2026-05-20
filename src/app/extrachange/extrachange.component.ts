@@ -18,6 +18,8 @@ export class ExtrachangeComponent implements OnInit {
 
   @ViewChild('myPaginator') myPaginator: any;
   modalRef!: BsModalRef;
+  readonly deliveryChargeMax = 300;
+  readonly deliveryChargeMaxLength = 6;
 
   offset = 0;
   limit = 7;
@@ -55,7 +57,13 @@ export class ExtrachangeComponent implements OnInit {
   initForm() {
     this.deliveryChargeForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9 ]+$')]],
-      deliveryCharge: ['', [Validators.required, Validators.min(0), Validators.max(300)]]
+      deliveryCharge: ['', [
+        Validators.required,
+        Validators.pattern(/^\d{1,3}(?:\.\d{1,2})?$/),
+        Validators.min(0.01),
+        Validators.max(this.deliveryChargeMax),
+        Validators.maxLength(this.deliveryChargeMaxLength)
+      ]]
     });
   }
 
@@ -102,7 +110,7 @@ export class ExtrachangeComponent implements OnInit {
 
     const payload = {
       name: this.deliveryChargeForm.value.name,
-      extracharges: this.deliveryChargeForm.value.deliveryCharge
+      extracharges: Number(this.deliveryChargeForm.value.deliveryCharge)
     };
 
     this.apiservice.addcharge(payload).subscribe(
@@ -141,7 +149,7 @@ export class ExtrachangeComponent implements OnInit {
 
     const payload = {
       name: this.deliveryChargeForm.value.name,
-      extracharges: this.deliveryChargeForm.value.deliveryCharge
+      extracharges: Number(this.deliveryChargeForm.value.deliveryCharge)
     };
 
     this.apiservice.updatecharge(payload, this.extrachargeid).subscribe(
@@ -203,6 +211,58 @@ export class ExtrachangeComponent implements OnInit {
     this.value = e.target.value;
     this.offset = 0;
     this.getextracharges();
+  }
+
+  allowDeliveryChargeInput(event: KeyboardEvent): boolean {
+    if (event.ctrlKey || event.metaKey || event.altKey || event.key.length > 1) {
+      return true;
+    }
+
+    const input = event.target as HTMLInputElement;
+    const nextValue = this.getNextDeliveryChargeValue(input, event.key);
+
+    if (!/^[0-9.]$/.test(event.key) || nextValue.length > this.deliveryChargeMaxLength) {
+      event.preventDefault();
+      return false;
+    }
+
+    if (event.key === '.' && input.value.includes('.')) {
+      event.preventDefault();
+      return false;
+    }
+
+    const decimals = nextValue.split('.')[1] || '';
+    if (decimals.length > 2) {
+      event.preventDefault();
+      return false;
+    }
+
+    return true;
+  }
+
+  sanitizeDeliveryChargeInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/[^0-9.]/g, '');
+    const decimalIndex = value.indexOf('.');
+
+    if (decimalIndex !== -1) {
+      const whole = value.slice(0, decimalIndex);
+      const decimals = value.slice(decimalIndex + 1).replace(/\./g, '').slice(0, 2);
+      value = `${whole}.${decimals}`;
+    }
+
+    value = value.slice(0, this.deliveryChargeMaxLength);
+
+    if (input.value !== value) {
+      input.value = value;
+      this.deliveryChargeForm.get('deliveryCharge')?.setValue(value);
+    }
+  }
+
+  private getNextDeliveryChargeValue(input: HTMLInputElement, key: string): string {
+    const start = input.selectionStart ?? input.value.length;
+    const end = input.selectionEnd ?? input.value.length;
+    return input.value.slice(0, start) + key + input.value.slice(end);
   }
 
   /* ---------- EXPORT ---------- */
