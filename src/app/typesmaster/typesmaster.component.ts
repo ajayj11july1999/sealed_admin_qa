@@ -264,12 +264,16 @@ export class TypesmasterComponent implements OnInit {
       //   demoStatus: 'closed',
       // };
       if (result) {
-        console.log(result);
         this.apiservice.deleteCategoryTypes(i._id).subscribe((res) => {
-          this.getCategoryTypes();
-
-        }),
-          (err) => { };
+          if (res.code == 200 || res.status == 200) {
+            this.toastrService.success(res.message);
+            this.getCategoryTypes();
+          } else {
+            this.toastrService.error(res.message);
+          }
+        }, (err) => {
+          this.toastrService.error('Failed to delete');
+        });
       }
     });
   }

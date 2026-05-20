@@ -89,6 +89,8 @@
 
                             <i *ngIf="userrole !== 'subadmin' || showEdit" class="fa fa-edit address_edit me-2"
                               (click)="editCategory(addtemplate,item)" style="color:#21aa47" aria-hidden="true"></i>
+                            <i *ngIf="userrole !== 'subadmin' || showEdit" (click)="deleteType(item)"
+                              class="fa fa-trash trash_icon" aria-hidden="true"></i>
 
                           </div>
                         </td>

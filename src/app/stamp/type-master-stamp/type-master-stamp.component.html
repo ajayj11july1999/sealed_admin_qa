@@ -86,7 +86,8 @@
                             <i class="fa fa-edit address_edit me-2" *ngIf="userrole !== 'subadmin' || showEdit"
                               (click)="AddModal(addtemplate);editTerms(item)" style="color:#21aa47"
                               aria-hidden="true"></i>
-                            <!-- <i (click)="deleteUserList(item)" class="fa fa-trash trash_icon" aria-hidden="true"></i> -->
+                            <i *ngIf="userrole !== 'subadmin' || showEdit" (click)="deleteKm(item)"
+                              class="fa fa-trash trash_icon" aria-hidden="true"></i>
                           </div>
                         </td>
                       </tr>
