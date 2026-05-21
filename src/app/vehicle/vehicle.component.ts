@@ -63,9 +63,32 @@ export class VehicleComponent implements OnInit {
 
 
   searchVehicle(event: any) {
-    this.value = event.target.value;
+    const sanitized = (event.target.value || '').replace(/[^a-zA-Z\s]/g, '');
+    event.target.value = sanitized;
+    this.value = sanitized;
     this.offset = 0;
     this.getVehicleList();
+  }
+
+  allowSearchInput(event: KeyboardEvent) {
+    const controlKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
+    if (controlKeys.includes(event.key) || event.ctrlKey || event.metaKey) {
+      return;
+    }
+    if (!/^[a-zA-Z\s]$/.test(event.key)) {
+      event.preventDefault();
+    }
+  }
+
+  onSearchPaste(event: ClipboardEvent) {
+    event.preventDefault();
+    const input = event.target as HTMLInputElement;
+    const pasted = event.clipboardData?.getData('text') || '';
+    const sanitized = pasted.replace(/[^a-zA-Z\s]/g, '');
+    const start = input.selectionStart || 0;
+    const end = input.selectionEnd || 0;
+    input.value = input.value.slice(0, start) + sanitized + input.value.slice(end);
+    input.dispatchEvent(new Event('input'));
   }
 
   pageChange(e: any) {
