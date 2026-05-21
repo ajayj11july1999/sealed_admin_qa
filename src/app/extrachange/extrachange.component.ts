@@ -28,6 +28,7 @@ export class ExtrachangeComponent implements OnInit {
   deliveryChargeForm!: FormGroup;
 
   value = '';
+  allExtracharge: any[] = [];
   extracharge: any[] = [];
 
   extrachargeid: string | null = null;
@@ -173,21 +174,28 @@ export class ExtrachangeComponent implements OnInit {
 
   getextracharges() {
     this.apiservice
-      .getextraCharges(this.limit, this.offset, this.value)
+      .getextraCharges('', '', this.value)
       .then((res: any) => {
         if (res.code === 200) {
-          this.extracharge = res.data?.data || [];
-          this.totalCount = res.data?.totalCount || 0;
+          this.allExtracharge = res.data?.data || [];
+          this.totalCount = this.allExtracharge.length;
+          this.applyPageSlice();
         }
       })
       .catch(() => {});
   }
 
+  private applyPageSlice() {
+    const start = this.offset * this.limit;
+    this.extracharge = this.allExtracharge.slice(start, start + this.limit);
+  }
+
   /* ---------- PAGINATION ---------- */
 
   pageChange(e: any) {
-    this.offset = e.pageIndex * e.pageSize;
-    this.getextracharges();
+    this.limit = e.pageSize;
+    this.offset = e.pageIndex;
+    this.applyPageSlice();
   }
 
   /* ---------- STATUS ---------- */
@@ -210,6 +218,9 @@ export class ExtrachangeComponent implements OnInit {
   onsearch(e: any) {
     this.value = e.target.value;
     this.offset = 0;
+    if (this.myPaginator) {
+      this.myPaginator.pageIndex = 0;
+    }
     this.getextracharges();
   }
 
@@ -290,33 +301,23 @@ export class ExtrachangeComponent implements OnInit {
   }
 
   async printTable(): Promise<void> {
-    const savedLimit = this.limit;
-    this.limit = this.totalCount;
-    this.offset = 0;
-    await this.getextracharges();
+    this.extracharge = [...this.allExtracharge];
 
     setTimeout(() => {
       const tableElement = document.querySelector('#table') as HTMLElement;
       if (tableElement) {
         this.printService.printElement(tableElement);
       }
-      this.limit = savedLimit;
-      this.offset = 0;
-      this.getextracharges();
+      this.applyPageSlice();
     }, 1000);
   }
 
   async copyTable(): Promise<void> {
-    const savedLimit = this.limit;
-    this.limit = this.totalCount;
-    this.offset = 0;
-    await this.getextracharges();
+    this.extracharge = [...this.allExtracharge];
 
     setTimeout(async () => {
       await this.copyService.copyTableText('#table');
-      this.limit = savedLimit;
-      this.offset = 0;
-      this.getextracharges();
+      this.applyPageSlice();
     }, 1000);
   }
 }

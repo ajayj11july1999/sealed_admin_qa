@@ -38,6 +38,12 @@ export class VerticalAppSidebarComponent implements OnDestroy {
       icon: 'dashboard',
     },
     {
+      state: 'vehicle',
+      name: 'Manage Vehicles',
+      type: 'link',
+      icon: 'directions_car',
+    },
+    {
       state: 'search',
       name: 'Search',
       type: 'link',
@@ -260,15 +266,6 @@ export class VerticalAppSidebarComponent implements OnDestroy {
       type: 'link',
       icon: 'store',
     },
-     {
-      state: 'vehicle',
-      name: 'Manage vehicle',
-      type: 'link',
-      icon: 'vehicle',
-    },
-
-
-
 
     // {
     //   state: 'restaurant',
@@ -284,6 +281,12 @@ export class VerticalAppSidebarComponent implements OnDestroy {
       name: 'Dashboard',
       type: 'link',
       icon: 'dashboard',
+    },
+    {
+      state: 'vehicle',
+      name: 'Manage Vehicles',
+      type: 'link',
+      icon: 'directions_car',
     },
     {
       state: 'zones',
@@ -531,14 +534,6 @@ export class VerticalAppSidebarComponent implements OnDestroy {
       type: 'link',
       icon: 'store',
     },
-
-    {
-      state: 'vehicle',
-      name: 'Manage vehicle',
-      type: 'link',
-      icon: 'vehicle',
-    },
-    
 
     // {
     //   state: 'restaurant',
