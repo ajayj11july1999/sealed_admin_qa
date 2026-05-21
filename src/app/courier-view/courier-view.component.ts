@@ -5,6 +5,15 @@ import { ApiServiceService } from '../service/api-service.service';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { HttpClient } from '@angular/common/http';
+import {
+  courierName,
+  formatListField,
+  formatTripAddress,
+  hasDisplayValue,
+  orderStatusLabel,
+  paymentModeLabel,
+  paymentStatusLabel,
+} from '../utils/trip-display.util';
 
 interface Action {
   name: string;
@@ -36,11 +45,12 @@ export class CourierViewComponent implements OnInit {
   userId: any;
   isVerified: any;
   viewshow: boolean = false;
-  viewshowcomplete: boolean = false;
   name: any;
   email: any;
   activetrip: any;
-  completetrip: any;
+  completedTrips: any[] = [];
+  completedTripsCount = 0;
+  completedTripsLoading = false;
   showAdd: any;
   showEdit: any;
   showExport: any;
@@ -479,8 +489,7 @@ downloadImage(url: string, event?: Event) {
   //   });
   // }
   moredetails(i: any) {
-
-    this.router.navigate(['/trip_details', { id: i?._id }]);
+    this.router.navigate(['/trip_details'], { queryParams: { id: i?._id } });
   }
 
   loadActiveTrips() {
@@ -494,14 +503,51 @@ downloadImage(url: string, event?: Event) {
       .catch((err) => { });
   }
   loadCompleteTrips() {
-    this.viewshowcomplete = true;
+    this.completedTripsLoading = true;
     this.apiService
       .getlistCourierCompleteTrip(this.courierId)
       .then((res) => {
-        this.completetrip = res.data.data;
-
+        this.completedTrips = res?.data?.data ?? [];
+        this.completedTripsCount = res?.data?.totalCount ?? this.completedTrips.length;
+        this.completedTripsLoading = false;
       })
-      .catch((err) => { });
+      .catch(() => {
+        this.completedTrips = [];
+        this.completedTripsCount = 0;
+        this.completedTripsLoading = false;
+      });
+  }
+
+  formatAddress(addr: any): string {
+    return formatTripAddress(addr);
+  }
+
+  getCourierName(item: any): string {
+    return courierName(item);
+  }
+
+  getPaymentMode(item: any): string {
+    return paymentModeLabel(item);
+  }
+
+  getPaymentStatus(item: any): string {
+    return paymentStatusLabel(item);
+  }
+
+  getPackageLabel(item: any): string {
+    return formatListField(item?.selectedPackage);
+  }
+
+  getSubCategoryLabel(item: any): string {
+    return formatListField(item?.subCategory);
+  }
+
+  getOrderStatusLabel(item: any): string {
+    return orderStatusLabel(item?.orderStatus);
+  }
+
+  hasValue(value: any): boolean {
+    return hasDisplayValue(value);
   }
 
   get driverAddress(): string {
@@ -514,10 +560,15 @@ downloadImage(url: string, event?: Event) {
   loadActive() {
     this.load = true;
   }
-  load1 = false;
-  loadComplete() {
-    this.load1 = true;
+
+  getPickupAddress(order: any): string {
+    return formatTripAddress(order?.pickupAddress?.[0]);
   }
+
+  getDropAddress(order: any): string {
+    return formatTripAddress(order?.dropAddress?.[0]);
+  }
+
   removeImage(type) {
     if (type == 'profile') {
       this.courierdetails.imgUrl = ''

@@ -7,6 +7,17 @@ import { ToastrService } from 'ngx-toastr';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { DeliveryTrackingService } from '../service/trackservice/delivery-tracking.service';
+import {
+  formatListField,
+  formatPaymentMode,
+  formatTripAddress,
+  hasContactPerson,
+  hasDisplayValue,
+  orderStatusLabel,
+  paymentModeLabel,
+  paymentStatusLabel,
+  statusTimestamp,
+} from '../utils/trip-display.util';
 
 @Component({
   selector: 'app-trip-details',
@@ -39,17 +50,55 @@ public delivery: { lat: number; lng: number } | null = null;
   movementPath: { lat: number; lng: number }[] = [];
   // dottedLineSegments: any;
 
-  /** Vehicle for this trip: nested on delivery man or top-level array from API. */
+  formatAddress(addr: any): string {
+    return formatTripAddress(addr);
+  }
+
+  getOrderStatusLabel(): string {
+    return orderStatusLabel(this.tripDetails?.orderStatus);
+  }
+
+  getPaymentModeLabel(): string {
+    return paymentModeLabel(this.tripDetails);
+  }
+
+  getPaymentStatusLabel(): string {
+    return paymentStatusLabel(this.tripDetails);
+  }
+
+  getPackageLabel(): string {
+    return formatListField(this.tripDetails?.selectedPackage);
+  }
+
+  getSubCategoryLabel(): string {
+    return formatListField(this.tripDetails?.subCategory);
+  }
+
+  getStatusTime(): string | Date | null {
+    return statusTimestamp(this.tripDetails);
+  }
+
+  hasContact(addr: any): boolean {
+    return hasContactPerson(addr);
+  }
+
+  hasValue(value: any): boolean {
+    return hasDisplayValue(value);
+  }
+
+  getPaymentDetailsModeLabel(): string {
+    const raw = this.tripDetails?.paymentDetails?.paymentMode ?? '';
+    return formatPaymentMode(raw);
+  }
+
   get courierVehicle(): any {
-    const nested = this.tripDetails?.deliveryManDetails?.vehicleDetails;
-    if (nested) {
-      return nested;
-    }
-    const list = this.tripDetails?.deliveryManVehicleDetails;
-    if (Array.isArray(list) && list.length > 0) {
-      return list[0];
-    }
-    return null;
+    return (
+      this.tripDetails?.orderVehicleDetails ??
+      this.tripDetails?.deliveryManDetails?.vehicleDetails ??
+      (Array.isArray(this.tripDetails?.deliveryManVehicleDetails)
+        ? this.tripDetails.deliveryManVehicleDetails[0]
+        : null)
+    );
   }
 
   get hasAcceptedPosition(): boolean {
@@ -127,27 +176,15 @@ public delivery: { lat: number; lng: number } | null = null;
 //   this.getTripDetails(this.id);
 // });
 ngOnInit(): void {
-
-  console.log("✔ TripDetailsComponent Loaded");
-
   this.activatedRoute.queryParams.subscribe((params) => {
-
-    console.log("📌 RAW Query Params:", params);
-
-    this.id = params['id'];
-    this.courierId = params['courierId'];
-
-    console.log("📌 Extracted Trip ID:", this.id);
-    console.log("📌 Extracted Courier ID:", this.courierId);
+    this.id = params['id'] || this.activatedRoute.snapshot.paramMap.get('id');
+    this.courierId = params['courierId'] || this.activatedRoute.snapshot.paramMap.get('courierId');
 
     if (!this.id) {
-      console.error("❌ No Trip ID found in URL!");
+      console.error('No Trip ID found in URL');
       return;
     }
 
-    console.log(`🚀 Fetching Order Details → orders?_id=${this.id}`);
-
-    // ⭐ FIX: NOW call your function
     this.getTripDetails(this.id);
   });
 }
@@ -344,11 +381,7 @@ ngOnInit(): void {
        * ------------------------------ */
       this.tripDetails.pickupAddress = this.tripDetails.pickupAddress ?? [];
       this.tripDetails.dropAddress = this.tripDetails.dropAddress ?? [];
-      this.tripDetails.assigneeDetails = this.tripDetails.assigneeDetails ?? null;
 
-      /** ------------------------------
-       * 2. PICKUP LOCATION
-       * ------------------------------ */
       if (this.tripDetails.pickupAddress.length > 0) {
         this.origin = {
           lat: +this.tripDetails.pickupAddress[0].latitude,
@@ -394,15 +427,27 @@ ngOnInit(): void {
       /** ------------------------------
        * 4. COURIER (ASSIGNEE) LOCATION
        * ------------------------------ */
-      if (this.tripDetails.assigneeDetails?.address?.latitude &&
-          this.tripDetails.assigneeDetails?.address?.longitude) {
+      const accepted = this.tripDetails.acceptedPosition;
+      const courierAddress = this.tripDetails.deliveryManDetails?.address;
+      const legacyAssigneeAddress = this.tripDetails.assigneeDetails?.address;
 
+      if (accepted?.lat != null && accepted?.lng != null) {
         this.delivery = {
-          lat: +this.tripDetails.assigneeDetails.address.latitude,
-          lng: +this.tripDetails.assigneeDetails.address.longitude
+          lat: +accepted.lat,
+          lng: +accepted.lng
+        };
+      } else if (courierAddress?.latitude != null && courierAddress?.longitude != null) {
+        this.delivery = {
+          lat: +courierAddress.latitude,
+          lng: +courierAddress.longitude
+        };
+      } else if (legacyAssigneeAddress?.latitude != null && legacyAssigneeAddress?.longitude != null) {
+        this.delivery = {
+          lat: +legacyAssigneeAddress.latitude,
+          lng: +legacyAssigneeAddress.longitude
         };
       } else {
-        this.delivery = null;   // ⭐ IMPORTANT: prevents map crash
+        this.delivery = null;
       }
 
       this.isMapLoaded = true;
@@ -497,6 +542,8 @@ removeDeliveryMan() {
       this.id;
 
     const deliveryManId =
+      this.tripDetails?.deliveryManDetails?._id ??
+      this.tripDetails?.assignedToId ??
       this.tripDetails?.assigneeDetails?._id;
 
     console.log("Order ID:", orderId);
@@ -602,7 +649,7 @@ removeDeliveryMan() {
         let payload = {
           deliveredAt: new Date(),
           orderStatus: "delivered",
-          assigneeDetails: this.tripDetails.assigneeDetails,
+          assignedToId: this.tripDetails.assignedToId ?? this.tripDetails.deliveryManDetails?._id,
           dropAddress: updatedDropAddress,
           paymentStatus: this.paymentStatus,
           userId: this.tripDetails.userId,
@@ -611,13 +658,8 @@ removeDeliveryMan() {
           subCategory: this.tripDetails.subCategory,
           pickupAddress: this.tripDetails.pickupAddress,
           totalKms: this.tripDetails.totalKms,
-          tripCost: this.tripDetails.tripCost,
           discountAmount: this.tripDetails.discountAmount,
           amountDetails: this.tripDetails.amountDetails,
-          // role:"",type:""
-
-
-
         };
         this.apiService
           .deliveredTrip(orderId, payload)

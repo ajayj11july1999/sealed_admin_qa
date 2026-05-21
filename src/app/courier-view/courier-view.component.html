@@ -3,7 +3,7 @@
 </ngx-spinner>
 
 <div fxLayout="row wrap">
-  <div fxFlex.gt-sm="100" fxFlex="100" style="overflow:hidden;">
+  <div fxFlex.gt-sm="100" fxFlex="100">
     <div class="container-fluid mt-3">
       <div class="row ">
         <span><i class="fa fa-arrow-left" aria-hidden="true" (click)="returntocourier()"></i></span>
@@ -24,11 +24,11 @@
                       <!-- <span class="text-center">{{isVerified}}</span> -->
                       <div *ngIf="courierdetails?.isVerified; else verified">
                         <!-- <div  [ngClass]="{'red': courierdetails?.isVerified != true}">unverified</div> -->
-                        <div class="green">verified</div>
+                        <div class="status-verified">verified</div>
                       </div>
                       <ng-template #verified>
                         <!-- <div  [ngClass]="{'red': courierdetails?.isVerified != true}">unverified</div> -->
-                        <div class="red">unverified</div>
+                        <div class="status-unverified">unverified</div>
                       </ng-template>
                     </div>
                   </div>
@@ -101,162 +101,153 @@
                     </div>
                   </div> -->
                   <div class="row">
-                    <div class="col-sm-12 col-md-6 col-lg-6 mt-3">
-                      <p>Active Trips<br>
+                    <div class="col-12 mb-3 activetrip">
+                      <div>
+                        <h5 class="heading">Active Trips</h5>
                         <button *ngIf="!load && activetrip?.length" mat-raised-button type="button"
-                          class=" btn_active mt-2" (click)="loadActive()">Load Active Trips</button>
-                      </p>
-                      <div *ngIf="activetrip?.length ">
-                        <div *ngIf="load">
-                          <mat-card class="m-0 mb-3" *ngFor="let item of activetrip; let i = index">
-                            <mat-card-content class="p-0">
-                              <div class=" card_active mt-3">
-                                <div class=" p-2">
-                                  <p class="text-center cashondelivery">
-                                    <!-- {{items.createdAt |date}} {{items.createdAt |date|:'mediumTime'}} -->
-                                    {{item?.createdAt | date}} {{item?.createdAt |
-                                    date:'mediumTime'}} {{item?.orderCode}}
-                                  </p>
-                                  <div class="col-lg-7 col-md-12 col-sm-12 mt-2">
-                                    <p><b>{{item?.deliveryType}}</b></p>
+                          class="btn_active mb-2" (click)="loadActive()">Load Active Trips</button>
+                      </div>
+                      <div *ngIf="activetrip?.length && load">
+                        <mat-card class="m-0 mb-3" *ngFor="let item of activetrip">
+                          <mat-card-content class="p-0">
+                            <div class="trip p-2">
+                              <p class="trip-title text-center mb-2"><b>{{item?.orderCode}}</b></p>
+                              <p class="trip-info"><b>Status:</b> {{getOrderStatusLabel(item)}}</p>
+                              <p class="trip-info"><b>Delivery Type:</b> {{item?.deliveryType}}</p>
+                              <p class="trip-info" *ngIf="hasValue(getPackageLabel(item))"><b>Package:</b> {{getPackageLabel(item)}}</p>
+                              <p class="trip-info" *ngIf="hasValue(getSubCategoryLabel(item))"><b>Sub Category:</b> {{getSubCategoryLabel(item)}}</p>
+                              <p class="trip-info" *ngIf="item?.createdAt"><b>Created At:</b> {{item.createdAt | date}} {{item.createdAt | date:'mediumTime'}}</p>
+                              <p class="trip-info"><b>Trip Distance:</b> {{item?.totalKms}} km</p>
+                              <div class="row mx-0" *ngIf="item?.pickupAddress?.length || item?.dropAddress?.length">
+                                <div class="col-md-6 p-1" *ngIf="item?.pickupAddress?.length">
+                                  <div class="green p-2 h-100">
+                                    <p class="trip-meta-text"><b>Pickup Address</b></p>
+                                    <ng-container *ngFor="let addr of item.pickupAddress">
+                                      <p class="trip-address">{{formatAddress(addr)}}</p>
+                                      <p class="trip-address" *ngIf="addr?.contactPerson"><b>Contact:</b> {{addr.contactPerson}}</p>
+                                      <p class="trip-address" *ngIf="addr?.contactPersonNumber"><b>Phone:</b> {{addr.contactPersonNumber}}</p>
+                                    </ng-container>
                                   </div>
-                                  <div class="col-5"></div>
-
-                                  <div class="row">
-
-                                    <div class="col-lg-8 col-md-8 col-sm-8">
-                                      <div class="card card_bg p-2">
-                                        <p> Time: {{item?.createdAt |
-                                          date:'mediumTime'}}<br>Date: {{item?.createdAt | date}}</p>
-                                      </div>
-                                    </div>
-
-                                  </div>
-                                  <div class="row mt-2">
-                                    <div class="col-12">
-                                      <p class="courier-trip-distance mb-2"><strong>Trip Distance:</strong> {{item?.totalKms}} km</p>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6 col-lg-6 mt-2">
-                                      <div class="card card_bg p-1">
-                                        <!-- <p style="font-size:12px">FROM<br>
-                                          {{item?.pickupAddress[i]?.street}} {{item?.pickupAddress[i]?.city}}
-                                          {{item?.pickupAddress[i]?.state}}
-                                          {{item?.pickupAddress[i]?.country}} {{item.pickupAddress[i]?.postalCode}}
-                                        </p> -->
-                                        <p style="font-size: 12px;"
-                                          *ngFor="let addr of item?.pickupAddress; let j = index">{{addr?.street}}
-                                          ,<br> {{ addr?.city}}<br> {{ addr?.state}} ,
-                                          {{ addr?.country }},
-                                          {{ addr?.postalCode }}
-                                        </p>
-                                      </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6 col-lg-6 mt-2">
-                                      <div class="card card_bg p-1">
-                                        <p style="font-size: 12px;"
-                                          *ngFor="let addr of item?.dropAddress; let j = index">{{addr?.street}}
-                                          ,<br> {{ addr?.city}} <br> {{ addr?.state}} ,
-                                          {{ addr?.country }} ,
-                                          {{ addr?.postalCode }}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div class="row mt-3">
-                                    <div class="col-lg-12 col-md-12 col-sm-12">
-                                      <p class="cashondelivery">Courire assigned: {{item?.assigneeDetails.name}}<br>
-                                        Trip Cost: {{item?.amountDetails?.finalAmount}} ₹<br>
-                                        Payment: {{item?.paymentDetails?.paymentMode}}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div class="text-center mt-4 mb-2">
-                                    <button mat-raised-button type="button" class=" btn_details"
-                                      (click)="moredetails(item)">MORE DETAILS</button>
+                                </div>
+                                <div class="col-md-6 p-1" *ngIf="item?.dropAddress?.length">
+                                  <div class="green p-2 h-100">
+                                    <p class="trip-meta-text"><b>Drop Address</b></p>
+                                    <ng-container *ngFor="let addr of item.dropAddress">
+                                      <p class="trip-address">{{formatAddress(addr)}}</p>
+                                      <p class="trip-address" *ngIf="addr?.contactPerson"><b>Contact:</b> {{addr.contactPerson}}</p>
+                                      <p class="trip-address" *ngIf="addr?.contactPersonNumber"><b>Phone:</b> {{addr.contactPersonNumber}}</p>
+                                    </ng-container>
                                   </div>
                                 </div>
                               </div>
-                            </mat-card-content>
-                          </mat-card>
-                        </div>
+                              <p class="trip-info" *ngIf="item?.userDetails?.name"><b>Customer:</b> {{item.userDetails.name}}</p>
+                              <p class="trip-info"><b>Courier Partner:</b> {{getCourierName(item)}}</p>
+                              <p class="trip-info"><b>Trip Cost:</b> ₹{{item?.amountDetails?.finalAmount}}</p>
+                              <p class="trip-info"><b>Payment Mode:</b> {{getPaymentMode(item)}}</p>
+                              <p class="trip-info"><b>Payment Status:</b> {{getPaymentStatus(item)}}</p>
+                              <div class="text-center my-3">
+                                <button mat-raised-button type="button" class="btn_details px-3"
+                                  (click)="moredetails(item)">More Details</button>
+                              </div>
+                            </div>
+                          </mat-card-content>
+                        </mat-card>
                       </div>
-                      <div *ngIf="!activetrip?.length">
-                        <tr>No results found.</tr>
-                      </div>
+                      <p *ngIf="!activetrip?.length" class="no-results">No results found.</p>
                     </div>
-                    <div class="col-sm-12 col-md-6 col-lg-6 mt-3">
-                      <p>Completed Trips<br>
-                        <button *ngIf="!load1 && completetrip?.length" mat-raised-button type="button"
-                          class=" btn_complete mt-2" (click)="loadComplete()">Load Complete Trips</button>
-                      </p>
-                      <div *ngIf="completetrip?.length ">
-                        <div *ngIf="load1">
-                          <mat-card class="m-0 mb-3" *ngFor="let item of completetrip; let i = index">
-                            <mat-card-content class="p-0">
-                              <div class=" card_active mt-3">
-                                <div class=" p-2">
-                                  <p class="text-center cashondelivery">
-                                    {{item?.createdAt | date}} {{item?.createdAt |
-                                    date:'mediumTime'}} {{item?.orderCode}}
-                                  </p>
-                                  <div class="col-lg-7 col-md-12 col-sm-12 mt-2">
-                                    <p><b>{{item?.deliveryType}}</b></p>
-                                  </div>
-                                  <div class="col-5"></div>
-                                  <div class="row">
-                                    <div class="col-lg-8 col-md-8 col-sm-8">
-                                      <div class="card card_bg p-2">
-                                        <p> Time : {{item?.createdAt | date:'mediumTime'}}<br>Date : {{item?.createdAt |
-                                          date}}</p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div class="row mt-2">
-                                    <div class="col-12">
-                                      <p class="courier-trip-distance mb-2"><strong>Trip Distance:</strong> {{item?.totalKms}} km</p>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6 col-lg-6 mt-2">
-                                      <div class="card card_bg p-1">
-                                        <p style="font-size: 12px;"
-                                          *ngFor="let addr of item?.pickupAddress; let j = index">
-                                          {{addr?.street}}<br> {{ addr?.city}} ,<br> {{ addr?.state}} ,
-                                          {{ addr?.country }} ,
-                                          {{ addr?.postalCode }}
-                                        </p>
-                                      </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6 col-lg-6 mt-2">
-                                      <div class="card card_bg p-1">
-                                        <p style="font-size: 12px;"
-                                          *ngFor="let addr of item?.dropAddress;let j = index">
-                                          {{addr?.street}} <br> {{ addr?.city}} ,<br> {{ addr?.state}} ,
-                                          {{ addr?.country }} ,
-                                          {{ addr?.postalCode }}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div class="row mt-3">
-                                    <div class="col-lg-12 col-md-12 col-sm-12">
-                                      <p class="cashondelivery">Courier assigned: {{item?.assigneeDetails.name}}<br>
-                                        Trip Cost: {{item?.amountDetails?.finalAmount}} ₹<br>
-                                        Payment: {{item?.paymentDetails?.paymentMode}}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div class="text-center mt-4 mb-2">
-                                    <button mat-raised-button type="button" class=" btn_details"
-                                      (click)="moredetails(item)">MORE DETAILS</button>
-                                  </div>
-                                </div>
-                              </div>
-                            </mat-card-content>
-                          </mat-card>
-                        </div>
-                      </div>
-                      <div *ngIf="!completetrip?.length">
-                        <tr>No results found.</tr>
-                      </div>
+                  </div>
+
+                  <div class="completed-trips-section mt-4">
+                    <div class="completed-trips-header">
+                      <h5 class="heading mb-0">Completed Trips</h5>
+                      <span class="completed-trips-count" *ngIf="completedTripsCount">
+                        {{ completedTripsCount }} trip(s)
+                      </span>
+                    </div>
+
+                    <p *ngIf="completedTripsLoading" class="completed-trips-message">Loading completed trips...</p>
+                    <p *ngIf="!completedTripsLoading && !completedTrips?.length" class="completed-trips-message">
+                      No completed trips found.
+                    </p>
+
+                    <div class="completed-trips-list" *ngIf="!completedTripsLoading && completedTrips?.length">
+                      <mat-card class="completed-trip-card mb-3" *ngFor="let order of completedTrips">
+                        <mat-card-content class="p-3">
+                          <div class="completed-trip-top">
+                            <div>
+                              <p class="completed-trip-code">{{ order.orderCode }}</p>
+                              <p class="completed-trip-meta">
+                                {{ order.deliveryType }}
+                                <span *ngIf="hasValue(getPackageLabel(order))"> · {{ getPackageLabel(order) }}</span>
+                              </p>
+                            </div>
+                            <span class="completed-trip-status">{{ getOrderStatusLabel(order) }}</span>
+                          </div>
+
+                          <div class="completed-trip-grid">
+                            <div class="completed-trip-field" *ngIf="order.deliveredAt">
+                              <span class="label">Delivered At</span>
+                              <span class="value">{{ order.deliveredAt | date }} {{ order.deliveredAt | date:'shortTime' }}</span>
+                            </div>
+                            <div class="completed-trip-field" *ngIf="order.pickUpedAt">
+                              <span class="label">Picked Up At</span>
+                              <span class="value">{{ order.pickUpedAt | date }} {{ order.pickUpedAt | date:'shortTime' }}</span>
+                            </div>
+                            <div class="completed-trip-field">
+                              <span class="label">Distance</span>
+                              <span class="value">{{ order.totalKms }} km</span>
+                            </div>
+                            <div class="completed-trip-field">
+                              <span class="label">Trip Cost</span>
+                              <span class="value">₹{{ order.amountDetails?.finalAmount }}</span>
+                            </div>
+                            <div class="completed-trip-field">
+                              <span class="label">Payment Mode</span>
+                              <span class="value">{{ getPaymentMode(order) }}</span>
+                            </div>
+                            <div class="completed-trip-field">
+                              <span class="label">Payment Status</span>
+                              <span class="value">{{ getPaymentStatus(order) }}</span>
+                            </div>
+                            <div class="completed-trip-field" *ngIf="order.userDetails?.name">
+                              <span class="label">Customer</span>
+                              <span class="value">{{ order.userDetails.name }}</span>
+                            </div>
+                            <div class="completed-trip-field">
+                              <span class="label">Courier Partner</span>
+                              <span class="value">{{ getCourierName(order) }}</span>
+                            </div>
+                          </div>
+
+                          <div class="completed-trip-addresses">
+                            <div class="completed-trip-address-block" *ngIf="order.pickupAddress?.length">
+                              <p class="address-label">Pickup</p>
+                              <p class="address-text">{{ getPickupAddress(order) }}</p>
+                              <p class="address-contact" *ngIf="order.pickupAddress[0]?.contactPerson">
+                                {{ order.pickupAddress[0].contactPerson }}
+                                <span *ngIf="order.pickupAddress[0]?.contactPersonNumber">
+                                  · {{ order.pickupAddress[0].contactPersonNumber }}
+                                </span>
+                              </p>
+                            </div>
+                            <div class="completed-trip-address-block" *ngIf="order.dropAddress?.length">
+                              <p class="address-label">Drop</p>
+                              <p class="address-text">{{ getDropAddress(order) }}</p>
+                              <p class="address-contact" *ngIf="order.dropAddress[0]?.contactPerson">
+                                {{ order.dropAddress[0].contactPerson }}
+                                <span *ngIf="order.dropAddress[0]?.contactPersonNumber">
+                                  · {{ order.dropAddress[0].contactPersonNumber }}
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+
+                          <div class="text-center mt-3">
+                            <button mat-raised-button type="button" class="btn_details px-4"
+                              (click)="moredetails(order)">More Details</button>
+                          </div>
+                        </mat-card-content>
+                      </mat-card>
                     </div>
                   </div>
                 </div>

@@ -10,67 +10,89 @@
             <mat-card-content>
               <div class="row ">
                 <div class="text-center header mb-3">
-                  {{tripDetails?.deliveryType}}
+                  {{tripDetails?.deliveryType || '-'}}
                 </div>
-                <div class="col-7">
-                  <p>{{tripDetails?.selectedPackage}}</p>
-                </div>
-                <div class="col-5">
-                  <p>Distance: {{tripDetails?.totalKms | number : '1.0-2'}} km</p>
+                <div class="col-12 text-center mb-2" *ngIf="tripDetails?.orderCode">
+                  <p class="mb-0"><b>Order Code:</b> {{ tripDetails.orderCode }}</p>
                 </div>
               </div>
-              <div class="row" *ngIf="tripDetails?.orderCode">
-                <div class="col-12 text-center mb-2">
-                  <p class="mb-0"><b>Order code:</b> {{ tripDetails.orderCode }}</p>
+              <div class="row">
+                <div class="col-md-6">
+                  <p><b>Status:</b> {{getOrderStatusLabel()}}</p>
+                  <p *ngIf="hasValue(getPackageLabel())"><b>Package:</b> {{getPackageLabel()}}</p>
+                  <p *ngIf="hasValue(getSubCategoryLabel())"><b>Sub Category:</b> {{getSubCategoryLabel()}}</p>
+                  <p *ngIf="tripDetails?.type"><b>Order Type:</b> {{tripDetails.type | titlecase}}</p>
+                  <p><b>Distance:</b> {{tripDetails?.totalKms | number : '1.0-2'}} km</p>
+                </div>
+                <div class="col-md-6">
+                  <p><b>Payment Mode:</b> {{getPaymentModeLabel()}}</p>
+                  <p><b>Payment Status:</b> {{getPaymentStatusLabel()}}</p>
+                  <p *ngIf="tripDetails?.paymentDetails?.paymentAmount != null">
+                    <b>Payment Amount:</b> ₹ {{tripDetails.paymentDetails.paymentAmount}}
+                  </p>
+                  <p *ngIf="tripDetails?.paymentDetails?.currency">
+                    <b>Currency:</b> {{tripDetails.paymentDetails.currency}}
+                  </p>
+                </div>
+              </div>
+              <div class="row" *ngIf="getStatusTime() as statusTime">
+                <div class="col-12">
+                  <p><b>{{getOrderStatusLabel()}} At:</b> {{statusTime | date}} {{statusTime | date:'mediumTime'}}</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <p *ngIf="tripDetails?.createdAt"><b>Created At:</b> {{tripDetails.createdAt | date}} {{tripDetails.createdAt | date:'mediumTime'}}</p>
+                  <p *ngIf="tripDetails?.pickUpedAt"><b>Picked Up At:</b> {{tripDetails.pickUpedAt | date}} {{tripDetails.pickUpedAt | date:'mediumTime'}}</p>
+                  <p *ngIf="tripDetails?.deliveredAt"><b>Delivered At:</b> {{tripDetails.deliveredAt | date}} {{tripDetails.deliveredAt | date:'mediumTime'}}</p>
+                </div>
+                <div class="col-md-6">
+                  <p *ngIf="tripDetails?.assignedAt"><b>Assigned At:</b> {{tripDetails.assignedAt | date}} {{tripDetails.assignedAt | date:'mediumTime'}}</p>
+                  <p *ngIf="tripDetails?.inProgressAt"><b>In Progress At:</b> {{tripDetails.inProgressAt | date}} {{tripDetails.inProgressAt | date:'mediumTime'}}</p>
+                  <p *ngIf="tripDetails?.cancelledAt"><b>Cancelled At:</b> {{tripDetails.cancelledAt | date}} {{tripDetails.cancelledAt | date:'mediumTime'}}</p>
+                </div>
+              </div>
+              <div class="row mt-2" *ngIf="tripDetails?.amountDetails">
+                <div class="col-12">
+                  <p class="mb-1"><b>Amount Details</b></p>
+                  <p class="mb-1" *ngIf="tripDetails.amountDetails.orderBasicAmount != null">
+                    Basic Amount: ₹ {{tripDetails.amountDetails.orderBasicAmount}}
+                  </p>
+                  <p class="mb-1" *ngIf="tripDetails.amountDetails.deliveryCharges != null">
+                    Delivery Charges: ₹ {{tripDetails.amountDetails.deliveryCharges}}
+                  </p>
+                  <p class="mb-1" *ngIf="tripDetails.amountDetails.documentCharge != null">
+                    Document Charge: ₹ {{tripDetails.amountDetails.documentCharge}}
+                  </p>
+                  <p class="mb-1" *ngIf="tripDetails.amountDetails.tax != null">
+                    Tax: ₹ {{tripDetails.amountDetails.tax}}
+                  </p>
+                  <p class="mb-1" *ngIf="tripDetails.amountDetails.couponAmount != null">
+                    Coupon Discount: ₹ {{tripDetails.amountDetails.couponAmount}}
+                  </p>
+                  <p class="mb-1"><b>Final Amount: ₹ {{tripDetails.amountDetails.finalAmount}}</b></p>
+                </div>
+              </div>
+              <div class="row" *ngIf="tripDetails?.paymentDetails">
+                <div class="col-12">
+                  <p class="mb-1"><b>Payment Details</b></p>
+                  <p class="mb-1" *ngIf="tripDetails.paymentDetails.paymentFrom">
+                    Payment From: {{tripDetails.paymentDetails.paymentFrom | titlecase}}
+                  </p>
+                  <p class="mb-1" *ngIf="hasValue(getPaymentDetailsModeLabel())">
+                    Recorded Payment Mode: {{getPaymentDetailsModeLabel()}}
+                  </p>
+                  <p class="mb-1" *ngIf="tripDetails.paymentDetails.codCompletedAt">
+                    COD Completed At: {{tripDetails.paymentDetails.codCompletedAt | date}} {{tripDetails.paymentDetails.codCompletedAt | date:'mediumTime'}}
+                  </p>
+                  <p class="mb-1" *ngIf="tripDetails.paymentDetails.copCompletedAt">
+                    COP Completed At: {{tripDetails.paymentDetails.copCompletedAt | date}} {{tripDetails.paymentDetails.copCompletedAt | date:'mediumTime'}}
+                  </p>
                 </div>
               </div>
               <div class="row ">
                 <div class="col-7">
-                  
-                  <p *ngIf="tripDetails?.orderStatus=='new'">Time: {{tripDetails?.newAt | date:'mediumTime'}}<br>
-                    <span>Date: {{tripDetails?.newAt |date}}</span>
-                  </p>
-                  <p *ngIf="tripDetails?.orderStatus=='orderAssigned'">Time: {{tripDetails?.assignedAt |
-                    date:'mediumTime'}}<br>
-                    <span>Date: {{tripDetails?.assignedAt |date}}</span>
-                  </p>
-                  <p *ngIf="tripDetails?.orderStatus=='orderInProgress'">Time: {{tripDetails?.inProgressAt |
-                    date:'mediumTime'}}<br>
-                    <span>Date: {{tripDetails?.inProgressAt |date}}</span>
-                  </p>
-                  <p *ngIf="tripDetails?.orderStatus=='orderPickedUped'">Time: {{tripDetails?.pickUpedAt |
-                    date:'mediumTime'}}<br>
-                    <span>Date: {{tripDetails?.pickUpedAt |date}}</span>
-                  </p>
-                  <p *ngIf="tripDetails?.orderStatus=='delivered'">Time: {{tripDetails?.deliveredAt |
-                    date:'mediumTime'}}<br>
-                    <span>Date: {{tripDetails?.deliveredAt |date}}</span>
-                  </p>
-                  <p *ngIf="tripDetails?.orderStatus=='cancelled'">Time: {{tripDetails?.cancelledAt |
-                    date:'mediumTime'}}<br>
-                    <span>Date: {{tripDetails?.cancelledAt |date}}</span>
-                  </p>
-                </div>
-                <div class="col-5">
-                  <p>Payment Mode: {{tripDetails?.paymentMode | uppercase}}</p>
-                  <p>Payment Status: {{tripDetails?.paymentStatus | titlecase}}</p>
-                </div>
-              </div>
-              <div class="row ">
-                <div class="col-7">
-                  <p *ngIf="tripDetails?.orderStatus == 'new'">Status: New</p>
-                  <p *ngIf="tripDetails?.orderStatus == 'orderPickedUped'">Status: Order Pickuped</p>
-                  <p *ngIf="tripDetails?.orderStatus == 'orderInProgress'">Status: Order InProgress </p>
-                  <p *ngIf="tripDetails?.orderStatus == 'orderAssigned'">Status: Order Assigned </p>
-                  <p *ngIf="tripDetails?.orderStatus == 'delivered'">Status: Delivered </p>
-                  <p *ngIf="tripDetails?.orderStatus == 'cancelled'">Status: Cancelled </p>
-                </div>
-                <div class="col-5">
-                </div>
-              </div>
-              <div class="row ">
-                <div class="col-7">
-                  <p>Cost: ₹ {{tripDetails?.amountDetails?.finalAmount}}</p>
+                  <p><b>Total Cost:</b> ₹ {{tripDetails?.amountDetails?.finalAmount}}</p>
                 </div>
                 <div class="col-5">
                   <div *ngIf="tripDetails?.orderStatus =='new'">
@@ -173,6 +195,30 @@
                       <td class="">
                         <p>{{tripDetails?.deliveryManDetails?.mobileNo}}</p>
                       </td>
+                    </div>
+                  </div>
+                  <div class="row ">
+                    <div class="col-6 pe-0">
+                      <td class=""><p>Email:</p></td>
+                    </div>
+                    <div class="col-6 pe-0">
+                      <td class=""><p>{{tripDetails?.deliveryManDetails?.email || '-'}}</p></td>
+                    </div>
+                  </div>
+                  <div class="row ">
+                    <div class="col-6 pe-0">
+                      <td class=""><p>Referral Code:</p></td>
+                    </div>
+                    <div class="col-6 pe-0">
+                      <td class=""><p>{{tripDetails?.deliveryManDetails?.referralCode || '-'}}</p></td>
+                    </div>
+                  </div>
+                  <div class="row ">
+                    <div class="col-6 pe-0">
+                      <td class=""><p>Wallet Balance:</p></td>
+                    </div>
+                    <div class="col-6 pe-0">
+                      <td class=""><p>₹ {{tripDetails?.deliveryManDetails?.walletBalance ?? 0}}</p></td>
                     </div>
                   </div>
                   <div class="row ">
@@ -280,9 +326,9 @@
                       <div class="col-6 ">
                         <b>Name :</b><br>
                       </div>
-                      <div class="col-6mb-3">
+                      <div class="col-6 mb-3">
                         <span class="address">
-                          {{tripDetails?.userDetails?.name}}
+                          {{tripDetails?.userDetails?.name || '-'}}
                         </span>
                       </div>
                     </div>
@@ -292,142 +338,57 @@
                       </div>
                       <div class="col-6 ">
                         <span class="address">
-                          {{tripDetails?.userDetails?.mobileNo}}
+                          {{tripDetails?.userDetails?.mobileNo || '-'}}
                         </span>
+                      </div>
+                    </div>
+                    <div class="row-wrap d-flex" *ngIf="tripDetails?.userDetails?.email">
+                      <div class="col-6 ">
+                        <b>Email :</b><br>
+                      </div>
+                      <div class="col-6 ">
+                        <span class="address">{{tripDetails.userDetails.email}}</span>
+                      </div>
+                    </div>
+                    <div class="row-wrap d-flex" *ngIf="tripDetails?.userDetails?.referralCode">
+                      <div class="col-6 ">
+                        <b>Referral Code :</b><br>
+                      </div>
+                      <div class="col-6 ">
+                        <span class="address">{{tripDetails.userDetails.referralCode}}</span>
                       </div>
                     </div>
                   </div>
 
                   <div class="centertext"><b>Pickup Info</b></div>
-                  <div *ngIf="tripDetails?.pickupAddress.length == 1">
-                    <div class="col-12 mb-3" *ngFor="let pickup of tripDetails?.pickupAddress;let j=index">
-
-                      <span class="address">
-
-                        {{pickup?.fullAddress}}
-
-                      </span>
-                      <br>
-                      <b>Type : </b> {{pickup?.addressType ? pickup.addressType : 'Home'}} <br>
-                      <span class="address"> <b> LandMark :</b> {{pickup?.landMark}}</span>
-                      <br>
-
-                      <div class="row-wrap d-flex">
-                        <div class="col-6 d-flex">
-                          <span><b>Contact Person :</b><br>
-                            <b>Contact Person Number :</b></span>
-                        </div>
-                        <div class="col-6 d-flex">
-                          <span>{{pickup?.contactPerson}}<br>
-                            {{pickup?.contactPersonNumber}}</span>
-                        </div>
-                      </div>
+                  <div class="col-12 mb-3" *ngFor="let pickup of tripDetails?.pickupAddress; let j = index">
+                    <span class="address">{{formatAddress(pickup)}}</span><br>
+                    <span *ngIf="pickup?.addressType"><b>Address Type:</b> {{pickup.addressType}}<br></span>
+                    <span *ngIf="pickup?.landMark" class="address"><b>Landmark:</b> {{pickup.landMark}}<br></span>
+                    <span *ngIf="pickup?.contactPerson"><b>Contact Person:</b> {{pickup.contactPerson}}<br></span>
+                    <span *ngIf="pickup?.contactPersonNumber"><b>Contact Number:</b> {{pickup.contactPersonNumber}}<br></span>
+                    <span *ngIf="pickup?.delivered != null"><b>Delivered:</b> {{pickup.delivered ? 'Yes' : 'No'}}<br></span>
+                    <div class="mt-2" *ngIf="pickup?.proofImageUrl">
+                      <b>Proof Image:</b><br>
+                      <img [src]="pickup.proofImageUrl" alt="Pickup proof" class="img-fluid mt-1" style="max-height: 180px; border-radius: 6px;">
                     </div>
-                  </div>
-                  <div *ngIf="tripDetails?.pickupAddress.length > 1">
-                    <mat-card *ngFor="let pickup of tripDetails?.pickupAddress;let j=index">
-                      <div class="col-12 mb-3">
-
-                        <span class="address">
-                          {{pickup?.fullAddress}}
-
-                        </span>
-                        <br>
-                        <b>Type : </b> {{pickup?.addressType ? pickup.addressType : 'Home'}}<br>
-                        <span class="address"> <b>LandMark :</b> {{pickup?.landMark}}</span>
-                        <br>
-
-                        <div class="row-wrap d-flex">
-                          <div class="col-6 d-flex">
-                            <span><b>Contact Person :</b><br>
-                              <b>Contact Person Number :</b></span>
-                          </div>
-                          <div class="col-6 d-flex">
-                            <span>{{pickup?.contactPerson}}<br>
-                              {{pickup?.contactPersonNumber}}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </mat-card>
                   </div>
                 </div>
                 <div class="row">
                   <div class="centertext"><b>Drop-off Info</b></div>
-                  <div *ngIf="tripDetails?.dropAddress.length == 1">
-                    <div class="col-12 dropinfo mb-3" *ngFor="let drop of tripDetails?.dropAddress;let j=index">
-                      <div class="p-1">
-
-
-                        <span class="address">
-                          {{drop?.fullAddress}}
-                          <!-- {{drop?.street}} {{drop?.city}}
-                        {{drop?.state}} {{drop?.country}}
-                        {{drop?.postalCode}} -->
-                        </span>
-                        <br>
-                        <b>Type : </b>{{drop?.addressType ? drop.addressType : 'Home'}}<br>
-                        <span class="address"><b>Landmark : </b>{{drop?.landMark}}</span><br>
-
-                        <div class="row-wrap d-flex" *ngIf="drop?.contactPerson.length">
-                          <div class="col-6 d-flex">
-                            <span><b>Contact Person :</b><br>
-                              <b>Contact Person Number :</b></span>
-                          </div>
-                          <div class="col-6 d-flex">
-                            <span>{{drop?.contactPerson}}<br>
-                              {{drop?.contactPersonNumber}}</span>
-                          </div>
-                        </div>
-                        <div class="row-wrap d-flex mt-3" *ngIf="!drop?.contactPerson.length">
-                          <div class="col-6 d-flex">
-                            <span><b>Contact Person :</b><br>
-                              <b>Contact Person Number :</b></span>
-                          </div>
-                          <div class="col-6 d-flex">
-                            <span>No Data<br>
-                              No Data</span>
-                          </div>
-                        </div>
-
+                  <div class="col-12 dropinfo mb-3" *ngFor="let drop of tripDetails?.dropAddress; let j = index">
+                    <div class="p-1">
+                      <span class="address">{{formatAddress(drop)}}</span><br>
+                      <span *ngIf="drop?.addressType"><b>Address Type:</b> {{drop.addressType}}<br></span>
+                      <span *ngIf="drop?.landMark" class="address"><b>Landmark:</b> {{drop.landMark}}<br></span>
+                      <span *ngIf="drop?.contactPerson"><b>Contact Person:</b> {{drop.contactPerson}}<br></span>
+                      <span *ngIf="drop?.contactPersonNumber"><b>Contact Number:</b> {{drop.contactPersonNumber}}<br></span>
+                      <span *ngIf="drop?.delivered != null"><b>Delivered:</b> {{drop.delivered ? 'Yes' : 'No'}}<br></span>
+                      <div class="mt-2" *ngIf="drop?.proofImageUrl">
+                        <b>Proof Image:</b><br>
+                        <img [src]="drop.proofImageUrl" alt="Drop proof" class="img-fluid mt-1" style="max-height: 180px; border-radius: 6px;">
                       </div>
                     </div>
-                  </div>
-                  <div *ngIf="tripDetails?.dropAddress.length > 1">
-                    <mat-card class="dropinfo m-0" *ngFor="let drop of tripDetails?.dropAddress;let j=index">
-                      <div>
-                        <div class="col-12  mb-3">
-
-                          <span class="address">
-                            {{drop?.fullAddress ? drop?.fullAddress :"-"}}
-                          </span>
-                          <br>
-                          <b>Type : </b>{{ drop?.addressType ? drop.addressType : 'Home'}} <br>
-                          <span class="address"><b>Landmark : </b> {{drop?.landMark ? drop?.landMark :'-'}}</span>
-
-                          <div class="row-wrap d-flex mt-3" *ngIf="drop?.contactPerson.length">
-                            <div class="col-6 d-flex">
-                              <span><b>Contact Person :</b><br>
-                                <b>Contact Person Number :</b></span>
-                            </div>
-                            <div class="col-6 d-flex">
-                              <span>{{drop?.contactPerson}}<br>
-                                {{drop?.contactPersonNumber}}</span>
-                            </div>
-                          </div>
-                          <div class="row-wrap d-flex mt-3" *ngIf="!drop?.contactPerson.length">
-                            <div class="col-6 d-flex">
-                              <span><b>Contact Person :</b><br>
-                                <b>Contact Person Number :</b></span>
-                            </div>
-                            <div class="col-6 d-flex">
-                              <span>No Data<br>
-                                No Data</span>
-                            </div>
-                          </div>
-
-                        </div>
-                      </div>
-                    </mat-card>
                   </div>
                 </div>
                 <div class="row-wrap d-flex">
@@ -440,13 +401,13 @@
                     </span>
                   </div>
                 </div>
-                <div class="row-wrap d-flex">
+                <div class="row-wrap d-flex" *ngIf="tripDetails?.baseKm != null">
                   <div class="col-6 mb-3">
-                    <b>Wastage Distance :</b><br>
+                    <b>Base Distance :</b><br>
                   </div>
                   <div class="col-6 mb-3">
                     <span class="address">
-                      {{tripDetails?.baseKm}}
+                      {{tripDetails?.baseKm}} km
                     </span>
                   </div>
                 </div>
@@ -514,72 +475,66 @@
         <h6 class="px-3 ">Delivery Logs</h6>
       </div>
       <div class="row">
-        <div class="col-sm-6 col-md-6 col-lg-3">
+        <div class="col-sm-6 col-md-6 col-lg-3" *ngIf="tripDetails?.createdAt">
           <mat-card>
             <mat-card-content class="">
               <div class="tripdetail">
-
-
                 <h4 class="header "><b>Trip Created</b></h4>
                 <div class="mt-2">
-                  <h4 class="datetime ">{{tripDetails?.createdAt| date }} <br>
-                    {{tripDetails?.createdAt | date:'mediumTime' }}</h4>
+                  <h4 class="datetime ">{{tripDetails.createdAt | date }} <br>
+                    {{tripDetails.createdAt | date:'mediumTime' }}</h4>
                 </div>
               </div>
             </mat-card-content>
           </mat-card>
-
         </div>
-        <div class="col-sm-6 col-md-6 col-lg-3 ">
+        <div class="col-sm-6 col-md-6 col-lg-3" *ngIf="tripDetails?.assignedAt">
           <mat-card>
             <mat-card-content class="">
-
               <div class="tripdetail">
-
-                <h4 class="header  "><b>Trip active Courier
-                    has been assigned</b></h4>
+                <h4 class="header  "><b>Courier Assigned</b></h4>
                 <div class="mt-2">
-                  <h4 class="datetime ">{{tripDetails?.assignedAt | date}} <br>
-                    {{tripDetails?.assignedAt | date:'mediumTime'}}</h4>
+                  <h4 class="datetime ">{{tripDetails.assignedAt | date}} <br>
+                    {{tripDetails.assignedAt | date:'mediumTime'}}</h4>
                 </div>
               </div>
             </mat-card-content>
           </mat-card>
         </div>
-        <div class="col-sm-6 col-md-6 col-lg-3">
+        <div class="col-sm-6 col-md-6 col-lg-3" *ngIf="tripDetails?.inProgressAt">
           <mat-card>
             <mat-card-content class=" ">
               <div class="tripdetail">
                 <h4 class="header  "><b>In Progress</b></h4>
                 <div class="mt-2">
-                  <h4 class="datetime  ">{{tripDetails?.inProgressAt| date}} <br>
-                    {{tripDetails?.inProgressAt |date:'mediumTime'}}</h4>
+                  <h4 class="datetime  ">{{tripDetails.inProgressAt | date}} <br>
+                    {{tripDetails.inProgressAt | date:'mediumTime'}}</h4>
                 </div>
               </div>
             </mat-card-content>
           </mat-card>
         </div>
-        <div class="col-sm-6 col-md-6 col-lg-3 ">
+        <div class="col-sm-6 col-md-6 col-lg-3" *ngIf="tripDetails?.pickUpedAt">
           <mat-card>
             <mat-card-content>
               <div class="tripdetail">
-                <h4 class="header"><b>Pickup completed</b></h4>
+                <h4 class="header"><b>Pickup Completed</b></h4>
                 <div class="mt-2">
-                  <h4 class="datetime  ">{{tripDetails?.pickUpedAt| date}} <br>
-                    {{tripDetails?.pickUpedAt| date:'mediumTime'}}</h4>
+                  <h4 class="datetime  ">{{tripDetails.pickUpedAt | date}} <br>
+                    {{tripDetails.pickUpedAt | date:'mediumTime'}}</h4>
                 </div>
               </div>
             </mat-card-content>
           </mat-card>
         </div>
-        <div class="col-sm-6 col-md-6 col-lg-3 ">
+        <div class="col-sm-6 col-md-6 col-lg-3" *ngIf="tripDetails?.deliveredAt">
           <mat-card>
             <mat-card-content>
               <div class="tripdetail">
-                <h4 class="header"><b>Delivery completed</b></h4>
+                <h4 class="header"><b>Delivery Completed</b></h4>
                 <div class="mt-2">
-                  <h4 class="datetime  ">{{tripDetails?.deliveredAt| date}} <br>
-                    {{tripDetails?.deliveredAt| date:'mediumTime'}}</h4>
+                  <h4 class="datetime  ">{{tripDetails.deliveredAt | date}} <br>
+                    {{tripDetails.deliveredAt | date:'mediumTime'}}</h4>
                 </div>
               </div>
             </mat-card-content>
