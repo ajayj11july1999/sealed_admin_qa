@@ -257,38 +257,52 @@ export class CourierViewComponent implements OnInit {
   // }
 
 
-  async onChange(files, type) {
+  private readonly allowedImageExtensions = ['png', 'jpg', 'jpeg'];
+  private readonly allowedImageMimeTypes = ['image/png', 'image/jpeg', 'image/jpg'];
 
-    // this.imagelist.imgUrl.value = 'src/assets/images/custm-nbb/user_dummy.png';
+  private isValidImageFile(file: File): boolean {
+    const ext =
+      file.name.substring(file.name.lastIndexOf('.') + 1, file.name.length) ||
+      file.name;
+    const extValid = this.allowedImageExtensions.includes(ext.toLowerCase());
+    const mimeValid =
+      !file.type ||
+      (file.type.startsWith('image/') &&
+        this.allowedImageMimeTypes.includes(file.type));
+    return extValid && mimeValid;
+  }
+
+  private resetFileInput(event?: Event): void {
+    const input = event?.target as HTMLInputElement;
+    if (input) {
+      input.value = '';
+    }
+  }
+
+  async onChange(files, type, event?: Event) {
     if (files && files.length > 0) {
-      var file = files[0];
-      let ext =
-        file.name.substring(file.name.lastIndexOf('.') + 1, file.name.length) ||
-        file.name;
-      if (ext == 'png' || ext == 'jpg' || ext == 'jpeg') {
-        if (!(file.size > 2097152)) {
-
-          let x: any;
-          var splitted;
-
-          var reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = function () {
-            let str: any = reader.result;
-            splitted = str.split(',');
-          };
-          setTimeout(() => {
-            this.uploadFile(files, files[0], splitted[1], type);
-
-          }, 1000);
-
-        } else {
-
-          this.toastr.error('Please Upload less 2mb file');
-        }
-      } else {
-        this.toastr.error('Invalid file format');
+      const file = files[0];
+      if (!this.isValidImageFile(file)) {
+        this.resetFileInput(event);
+        this.toastr.warning('Only image files (JPG, JPEG, PNG) are allowed.');
+        return;
       }
+      if (file.size > 2097152) {
+        this.resetFileInput(event);
+        this.toastr.error('Please Upload less 2mb file');
+        return;
+      }
+
+      let splitted: string[];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const str: any = reader.result;
+        splitted = str.split(',');
+      };
+      setTimeout(() => {
+        this.uploadFile(files, files[0], splitted[1], type);
+      }, 1000);
     }
   }
   async uploadFile(files, file, splitted, type) {
@@ -371,50 +385,27 @@ export class CourierViewComponent implements OnInit {
   //     a.click();
   //   })
   // }
-downloadImage(url: string) {
+downloadImage(url: string, event?: Event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
   if (!url) return;
 
   const fileName = this.splitFileName(url) || 'file';
 
-  if (url.startsWith('http')) {
-    fetch(url)
-      .then(response => response.blob())
-      .then(blob => {
-        const objectUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = objectUrl;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(objectUrl);
-      })
-      .catch(() => {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        a.target = '_blank';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      });
-    return;
-  }
-
-  this.apiService.getimageDownload(url).subscribe(res => {
-    const base64 = res?.data;
-    let mimeType = 'image/png';
-    if (fileName.endsWith('.jpg') || fileName.endsWith('.jpeg')) {
-      mimeType = 'image/jpeg';
-    } else if (fileName.endsWith('.pdf')) {
-      mimeType = 'application/pdf';
-    }
-    const link = document.createElement('a');
-    link.href = `data:${mimeType};base64,${base64}`;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  this.apiService.getimageDownload(url).subscribe({
+    next: (res) => {
+      const base64 = res?.data;
+      if (!base64) {
+        this.toastr.error('Unable to download file');
+        return;
+      }
+      this.downloadedImage(base64, fileName);
+    },
+    error: () => {
+      this.toastr.error('Failed to download file');
+    },
   });
 }
   splitFileName(url: string): string {
@@ -447,18 +438,23 @@ downloadImage(url: string) {
     return new Blob([byteArray], { type: contentType });
   }
 
-  async downloadedImage(base64Data: string, fileName: string) {
-    const blob = await this.convertBase64ToBlob(base64Data, 'image/png');
-    const url = window.URL.createObjectURL(blob);
+  downloadedImage(base64Data: string, fileName: string) {
+    const ext = fileName.split('.').pop()?.toLowerCase();
+    let contentType = 'image/png';
+    if (ext === 'jpg' || ext === 'jpeg') {
+      contentType = 'image/jpeg';
+    } else if (ext === 'pdf') {
+      contentType = 'application/pdf';
+    }
 
+    const blob = this.convertBase64ToBlob(base64Data, contentType);
+    const objectUrl = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
+    a.href = objectUrl;
     a.download = fileName;
     document.body.appendChild(a);
     a.click();
-
-    // Clean up
-    window.URL.revokeObjectURL(url);
+    window.URL.revokeObjectURL(objectUrl);
     document.body.removeChild(a);
   }
 
