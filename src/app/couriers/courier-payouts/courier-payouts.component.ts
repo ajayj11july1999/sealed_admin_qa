@@ -26,6 +26,9 @@ interface Page {
 })
 export class CourierPayoutsComponent implements OnInit {
 
+  private readonly amountPattern = /^[0-9]+(\.[0-9]{1,2})?$/;
+  private readonly controlKeys = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+
   payoutForm: any = {
     name: '',
     mobileNo: '',
@@ -124,33 +127,123 @@ export class CourierPayoutsComponent implements OnInit {
   }
 
   create(f) {
+    f.controls?.currentAmountPaid?.markAsTouched();
+    f.controls?.paymentMode?.markAsTouched();
 
-    if (f.form?.valid) {
-      // this.payoutForm.deliveryManId=
-        const payload = { ...this.payoutForm }; // clone object
-  delete payload.createdAt;               // remove createdAt
+    const amount = String(this.payoutForm.currentAmountPaid ?? '').trim();
 
-  this.apiservice.addpayout(payload, this.payoutForm._id).subscribe((res) => {
-        console.log(res)
-        if (res.status = 200) {
-          this.toastr.success('Updated Successfully');
-          this.getlistpayouts();
-          // this.toastr.success(this.userId ? 'Updated Successfully' : 'Registered Successfully');
-          this.clear();
-          this.modalService.hide();
-        }
-        else {
-
-          this.toastr.error(res.message);
-        }
-
-
-      }, err => {
-        this.toastr.error('Invalid email/mobile No');
-      })
-    } else {
-      this.toastr.error('Invalid input provided');
+    if (!amount) {
+      this.toastr.error('Payment amount is required.');
+      return;
     }
+
+    if (!this.amountPattern.test(amount)) {
+      this.toastr.error('Enter a valid payment amount (e.g. 100 or 100.50).');
+      return;
+    }
+
+    if (Number(amount) <= 0) {
+      this.toastr.error('Payment amount must be greater than 0.');
+      return;
+    }
+
+    if (!this.payoutForm.paymentMode) {
+      this.toastr.error('Payment type is required.');
+      return;
+    }
+
+    const payload = {
+      ...this.payoutForm,
+      currentAmountPaid: Number(amount),
+    };
+    delete payload.createdAt;
+
+    this.apiservice.addpayout(payload, this.payoutForm._id).subscribe((res) => {
+      console.log(res)
+      if (res.status === 200 || res.code === 200) {
+        this.toastr.success('Updated Successfully');
+        this.getlistpayouts();
+        this.clear();
+        this.modalService.hide();
+      } else {
+        this.toastr.error(this.getPayoutErrorMessage(res?.message));
+      }
+    }, err => {
+      this.toastr.error(this.getPayoutErrorMessage(err?.error?.message));
+    });
+  }
+
+  private getPayoutErrorMessage(message?: string): string {
+    if (!message) {
+      return 'Failed to add payout. Please try again.';
+    }
+
+    if (/email|mobile/i.test(message)) {
+      return 'Enter a valid payment amount.';
+    }
+
+    return message;
+  }
+
+  sanitizeAmount(value: any): string {
+    if (value == null || value === '') {
+      return '';
+    }
+
+    let str = String(value).replace(/[^0-9.]/g, '');
+    const dotIndex = str.indexOf('.');
+    if (dotIndex !== -1) {
+      str = str.slice(0, dotIndex + 1) + str.slice(dotIndex + 1).replace(/\./g, '');
+    }
+    if (str.startsWith('.')) {
+      str = `0${str}`;
+    }
+
+    const [intPart = '', decPart] = str.split('.');
+    return decPart !== undefined ? `${intPart}.${decPart.slice(0, 2)}` : intPart;
+  }
+
+  blockInvalidAmountKeys(event: KeyboardEvent): void {
+    if (['e', 'E', '+', '-'].includes(event.key)) {
+      event.preventDefault();
+    }
+  }
+
+  allowNumbersOnly(event: KeyboardEvent): boolean {
+    if (this.controlKeys.includes(event.key) || event.ctrlKey || event.metaKey) {
+      return true;
+    }
+
+    const char = event.key;
+    const input = event.target as HTMLInputElement;
+    if (/^[0-9]$/.test(char)) {
+      return true;
+    }
+    if (char === '.' && !input.value.includes('.')) {
+      return true;
+    }
+
+    event.preventDefault();
+    return false;
+  }
+
+  onAmountPaste(event: ClipboardEvent): void {
+    event.preventDefault();
+    const input = event.target as HTMLInputElement;
+    const start = input.selectionStart ?? input.value.length;
+    const end = input.selectionEnd ?? input.value.length;
+    const pasted = event.clipboardData?.getData('text') ?? '';
+    const merged = `${input.value.slice(0, start)}${pasted}${input.value.slice(end)}`;
+    const sanitized = this.sanitizeAmount(merged);
+    this.payoutForm.currentAmountPaid = sanitized;
+    input.value = sanitized;
+  }
+
+  onAmountInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const sanitized = this.sanitizeAmount(input.value);
+    this.payoutForm.currentAmountPaid = sanitized;
+    input.value = sanitized;
   }
 
   clear() {
@@ -161,10 +254,13 @@ export class CourierPayoutsComponent implements OnInit {
     this.payoutForm.currentAmountPaid = '';
   }
   editpayout(item: any) {
-
     this.isedit = true;
-    this.payoutForm = item;
-    this.payoutForm.deliveryManId = item?.deliveryManId
+    this.payoutForm = {
+      ...item,
+      currentAmountPaid: '',
+      paymentMode: '',
+      deliveryManId: item?.deliveryManId,
+    };
   }
   searchUserList(e: any) {
     this.offset = 0;
