@@ -355,3 +355,15 @@ input {
   margin: 7px;
   padding: 6px;
 }
+
+.document-block {
+  text-align: left;
+
+  p {
+    text-align: left;
+  }
+
+  .btn-group {
+    justify-content: flex-start;
+  }
+}

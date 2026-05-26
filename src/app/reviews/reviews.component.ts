@@ -45,7 +45,7 @@ export class ReviewsComponent implements OnInit {
   userrole: any;
   limit: number = 15;
   offset: number = 0;
-  value: any;
+  value: string = '';
   totalCount: number = 0;
 
   constructor(private dialog: MatDialog, private apiservice: ApiServiceService,
@@ -97,6 +97,13 @@ export class ReviewsComponent implements OnInit {
   }
 
   onRatingChange() {
+    this.resetPagination();
+  }
+
+  clearFilters() {
+    this.selectedReviewerType = '';
+    this.selectedRating = '';
+    this.value = '';
     this.resetPagination();
   }
 

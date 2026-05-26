@@ -32,11 +32,13 @@
                         <option [value]="2">2 Star</option>
                         <option [value]="1">1 Star</option>
                       </select>
+
+                      <button type="button" class="clear-button" (click)="clearFilters()">Clear</button>
                     </div>
                   </div>
                   <div class="col-lg-4 col-md-5 col-12 text-end">
                     <div class="search-box">
-                      <input type="text" (input)="searchUserList($event)" class="search-input" placeholder="Search by order / comment">
+                      <input type="text" [(ngModel)]="value" (input)="searchUserList($event)" class="search-input" placeholder="Search by order / comment">
 
                       <button class="search-button" type="submit" value="search">
                         <i class="fa fa-search"></i>
