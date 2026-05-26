@@ -82,7 +82,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       {
         fromdate: [null, [Validators.required]],
         todate: [null, [Validators.required]],
-        orderstatus: [''],
+        orderstatus: [null],
       },
       { validators: tripDateRangeOrderValidator }
     );
@@ -278,7 +278,11 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
   clear() {
     this.searchtripidForm.reset();
-    this.searchtripDateForm.reset();
+    this.searchtripDateForm.reset({
+      fromdate: null,
+      todate: null,
+      orderstatus: null,
+    });
     this.selectedStatus = '';
     if (this.courierFilterActive) {
       this.router.navigate(['/search']);
