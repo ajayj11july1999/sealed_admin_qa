@@ -3,7 +3,10 @@ import {
   ElementRef,
   ViewChild,
   AfterViewInit,
+  OnDestroy,
   OnInit,
+  NgZone,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { ApiServiceService } from '../service/api-service.service';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
@@ -12,13 +15,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { HttpErrorResponse } from '@angular/common/http';
 declare const google: any;
 
+const GOOGLE_MAPS_API_KEY = 'AIzaSyAOZewZNjU5p3SRKy4waqDjhkpvK2vIjso';
+
 @Component({
   selector: 'app-zone',
   templateUrl: './zone.component.html',
   styleUrls: ['./zone.component.scss'],
 })
-export class ZoneComponent implements OnInit, AfterViewInit {
+export class ZoneComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('mapContainer') mapContainer!: ElementRef<HTMLElement>;
 
   map!: google.maps.Map;
 
@@ -28,8 +34,6 @@ export class ZoneComponent implements OnInit, AfterViewInit {
 
   // Saved shapes
   savedPolylines: google.maps.Polyline[] = [];
-
-  drawingManager!: google.maps.drawing.DrawingManager;
 
   zones: any[] = [];
   allZones: any[] = [];
@@ -60,6 +64,12 @@ searchValue = '';
   /** Names of existing zones that overlap the current preview zone. */
   overlapWarning: string[] = [];
 
+  drawModeActive = false;
+  mapLoading = true;
+  mapLoadError = '';
+  /** Set when preview zone fails min/max size validation. */
+  previewSizeIssue: 'small' | 'large' | null = null;
+
   /** Page size when loading zones from the API (must load all rows for overlap checks). */
   private readonly zoneApiPageSize = 200;
 
@@ -69,7 +79,19 @@ searchValue = '';
   /** Maximum edge length (width and height) for a drawn zone, in meters. */
   private readonly maxZoneSideMeters = 50000;
 
-  private get minZoneSideDisplay(): string {
+  private mapsInitTimer: ReturnType<typeof setTimeout> | null = null;
+  private mapsReadyCallbacks: (() => void)[] = [];
+  private googleMapsLoadPromise: Promise<void> | null = null;
+  private autocompleteInitialized = false;
+
+  /** Custom rectangle draw (replaces deprecated DrawingManager). */
+  private drawMapListeners: google.maps.MapsEventListener[] = [];
+  private drawStartLatLng: google.maps.LatLng | null = null;
+  private drawTempRectangle: google.maps.Rectangle | null = null;
+  private isDraggingDraw = false;
+  private documentMouseUpHandler: (() => void) | null = null;
+
+  get minZoneSideDisplay(): string {
     const m = this.minZoneSideMeters;
     if (m >= 1000 && m % 1000 === 0) {
       return `${m / 1000} km`;
@@ -77,7 +99,7 @@ searchValue = '';
     return `${m} m`;
   }
 
-  private get maxZoneSideDisplay(): string {
+  get maxZoneSideDisplay(): string {
     const m = this.maxZoneSideMeters;
     if (m >= 1000 && m % 1000 === 0) {
       return `${m / 1000} km`;
@@ -88,7 +110,9 @@ searchValue = '';
 constructor(
   private api: ApiServiceService,
   private dialog: MatDialog,
-  private toastr: ToastrService
+  private toastr: ToastrService,
+  private ngZone: NgZone,
+  private cdr: ChangeDetectorRef
 ) {}
 
   // ---------------- LIFECYCLE ----------------
@@ -98,9 +122,147 @@ constructor(
   }
 
   ngAfterViewInit(): void {
-    this.initMap();
-    this.initAutocomplete();
-    this.initDrawing();
+    this.bootstrapMapStack();
+  }
+
+  ngOnDestroy(): void {
+    if (this.mapsInitTimer) {
+      clearTimeout(this.mapsInitTimer);
+      this.mapsInitTimer = null;
+    }
+    this.stopDrawMode();
+  }
+
+  /** Load Google Maps JS (waits for index.html script or injects one). */
+  private loadGoogleMapsScript(): Promise<void> {
+    if (this.isGoogleMapsApiAvailable()) {
+      return Promise.resolve();
+    }
+
+    if (this.googleMapsLoadPromise) {
+      return this.googleMapsLoadPromise;
+    }
+
+    this.googleMapsLoadPromise = new Promise((resolve, reject) => {
+      const finish = (): void => {
+        if (this.isGoogleMapsApiAvailable()) {
+          resolve();
+        } else {
+          this.waitForGoogleMapsApi(resolve, reject);
+        }
+      };
+
+      const existing = Array.from(document.scripts).find((s) =>
+        s.src.includes('maps.googleapis.com/maps/api/js')
+      );
+
+      if (existing) {
+        existing.addEventListener('load', finish, { once: true });
+        existing.addEventListener('error', () => reject(new Error('Google Maps script error')), {
+          once: true,
+        });
+        finish();
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&language=en`;
+      script.async = true;
+      script.defer = true;
+      script.onload = finish;
+      script.onerror = () => reject(new Error('Google Maps script error'));
+      document.head.appendChild(script);
+    });
+
+    return this.googleMapsLoadPromise;
+  }
+
+  private waitForGoogleMapsApi(
+    resolve: () => void,
+    reject: (err: Error) => void,
+    attempt = 0
+  ): void {
+    if (this.isGoogleMapsApiAvailable()) {
+      resolve();
+      return;
+    }
+    if (attempt >= 100) {
+      reject(new Error('Google Maps API timed out'));
+      return;
+    }
+    this.mapsInitTimer = setTimeout(
+      () => this.waitForGoogleMapsApi(resolve, reject, attempt + 1),
+      100
+    );
+  }
+
+  private isGoogleMapsApiAvailable(): boolean {
+    const g = (window as { google?: any }).google;
+    return !!(g?.maps?.Map && g?.maps?.places?.Autocomplete);
+  }
+
+  private bootstrapMapStack(onReady?: () => void): void {
+    if (onReady) {
+      this.mapsReadyCallbacks.push(onReady);
+    }
+
+    if (this.map) {
+      this.mapLoading = false;
+      this.runMapsReadyCallbacks();
+      return;
+    }
+
+    this.mapLoading = true;
+    this.mapLoadError = '';
+    this.cdr.markForCheck();
+
+    this.loadGoogleMapsScript()
+      .then(() => {
+        this.ngZone.run(() => {
+          this.setupMapStackIfNeeded();
+          this.mapLoading = false;
+          this.runMapsReadyCallbacks();
+          this.cdr.detectChanges();
+        });
+      })
+      .catch((err: Error) => {
+        this.ngZone.run(() => {
+          this.mapLoading = false;
+          this.mapLoadError = 'Failed to load Google Maps. Please refresh the page.';
+          this.mapsReadyCallbacks = [];
+          this.toastr.error(this.mapLoadError);
+          console.error(err);
+          this.cdr.detectChanges();
+        });
+      });
+  }
+
+  /** Initialize map and autocomplete — each step is idempotent. */
+  private setupMapStackIfNeeded(): void {
+    if (!this.mapContainer?.nativeElement) {
+      return;
+    }
+
+    if (!this.map) {
+      this.initMap();
+    }
+    if (!this.autocompleteInitialized) {
+      this.initAutocomplete();
+    }
+
+    if (this.allZones.length > 0) {
+      this.drawSavedZones();
+      this.mapDeliveryPartnersToZones();
+    }
+  }
+
+  private runMapsReadyCallbacks(): void {
+    const callbacks = this.mapsReadyCallbacks.splice(0);
+    callbacks.forEach((cb) => cb());
+  }
+
+  private markPreviewChanged(): void {
+    this.cdr.detectChanges();
   }
 
   // ---------------- DELIVERY PARTNERS ----------------
@@ -199,6 +361,8 @@ mapDeliveryPartnersToZones() {
   }
 
   addZoneMarkers() {
+    if (!this.map) return;
+
     // Clear existing markers if any
     this.zones.forEach((zone) => {
       if (zone.marker) {
@@ -224,7 +388,9 @@ mapDeliveryPartnersToZones() {
         });
 
         marker.addListener('click', () => {
-          this.showDeliveryList(zone.deliveryList, marker, zone.displayName);
+          this.ngZone.run(() => {
+            this.showDeliveryList(zone.deliveryList, marker, zone.displayName);
+          });
         });
 
         zone.marker = marker;
@@ -265,20 +431,27 @@ mapDeliveryPartnersToZones() {
 
   // ---------------- MAP INIT ----------------
   initMap() {
-    this.map = new google.maps.Map(
-      document.getElementById('map') as HTMLElement,
-      {
-        center: { lat: this.lat, lng: this.lng },
-        zoom: this.zoom,
-      }
-    );
+    const mapEl = this.mapContainer?.nativeElement;
+    if (!mapEl) return;
+
+    this.map = new google.maps.Map(mapEl, {
+      center: { lat: this.lat, lng: this.lng },
+      zoom: this.zoom,
+      mapTypeControl: true,
+      streetViewControl: false,
+    });
   }
 
-  // ---------------- AUTOCOMPLETE (OLD FEATURE) ----------------
+  // ---------------- AUTOCOMPLETE (search to select zone area) ----------------
   initAutocomplete() {
+    if (this.autocompleteInitialized || !this.searchInput?.nativeElement) {
+      return;
+    }
+    this.autocompleteInitialized = true;
+
     const autocomplete = new google.maps.places.Autocomplete(
       this.searchInput.nativeElement,
-      { types: ['geocode'] }
+      { types: ['geocode'], fields: ['place_id', 'geometry', 'address_components', 'name'] }
     );
 
     autocomplete.addListener('place_changed', () => {
@@ -288,55 +461,74 @@ mapDeliveryPartnersToZones() {
       const ne = place.geometry.viewport.getNorthEast();
       const sw = place.geometry.viewport.getSouthWest();
 
-      this.clearPreview();
+      this.ngZone.run(() => {
+        this.clearPreview();
 
-      const rectanglePath = [
-        { lat: ne.lat(), lng: sw.lng() },
-        { lat: ne.lat(), lng: ne.lng() },
-        { lat: sw.lat(), lng: ne.lng() },
-        { lat: sw.lat(), lng: sw.lng() },
-        { lat: ne.lat(), lng: sw.lng() },
-      ];
+        const rectanglePath = [
+          { lat: ne.lat(), lng: sw.lng() },
+          { lat: ne.lat(), lng: ne.lng() },
+          { lat: sw.lat(), lng: ne.lng() },
+          { lat: sw.lat(), lng: sw.lng() },
+          { lat: ne.lat(), lng: sw.lng() },
+        ];
 
-      this.previewPolyline = new google.maps.Polyline({
-        path: rectanglePath,
-        strokeOpacity: 0.6,
-        strokeWeight: 2,
-        icons: [
-          {
-            icon: {
-              path: 'M 0,-1 0,1',
-              strokeOpacity: 1,
-              strokeColor: '#ff0000',
-              scale: 4,
+        this.previewPolyline = new google.maps.Polyline({
+          path: rectanglePath,
+          strokeOpacity: 0.6,
+          strokeWeight: 2,
+          icons: [
+            {
+              icon: {
+                path: 'M 0,-1 0,1',
+                strokeOpacity: 1,
+                strokeColor: '#ff0000',
+                scale: 4,
+              },
+              offset: '0',
+              repeat: '10px',
             },
-            offset: '0',
-            repeat: '10px',
+          ],
+          map: this.map,
+        });
+
+        const rawName =
+          this.extractZone(place.address_components || []) ||
+          this.searchInput.nativeElement.value;
+        this.pendingZoneName = this.sanitizeZoneNameInput(rawName);
+
+        this.previewZone = {
+          zoneName: this.pendingZoneName,
+          placeId: place.place_id,
+          center: {
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng(),
           },
-        ],
-        map: this.map,
+          bounds: {
+            northeast: { lat: ne.lat(), lng: ne.lng() },
+            southwest: { lat: sw.lat(), lng: sw.lng() },
+          },
+          isActive: true,
+        };
+
+        this.overlapWarning = this.checkOverlappingZones(this.previewZone.bounds);
+
+        this.previewSizeIssue = this.zoneSideLengthIssue(
+          this.previewZone.bounds.northeast,
+          this.previewZone.bounds.southwest
+        );
+        if (this.previewSizeIssue === 'small') {
+          this.toastr.warning(
+            `Selected area is too small. Each side must be at least ${this.minZoneSideDisplay}. Search a larger area or use Draw Zone.`
+          );
+        } else if (this.previewSizeIssue === 'large') {
+          this.toastr.warning(
+            `Selected area is too large. Each side must be at most ${this.maxZoneSideDisplay}.`
+          );
+        }
+
+        this.drawModeActive = false;
+        this.markPreviewChanged();
       });
-
-      const rawName =
-        this.extractZone(place.address_components || []) ||
-        this.searchInput.nativeElement.value;
-      this.pendingZoneName = this.sanitizeZoneNameInput(rawName);
-
-      this.previewZone = {
-        zoneName: this.pendingZoneName,
-        placeId: place.place_id,
-        center: {
-          lat: place.geometry.location.lat(),
-          lng: place.geometry.location.lng(),
-        },
-        bounds: {
-          northeast: { lat: ne.lat(), lng: ne.lng() },
-          southwest: { lat: sw.lat(), lng: sw.lng() },
-        },
-        isActive: true,
-      };
-
-      this.overlapWarning = this.checkOverlappingZones(this.previewZone.bounds);
 
       this.map.fitBounds(place.geometry.viewport);
     });
@@ -495,99 +687,207 @@ mapDeliveryPartnersToZones() {
       .map((z) => z.zoneName || 'Unknown Zone');
   }
 
-  // ---------------- MANUAL DRAW RECTANGLE ----------------
-  initDrawing() {
-    this.drawingManager = new google.maps.drawing.DrawingManager({
-      drawingControl: true,
-      drawingMode: null,
-      drawingControlOptions: {
-        position: google.maps.ControlPosition.TOP_CENTER,
-        drawingModes: ['rectangle'],
-      },
-      rectangleOptions: {
-        fillOpacity: 0.1,
-        strokeWeight: 2,
-        strokeColor: '#ff0000',
-        clickable: false,
-      },
-    });
+  // ---------------- MANUAL DRAW RECTANGLE (custom — DrawingManager is deprecated) ----------------
 
-    this.drawingManager.setMap(this.map);
-
-    google.maps.event.addListener(
-      this.drawingManager,
-      'overlaycomplete',
-      (event: any) => {
-        if (event.type !== 'rectangle') return;
-
-        this.clearPreview();
-
-        // ✅ STRICT MODE SAFE
-        const rectangle = event.overlay as google.maps.Rectangle;
-
-        const bounds = rectangle.getBounds();
-        if (!bounds) {
-          rectangle.setMap(null);
-          this.drawingManager.setDrawingMode(null);
-          return;
-        }
-
-        const ne = bounds.getNorthEast();
-        const sw = bounds.getSouthWest();
-
-        const nePlain = { lat: ne.lat(), lng: ne.lng() };
-        const swPlain = { lat: sw.lat(), lng: sw.lng() };
-        const sideIssue = this.zoneSideLengthIssue(nePlain, swPlain);
-        if (sideIssue === 'small') {
-          this.toastr.warning(
-            `Draw a larger zone. Each side must be at least ${this.minZoneSideDisplay}.`
-          );
-          rectangle.setMap(null);
-          this.drawingManager.setDrawingMode(null);
-          return;
-        }
-        if (sideIssue === 'large') {
-          this.toastr.warning(
-            `Zone is too large. Each side must be at most ${this.maxZoneSideDisplay}.`
-          );
-          rectangle.setMap(null);
-          this.drawingManager.setDrawingMode(null);
-          return;
-        }
-
-        this.previewRectangle = rectangle;
-
-        const center = bounds.getCenter();
-
-        this.pendingZoneName = this.sanitizeZoneNameInput(
-          this.searchInput.nativeElement.value
-        );
-
-        this.previewZone = {
-          zoneName: this.pendingZoneName,
-          center: {
-            lat: center.lat(),
-            lng: center.lng(),
-          },
-          bounds: {
-            northeast: nePlain,
-            southwest: swPlain,
-          },
-          isActive: true,
-        };
-
-        this.overlapWarning = this.checkOverlappingZones(this.previewZone.bounds);
-
-        this.drawingManager.setDrawingMode(null);
+  enableDraw() {
+    this.bootstrapMapStack(() => {
+      if (!this.map) {
+        this.toastr.error('Map failed to load. Please refresh the page.');
+        return;
       }
+      this.startDrawMode();
+    });
+  }
+
+  private startDrawMode(): void {
+    if (!this.map) return;
+
+    this.clearPreview();
+    this.drawModeActive = true;
+    this.map.setZoom(11);
+    this.map.setOptions({ draggableCursor: 'crosshair', draggingCursor: 'crosshair' });
+    this.attachDrawListeners();
+    this.cdr.detectChanges();
+
+    this.toastr.info(
+      `Click and drag on the map to draw a zone (${this.minZoneSideDisplay} to ${this.maxZoneSideDisplay} per side).`,
+      '',
+      { timeOut: 7000 }
     );
   }
 
-  enableDraw() {
-    this.clearPreview();
-    this.drawingManager.setDrawingMode(
-      google.maps.drawing.OverlayType.RECTANGLE
+  private stopDrawMode(): void {
+    this.drawModeActive = false;
+    this.isDraggingDraw = false;
+    this.drawStartLatLng = null;
+    this.detachDrawListeners();
+    this.removeDocumentMouseUpListener();
+    this.clearDrawTempRectangle();
+
+    if (this.map) {
+      this.map.setOptions({
+        draggable: true,
+        draggableCursor: undefined,
+        draggingCursor: undefined,
+      });
+    }
+  }
+
+  private attachDrawListeners(): void {
+    if (!this.map || this.drawMapListeners.length > 0) return;
+
+    this.drawMapListeners.push(
+      this.map.addListener('mousedown', (e: google.maps.MapMouseEvent) => {
+        this.onDrawMouseDown(e);
+      }),
+      this.map.addListener('mousemove', (e: google.maps.MapMouseEvent) => {
+        this.onDrawMouseMove(e);
+      }),
+      this.map.addListener('mouseup', (e: google.maps.MapMouseEvent) => {
+        this.onDrawMouseUp(e);
+      })
     );
+  }
+
+  private detachDrawListeners(): void {
+    this.drawMapListeners.forEach((l) => l.remove());
+    this.drawMapListeners = [];
+  }
+
+  private attachDocumentMouseUpListener(): void {
+    this.removeDocumentMouseUpListener();
+    this.documentMouseUpHandler = () => {
+      this.ngZone.run(() => this.finishDrawDrag(null));
+    };
+    document.addEventListener('mouseup', this.documentMouseUpHandler);
+  }
+
+  private removeDocumentMouseUpListener(): void {
+    if (this.documentMouseUpHandler) {
+      document.removeEventListener('mouseup', this.documentMouseUpHandler);
+      this.documentMouseUpHandler = null;
+    }
+  }
+
+  private onDrawMouseDown(e: google.maps.MapMouseEvent): void {
+    if (!this.drawModeActive || !e.latLng || !this.map) return;
+
+    const domEvent = e.domEvent as MouseEvent | undefined;
+    if (domEvent?.button !== undefined && domEvent.button !== 0) return;
+
+    this.isDraggingDraw = true;
+    this.drawStartLatLng = e.latLng;
+    this.map.setOptions({ draggable: false });
+    this.clearDrawTempRectangle();
+    this.attachDocumentMouseUpListener();
+  }
+
+  private onDrawMouseMove(e: google.maps.MapMouseEvent): void {
+    if (!this.isDraggingDraw || !this.drawStartLatLng || !e.latLng || !this.map) return;
+
+    const bounds = this.boundsFromLatLngPair(this.drawStartLatLng, e.latLng);
+    if (!this.drawTempRectangle) {
+      this.drawTempRectangle = new google.maps.Rectangle({
+        bounds,
+        fillOpacity: 0.12,
+        fillColor: '#ff0000',
+        strokeWeight: 2,
+        strokeColor: '#ff0000',
+        map: this.map,
+        clickable: false,
+      });
+    } else {
+      this.drawTempRectangle.setBounds(bounds);
+    }
+  }
+
+  private onDrawMouseUp(e: google.maps.MapMouseEvent): void {
+    this.ngZone.run(() => this.finishDrawDrag(e.latLng ?? null));
+  }
+
+  private finishDrawDrag(endLatLng: google.maps.LatLng | null): void {
+    if (!this.isDraggingDraw || !this.drawStartLatLng) return;
+
+    this.isDraggingDraw = false;
+    this.removeDocumentMouseUpListener();
+
+    const start = this.drawStartLatLng;
+    this.drawStartLatLng = null;
+
+    if (!endLatLng) {
+      this.clearDrawTempRectangle();
+      return;
+    }
+
+    const bounds = this.boundsFromLatLngPair(start, endLatLng);
+    const ne = bounds.getNorthEast();
+    const sw = bounds.getSouthWest();
+    const nePlain = { lat: ne.lat(), lng: ne.lng() };
+    const swPlain = { lat: sw.lat(), lng: sw.lng() };
+    const { widthM, heightM } = this.boundsSideLengthsMeters(nePlain, swPlain);
+
+    if (widthM < 50 || heightM < 50) {
+      this.clearDrawTempRectangle();
+      this.toastr.warning('Click and drag on the map to draw a zone (don\'t just click).');
+      return;
+    }
+
+    this.clearDrawTempRectangle();
+
+    this.previewRectangle = new google.maps.Rectangle({
+      bounds,
+      fillOpacity: 0.15,
+      fillColor: '#ff0000',
+      strokeWeight: 2,
+      strokeColor: '#ff0000',
+      map: this.map,
+      clickable: false,
+    });
+
+    const center = bounds.getCenter();
+    this.pendingZoneName = this.sanitizeZoneNameInput(
+      this.searchInput.nativeElement.value
+    );
+
+    this.previewZone = {
+      zoneName: this.pendingZoneName,
+      center: { lat: center.lat(), lng: center.lng() },
+      bounds: { northeast: nePlain, southwest: swPlain },
+      isActive: true,
+    };
+
+    this.previewSizeIssue = this.zoneSideLengthIssue(nePlain, swPlain);
+    this.overlapWarning = this.checkOverlappingZones(this.previewZone.bounds);
+
+    if (this.previewSizeIssue === 'small') {
+      this.toastr.warning(
+        `Zone is too small. Each side must be at least ${this.minZoneSideDisplay}. Drag a larger rectangle or cancel and try again.`
+      );
+    } else if (this.previewSizeIssue === 'large') {
+      this.toastr.warning(
+        `Zone is too large. Each side must be at most ${this.maxZoneSideDisplay}.`
+      );
+    }
+
+    this.stopDrawMode();
+    this.markPreviewChanged();
+  }
+
+  private boundsFromLatLngPair(
+    a: google.maps.LatLng,
+    b: google.maps.LatLng
+  ): google.maps.LatLngBounds {
+    return new google.maps.LatLngBounds(
+      { lat: Math.min(a.lat(), b.lat()), lng: Math.min(a.lng(), b.lng()) },
+      { lat: Math.max(a.lat(), b.lat()), lng: Math.max(a.lng(), b.lng()) }
+    );
+  }
+
+  private clearDrawTempRectangle(): void {
+    if (this.drawTempRectangle) {
+      this.drawTempRectangle.setMap(null);
+      this.drawTempRectangle = null;
+    }
   }
 
   // ---------------- SAVE ----------------
@@ -596,14 +896,14 @@ mapDeliveryPartnersToZones() {
 
   const b = this.previewZone.bounds;
   if (b?.northeast && b?.southwest) {
-    const sideIssue = this.zoneSideLengthIssue(b.northeast, b.southwest);
-    if (sideIssue === 'small') {
+    this.previewSizeIssue = this.zoneSideLengthIssue(b.northeast, b.southwest);
+    if (this.previewSizeIssue === 'small') {
       this.toastr.warning(
         `Zone is too small. Each side must be at least ${this.minZoneSideDisplay}.`
       );
       return;
     }
-    if (sideIssue === 'large') {
+    if (this.previewSizeIssue === 'large') {
       this.toastr.warning(
         `Zone is too large. Each side must be at most ${this.maxZoneSideDisplay}.`
       );
@@ -654,11 +954,13 @@ private persistZone() {
   this.loading = true;
 
   this.api.createZone(this.previewZone).subscribe({
-    next: () => {
+    next: (res: any) => {
       this.loading = false;
+      this.toastr.success(res?.message || 'Zone saved successfully');
       this.clearPreview();
       this.loadZones();
       this.searchInput.nativeElement.value = '';
+      this.cdr.detectChanges();
     },
     error: (err: unknown) => {
       this.loading = false;
@@ -674,9 +976,11 @@ private persistZone() {
   }
 
   clearPreview() {
+    this.stopDrawMode();
     this.previewZone = null;
     this.pendingZoneName = '';
     this.overlapWarning = [];
+    this.previewSizeIssue = null;
 
     if (this.previewPolyline) {
       this.previewPolyline.setMap(null);
@@ -687,6 +991,8 @@ private persistZone() {
       this.previewRectangle.setMap(null);
       this.previewRectangle = undefined;
     }
+
+    this.cdr.detectChanges();
   }
 
   // ---------------- LOAD SAVED ZONES ----------------
@@ -727,19 +1033,23 @@ loadZones(): void {
 
 /** Apply full zone list from API (all pages merged) to state and map. */
 private applyLoadedZones(all: any[]): void {
-  this.allZones = all;
-  this.totalCount = this.allZones.length;
+  this.ngZone.run(() => {
+    this.allZones = all;
+    this.totalCount = this.allZones.length;
 
-  const start = this.offset * this.limit;
-  const end = start + this.limit;
-  this.zones = this.allZones.slice(start, end);
+    const start = this.offset * this.limit;
+    const end = start + this.limit;
+    this.zones = this.allZones.slice(start, end);
 
-  this.drawSavedZones();
-  this.mapDeliveryPartnersToZones();
+    this.drawSavedZones();
+    this.mapDeliveryPartnersToZones();
 
-  if (this.previewZone?.bounds) {
-    this.overlapWarning = this.checkOverlappingZones(this.previewZone.bounds);
-  }
+    if (this.previewZone?.bounds) {
+      this.overlapWarning = this.checkOverlappingZones(this.previewZone.bounds);
+    }
+
+    this.cdr.detectChanges();
+  });
 }
  pageChange(e: any) {
 
@@ -757,11 +1067,14 @@ private applyLoadedZones(all: any[]): void {
 }
 
   drawSavedZones() {
+    if (!this.map) return;
+
     this.savedPolylines.forEach(p => p.setMap(null));
     this.savedPolylines = [];
 
     for (const zone of this.zones) {
-      const b = zone.bounds;
+      const b = this.normalizeBounds(zone.bounds);
+      if (!b) continue;
 
       const path = [
         { lat: b.northeast.lat, lng: b.southwest.lng },
