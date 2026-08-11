@@ -31,16 +31,6 @@
   <div *ngIf="drawModeActive" class="alert alert-info mb-2" role="status">
     <strong>Draw mode active.</strong>
     Click and drag on the map to draw a rectangle.
-    Each side must be between <strong>{{ minZoneSideDisplay }}</strong> and <strong>{{ maxZoneSideDisplay }}</strong>.
-  </div>
-
-  <!-- SIZE VALIDATION WARNING -->
-  <div *ngIf="previewZone && previewSizeIssue === 'small'" class="alert alert-warning mb-2" role="alert">
-    Zone is too small — each side must be at least <strong>{{ minZoneSideDisplay }}</strong>.
-    Cancel and draw a larger rectangle, or search for a bigger area.
-  </div>
-  <div *ngIf="previewZone && previewSizeIssue === 'large'" class="alert alert-warning mb-2" role="alert">
-    Zone is too large — each side must be at most <strong>{{ maxZoneSideDisplay }}</strong>.
   </div>
 
   <!-- OVERLAP WARNING -->
@@ -76,7 +66,7 @@
       <button
         class="btn btn-success"
         (click)="saveZone()"
-        [disabled]="loading || !!previewSizeIssue"
+        [disabled]="loading"
       >
         Save Zone
       </button>

@@ -67,17 +67,9 @@ searchValue = '';
   drawModeActive = false;
   mapLoading = true;
   mapLoadError = '';
-  /** Set when preview zone fails min/max size validation. */
-  previewSizeIssue: 'small' | 'large' | null = null;
 
   /** Page size when loading zones from the API (must load all rows for overlap checks). */
   private readonly zoneApiPageSize = 200;
-
-  /** Minimum edge length (width and height) for a drawn zone, in meters. */
-  private readonly minZoneSideMeters = 3000;
-
-  /** Maximum edge length (width and height) for a drawn zone, in meters. */
-  private readonly maxZoneSideMeters = 50000;
 
   private mapsInitTimer: ReturnType<typeof setTimeout> | null = null;
   private mapsReadyCallbacks: (() => void)[] = [];
@@ -90,22 +82,6 @@ searchValue = '';
   private drawTempRectangle: google.maps.Rectangle | null = null;
   private isDraggingDraw = false;
   private documentMouseUpHandler: (() => void) | null = null;
-
-  get minZoneSideDisplay(): string {
-    const m = this.minZoneSideMeters;
-    if (m >= 1000 && m % 1000 === 0) {
-      return `${m / 1000} km`;
-    }
-    return `${m} m`;
-  }
-
-  get maxZoneSideDisplay(): string {
-    const m = this.maxZoneSideMeters;
-    if (m >= 1000 && m % 1000 === 0) {
-      return `${m / 1000} km`;
-    }
-    return `${m} m`;
-  }
 
 constructor(
   private api: ApiServiceService,
@@ -512,20 +488,6 @@ mapDeliveryPartnersToZones() {
 
         this.overlapWarning = this.checkOverlappingZones(this.previewZone.bounds);
 
-        this.previewSizeIssue = this.zoneSideLengthIssue(
-          this.previewZone.bounds.northeast,
-          this.previewZone.bounds.southwest
-        );
-        if (this.previewSizeIssue === 'small') {
-          this.toastr.warning(
-            `Selected area is too small. Each side must be at least ${this.minZoneSideDisplay}. Search a larger area or use Draw Zone.`
-          );
-        } else if (this.previewSizeIssue === 'large') {
-          this.toastr.warning(
-            `Selected area is too large. Each side must be at most ${this.maxZoneSideDisplay}.`
-          );
-        }
-
         this.drawModeActive = false;
         this.markPreviewChanged();
       });
@@ -624,20 +586,6 @@ mapDeliveryPartnersToZones() {
     };
   }
 
-  private zoneSideLengthIssue(
-    ne: { lat: number; lng: number },
-    sw: { lat: number; lng: number }
-  ): 'small' | 'large' | null {
-    const { widthM, heightM } = this.boundsSideLengthsMeters(ne, sw);
-    if (widthM < this.minZoneSideMeters || heightM < this.minZoneSideMeters) {
-      return 'small';
-    }
-    if (widthM > this.maxZoneSideMeters || heightM > this.maxZoneSideMeters) {
-      return 'large';
-    }
-    return null;
-  }
-
   // ---------------- OVERLAP DETECTION ----------------
 
   /**
@@ -710,7 +658,7 @@ mapDeliveryPartnersToZones() {
     this.cdr.detectChanges();
 
     this.toastr.info(
-      `Click and drag on the map to draw a zone (${this.minZoneSideDisplay} to ${this.maxZoneSideDisplay} per side).`,
+      'Click and drag on the map to draw a zone.',
       '',
       { timeOut: 7000 }
     );
@@ -856,18 +804,7 @@ mapDeliveryPartnersToZones() {
       isActive: true,
     };
 
-    this.previewSizeIssue = this.zoneSideLengthIssue(nePlain, swPlain);
     this.overlapWarning = this.checkOverlappingZones(this.previewZone.bounds);
-
-    if (this.previewSizeIssue === 'small') {
-      this.toastr.warning(
-        `Zone is too small. Each side must be at least ${this.minZoneSideDisplay}. Drag a larger rectangle or cancel and try again.`
-      );
-    } else if (this.previewSizeIssue === 'large') {
-      this.toastr.warning(
-        `Zone is too large. Each side must be at most ${this.maxZoneSideDisplay}.`
-      );
-    }
 
     this.stopDrawMode();
     this.markPreviewChanged();
@@ -893,23 +830,6 @@ mapDeliveryPartnersToZones() {
   // ---------------- SAVE ----------------
  saveZone() {
   if (!this.previewZone) return;
-
-  const b = this.previewZone.bounds;
-  if (b?.northeast && b?.southwest) {
-    this.previewSizeIssue = this.zoneSideLengthIssue(b.northeast, b.southwest);
-    if (this.previewSizeIssue === 'small') {
-      this.toastr.warning(
-        `Zone is too small. Each side must be at least ${this.minZoneSideDisplay}.`
-      );
-      return;
-    }
-    if (this.previewSizeIssue === 'large') {
-      this.toastr.warning(
-        `Zone is too large. Each side must be at most ${this.maxZoneSideDisplay}.`
-      );
-      return;
-    }
-  }
 
   const name = this.pendingZoneName.trim();
   if (!name) {
@@ -980,7 +900,6 @@ private persistZone() {
     this.previewZone = null;
     this.pendingZoneName = '';
     this.overlapWarning = [];
-    this.previewSizeIssue = null;
 
     if (this.previewPolyline) {
       this.previewPolyline.setMap(null);
