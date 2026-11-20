@@ -1,0 +1,123 @@
+<div class="pt-3">
+  <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+    <div>
+      <h6 class="mb-0">Price per vehicle</h6>
+      <small class="text-muted">
+        Fare = base price for the first base km, then per km beyond — the same formula as B2C. {{ customCount }} of {{ rows.length }} vehicles
+        have a partner rate; the rest use the standard rate.
+      </small>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary btn-sm" (click)="showPreview = !showPreview">
+        <i class="fa fa-calculator me-1"></i> {{ showPreview ? 'Hide price check' : 'Price check' }}
+      </button>
+      <button class="btn btn-outline-secondary btn-sm" (click)="load()" [disabled]="loading" title="Refresh">
+        <i class="fa fa-rotate-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+  <table class="table table-bordered table-striped align-middle">
+    <thead>
+      <tr>
+        <th>Vehicle</th>
+        <th>Standard rate (B2C)</th>
+        <th>Partner rate</th>
+        <th>Last changed</th>
+        <th class="text-center" style="width: 220px">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngIf="loading">
+        <td colspan="5" class="text-center text-muted py-4">Loading vehicles…</td>
+      </tr>
+      <tr *ngIf="!loading && !error && rows.length === 0">
+        <td colspan="5" class="text-center text-muted py-4">No vehicles found in Manage Vehicles.</td>
+      </tr>
+      <tr *ngFor="let row of rows">
+        <td>
+          <div class="d-flex align-items-center gap-2">
+            <img *ngIf="row.imageUrl" [src]="row.imageUrl" alt="" style="height: 32px; width: 32px; object-fit: cover; border-radius: 6px" />
+            <span>{{ row.name }}</span>
+            <span class="badge bg-secondary" *ngIf="row.status === 'inactive'" title="Not offered while inactive; the partner rate is kept">inactive</span>
+          </div>
+        </td>
+        <td>{{ rateLabel(row.standard) }}</td>
+        <td>
+          <strong *ngIf="row.partner">{{ rateLabel(row.partner) }}</strong>
+          <span class="badge bg-light text-dark border" *ngIf="!row.partner">Standard</span>
+        </td>
+        <td>
+          <small class="text-muted" *ngIf="row.partner">
+            {{ row.partner.updatedAt | date: 'dd MMM yyyy, h:mm a' }}<br />{{ row.partner.updatedBy }}
+          </small>
+        </td>
+        <td class="text-center">
+          <button class="btn btn-sm btn-primary me-2" (click)="edit(row)" [disabled]="busyVehicleId === row.vehicleId">
+            <i class="fa fa-pen-to-square me-1"></i>{{ row.partner ? 'Edit' : 'Set rate' }}
+          </button>
+          <button class="btn btn-sm btn-outline-danger" *ngIf="row.partner" (click)="reset(row)" [disabled]="busyVehicleId === row.vehicleId">
+            Reset
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="card card-body mt-3" *ngIf="showPreview">
+    <h6>Price check</h6>
+    <small class="text-muted mb-2">Prices a trip exactly as the partner would see it — same road distance as B2C, this partner's rates.</small>
+
+    <div class="row g-2 align-items-end mb-2">
+      <div class="col-auto fw-semibold" style="width: 80px">Pickup</div>
+      <div class="col-3"><input type="number" class="form-control form-control-sm" placeholder="Latitude" [(ngModel)]="pickup.latitude" /></div>
+      <div class="col-3"><input type="number" class="form-control form-control-sm" placeholder="Longitude" [(ngModel)]="pickup.longitude" /></div>
+    </div>
+    <div class="row g-2 align-items-end mb-2" *ngFor="let drop of drops; let i = index">
+      <div class="col-auto fw-semibold" style="width: 80px">Drop {{ i + 1 }}</div>
+      <div class="col-3"><input type="number" class="form-control form-control-sm" placeholder="Latitude" [(ngModel)]="drop.latitude" /></div>
+      <div class="col-3"><input type="number" class="form-control form-control-sm" placeholder="Longitude" [(ngModel)]="drop.longitude" /></div>
+      <div class="col-auto">
+        <button class="btn btn-sm btn-link text-danger" *ngIf="drops.length > 1" (click)="removeDrop(i)"><i class="fa fa-xmark"></i></button>
+      </div>
+    </div>
+    <div class="d-flex gap-2 mb-3">
+      <button class="btn btn-sm btn-outline-secondary" (click)="addDrop()" [disabled]="drops.length >= 15">
+        <i class="fa fa-plus me-1"></i>Add drop
+      </button>
+      <button class="btn btn-sm btn-primary" (click)="runPreview()" [disabled]="previewing">
+        <span *ngIf="previewing" class="spinner-border spinner-border-sm me-1"></span>Check price
+      </button>
+    </div>
+
+    <ng-container *ngIf="preview">
+      <p class="mb-2">
+        Road distance: <strong>{{ preview.totalKm }} km</strong>
+        <span class="text-muted" *ngIf="preview.legsKm.length > 1">({{ preview.legsKm.join(' + ') }} km)</span>
+      </p>
+      <table class="table table-sm table-bordered mb-0">
+        <thead>
+          <tr>
+            <th>Vehicle</th>
+            <th>Partner pays</th>
+            <th>B2C pays</th>
+            <th>Rate applied</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let v of preview.vehicles">
+            <td>{{ v.name }}</td>
+            <td><strong>₹{{ v.totalCost | number: '1.2-2' }}</strong></td>
+            <td>₹{{ v.standardCost | number: '1.2-2' }}</td>
+            <td>
+              <span class="badge" [ngClass]="v.rateSource === 'partner' ? 'bg-primary' : 'bg-light text-dark border'">{{ v.rateSource }}</span>
+              <small class="text-muted ms-1">{{ rateLabel(v.rate) }}</small>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-container>
+  </div>
+</div>

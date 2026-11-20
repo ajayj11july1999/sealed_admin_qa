@@ -1,0 +1,59 @@
+<div class="container-fluid mt-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h4 class="mb-0">Partners (API)</h4>
+      <small class="text-muted">Businesses that book through the Partner API and the partner portal.</small>
+    </div>
+    <button class="btn btn-primary" routerLink="new">
+      <i class="fa fa-plus-circle me-2"></i> Create partner
+    </button>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2 mb-2">
+    <input type="text" class="form-control w-25" placeholder="Search name or Key ID…" [(ngModel)]="search" />
+    <button class="btn btn-outline-secondary" (click)="load()" [disabled]="loading" title="Refresh">
+      <i class="fa fa-rotate-right"></i>
+    </button>
+  </div>
+
+  <div class="alert alert-danger" *ngIf="error && !loading">{{ error }}</div>
+
+  <table class="table table-bordered table-striped table-hover">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Key ID</th>
+        <th>Environment</th>
+        <th>Status</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngIf="loading">
+        <td colspan="6" class="text-center text-muted py-4">Loading partners…</td>
+      </tr>
+      <tr *ngIf="!loading && !error && filtered.length === 0">
+        <td colspan="6" class="text-center text-muted py-4">
+          {{ partners.length ? 'No partner matches your search.' : 'No partners yet — create the first one.' }}
+        </td>
+      </tr>
+      <tr *ngFor="let p of filtered; let i = index" [routerLink]="[p.keyId]" style="cursor: pointer">
+        <td>{{ i + 1 }}</td>
+        <td>{{ p.name }}</td>
+        <td class="font-monospace">{{ p.keyId }}</td>
+        <td>
+          <span class="badge" [ngClass]="p.env === 'live' ? 'bg-warning text-dark' : 'bg-info text-dark'">{{ p.env | uppercase }}</span>
+        </td>
+        <td>
+          <span
+            class="badge"
+            [ngClass]="p.status === 'active' ? 'bg-success' : p.status === 'suspended' ? 'bg-warning text-dark' : 'bg-secondary'"
+            >{{ p.status }}</span
+          >
+        </td>
+        <td>{{ p.createdAt | date: 'dd MMM yyyy, h:mm a' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

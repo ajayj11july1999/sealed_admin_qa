@@ -290,6 +290,14 @@ export const AppRoutes: Routes = [
         },
       },
       {
+        path: 'partners-api',
+        loadChildren: () => import('./partner-management/partner-management.module').then((m) => m.PartnerManagementModule),
+        data: {
+          title: 'Partners (API)',
+          urls: [{ title: 'Dashboard', url: '/ ' }, { title: 'Partners (API)' }],
+        },
+      },
+      {
         path: 'payout',
         component: PayoutComponent,
 

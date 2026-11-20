@@ -344,6 +344,12 @@ export class VerticalAppSidebarComponent implements OnDestroy {
       icon: 'warning',
     },
     {
+      state: 'partners-api',
+      name: 'Partners (API)',
+      type: 'link',
+      icon: 'business_center',
+    },
+    {
       state: 'couriers',
       name: 'Courier partners',
       type: 'sub',

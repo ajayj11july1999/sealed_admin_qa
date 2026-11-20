@@ -45,6 +45,8 @@ export const environment = {
   // baseUrl: 'https://sealedtobusiness.com/api/',
   // baseUrl: 'http://localhost:5000/api/',
   baseUrl: "https://qa.sealed.co.in/api/",
+  // sealed_partner_api admin surface (Partners (API) screens). Trailing slash required.
+  partnerApiUrl: 'http://localhost:8080/api/admin/v1/',
 
     // realtimeBaseUrl: 'http://localhost:3000/api/'
   //  zoneBaseUrl: 'http://localhost:3000/api/realtime',

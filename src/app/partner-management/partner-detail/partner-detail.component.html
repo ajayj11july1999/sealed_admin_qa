@@ -1,0 +1,63 @@
+<div class="container-fluid mt-3">
+  <button class="btn btn-link px-0 mb-2" routerLink="/partners-api"><i class="fa fa-arrow-left me-1"></i> Partners</button>
+
+  <div class="text-muted py-4" *ngIf="loading && !partner">Loading partner…</div>
+
+  <div class="card card-body text-center py-5" *ngIf="notFound">
+    <h5>No partner {{ keyId }}</h5>
+    <p class="text-muted mb-3">It may have been mistyped. Go back to the list to pick one.</p>
+    <div><button class="btn btn-outline-primary" routerLink="/partners-api">Back to partners</button></div>
+  </div>
+
+  <div class="alert alert-danger d-flex justify-content-between align-items-center" *ngIf="error">
+    <span>{{ error }}</span>
+    <button class="btn btn-sm btn-outline-danger" (click)="load()">Retry</button>
+  </div>
+
+  <ng-container *ngIf="partner">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+      <div>
+        <h4 class="mb-1">{{ partner.name }}</h4>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <span class="font-monospace">{{ partner.keyId }}</span>
+          <button class="btn btn-sm btn-link p-0" (click)="copyKeyId()" title="Copy Key ID"><i class="fa fa-copy"></i></button>
+          <span class="badge" [ngClass]="partner.env === 'live' ? 'bg-warning text-dark' : 'bg-info text-dark'">{{ partner.env | uppercase }}</span>
+          <span
+            class="badge"
+            [ngClass]="partner.status === 'active' ? 'bg-success' : partner.status === 'suspended' ? 'bg-warning text-dark' : 'bg-secondary'"
+            >{{ partner.status }}</span
+          >
+        </div>
+        <small class="text-muted">
+          Orders belong to S2B account <span class="font-monospace">{{ partner.coreActorId }}</span> · created
+          {{ partner.createdAt | date: 'dd MMM yyyy' }}
+        </small>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-success" *ngIf="partner.status !== 'active'" [disabled]="updatingStatus" (click)="setStatus('active')">
+          Activate
+        </button>
+        <button class="btn btn-outline-warning" *ngIf="partner.status === 'active'" [disabled]="updatingStatus" (click)="setStatus('suspended')">
+          Suspend
+        </button>
+        <button class="btn btn-outline-danger" *ngIf="partner.status !== 'revoked'" [disabled]="updatingStatus" (click)="setStatus('revoked')">
+          Revoke
+        </button>
+      </div>
+    </div>
+
+    <mat-tab-group animationDuration="0ms">
+      <mat-tab label="Pricing">
+        <ng-template matTabContent>
+          <app-partner-pricing [keyId]="partner.keyId"></app-partner-pricing>
+        </ng-template>
+      </mat-tab>
+      <mat-tab label="Portal logins">
+        <ng-template matTabContent>
+          <app-partner-logins [keyId]="partner.keyId"></app-partner-logins>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+  </ng-container>
+</div>
