@@ -253,6 +253,81 @@ export class CourierPayoutsComponent implements OnInit {
     this.payoutForm.paymentMode = '';
     this.payoutForm.currentAmountPaid = '';
   }
+  adjustForm: any = {
+    deliveryManId: '',
+    name: '',
+    mobileNo: '',
+    balanceAmount: 0,
+    transactionType: 'credit',
+    amount: '',
+    paymentMode: 'Cash',
+    note: '',
+  };
+  adjustSubmitting = false;
+
+  openAdjust(template: TemplateRef<any>, item: any) {
+    this.adjustForm = {
+      deliveryManId: item?.deliveryManId,
+      name: item?.name,
+      mobileNo: item?.mobileNo,
+      balanceAmount: item?.balanceAmount ?? 0,
+      transactionType: 'credit',
+      amount: '',
+      paymentMode: 'Cash',
+      note: '',
+    };
+    this.AddModal(template);
+  }
+
+  onAdjustAmountInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const sanitized = this.sanitizeAmount(input.value);
+    this.adjustForm.amount = sanitized;
+    input.value = sanitized;
+  }
+
+  get adjustBalanceAfter(): number {
+    const amount = Number(this.adjustForm.amount) || 0;
+    const balance = Number(this.adjustForm.balanceAmount) || 0;
+    const after = this.adjustForm.transactionType === 'debit' ? balance - amount : balance + amount;
+    return Math.round(after * 100) / 100;
+  }
+
+  submitAdjust() {
+    const amount = String(this.adjustForm.amount ?? '').trim();
+    if (!amount || !this.amountPattern.test(amount) || Number(amount) <= 0) {
+      this.toastr.error('Enter a valid amount greater than 0.');
+      return;
+    }
+    if (!String(this.adjustForm.note || '').trim()) {
+      this.toastr.error('Reason is required.');
+      return;
+    }
+    if (!this.adjustForm.deliveryManId) {
+      this.toastr.error('Courier partner not found.');
+      return;
+    }
+    this.adjustSubmitting = true;
+    this.apiservice.adjustCourierWallet(this.adjustForm.deliveryManId, {
+      transactionType: this.adjustForm.transactionType,
+      amount: Number(amount),
+      paymentMode: this.adjustForm.paymentMode,
+      note: String(this.adjustForm.note).trim(),
+    }).subscribe((res) => {
+      this.adjustSubmitting = false;
+      if (res?.status === true || res?.code === 200) {
+        this.toastr.success(res?.message || 'Wallet updated');
+        this.getlistpayouts();
+        this.modalRef?.hide();
+      } else {
+        this.toastr.error(res?.message || 'Failed to update wallet');
+      }
+    }, err => {
+      this.adjustSubmitting = false;
+      this.toastr.error(err?.error?.message || 'Failed to update wallet');
+    });
+  }
+
   editpayout(item: any) {
     this.isedit = true;
     this.payoutForm = {

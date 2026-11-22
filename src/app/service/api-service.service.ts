@@ -1520,6 +1520,12 @@ deleteVehicle(id: any) {
         });
     });
   }
+  /** Add (credit) or deduct (debit) money on a courier's wallet. */
+  adjustCourierWallet(deliveryManId: any, postData: any): Observable<any> {
+    const url = `main/deliveryPay/adjust/${deliveryManId}`;
+    return this.auth.guestpost(url, postData).pipe(map((res) => res));
+  }
+
   addpayout(postData: any, id: any): Observable<any> {
     if (id) {
       let url = `main/deliveryPay/${id}`;

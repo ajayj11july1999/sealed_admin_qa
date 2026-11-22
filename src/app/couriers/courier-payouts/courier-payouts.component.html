@@ -43,7 +43,7 @@
                         <th>Mobile Number</th>
                         <th>Total Order Amount</th>
                         <th>Paid Amount</th>
-                        <th>Balance Amount</th>
+                        <th>Wallet</th>
                         <th>Status</th>
                         <th>Created Date</th>
                         <th>Action</th>
@@ -84,6 +84,9 @@
                             <button class="hty-btn" mat-flat-button color="primary"
                               *ngIf="userrole !== 'subadmin' || showAdd"
                               (click)="AddModal(addtemplate);editpayout(item)">Add Payout</button>
+                            <button class="hty-btn" mat-flat-button color="accent"
+                              *ngIf="userrole !== 'subadmin' || showAdd"
+                              (click)="openAdjust(adjusttemplate, item)">Add Money</button>
                             <button class="hty-btn" mat-button mat-flat-button color="primary"
                               *ngIf="userrole !== 'subadmin' || showHistory" (click)="viewHistory(item)">View History</button>
                           </div>
@@ -133,7 +136,7 @@
         </div>
         <div class="col-md-4 col-sm-12">
           <mat-form-field>
-            <input matInput placeholder="Total Amount" name="balanceAmount" [(ngModel)]="payoutForm.balanceAmount"
+            <input matInput placeholder="Wallet" name="balanceAmount" [(ngModel)]="payoutForm.balanceAmount"
               required #balanceAmount="ngModel" disabled>
           </mat-form-field>
         </div>
@@ -171,5 +174,65 @@
     </div>
 
 
+  </div>
+</ng-template>
+
+<ng-template #adjusttemplate>
+  <div class="modal-header">
+    <mat-card-title>Add / Deduct Courier Wallet Money</mat-card-title>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p class="mb-3">
+      <strong>{{ adjustForm.name }}</strong> ({{ adjustForm.mobileNo }}) &mdash;
+      wallet
+      <strong [style.color]="adjustForm.balanceAmount < 0 ? '#d32f2f' : null">₹{{ adjustForm.balanceAmount }}</strong>
+    </p>
+    <div class="row">
+      <div class="col-md-4 col-sm-12">
+        <mat-form-field>
+          <mat-select placeholder="Action" name="adjType" [(ngModel)]="adjustForm.transactionType">
+            <mat-option value="credit">Add money (courier paid us)</mat-option>
+            <mat-option value="debit">Deduct money</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <mat-form-field>
+          <input matInput placeholder="Amount" name="adjAmount" [ngModel]="adjustForm.amount"
+            inputmode="decimal" autocomplete="off"
+            (keydown)="blockInvalidAmountKeys($event)" (keypress)="allowNumbersOnly($event)"
+            (input)="onAdjustAmountInput($event)">
+        </mat-form-field>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <mat-form-field>
+          <mat-select placeholder="Payment Type" name="adjMode" [(ngModel)]="adjustForm.paymentMode">
+            <mat-option value="Cash">Cash</mat-option>
+            <mat-option value="UPI">UPI</mat-option>
+            <mat-option value="Online">Online</mat-option>
+            <mat-option value="Bank Transfer">Bank Transfer</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="col-12">
+        <mat-form-field class="w-100">
+          <input matInput placeholder="Reason (required, e.g. cash collected at office)" name="adjNote"
+            [(ngModel)]="adjustForm.note" maxlength="300" autocomplete="off">
+        </mat-form-field>
+      </div>
+    </div>
+    <p *ngIf="adjustForm.amount">
+      Wallet after: <strong [style.color]="adjustBalanceAfter < 0 ? '#d32f2f' : null">₹{{ adjustBalanceAfter }}</strong>
+      <span *ngIf="adjustBalanceAfter <= -200" class="text-danger"> &mdash; still at or below -₹200, courier stays paused</span>
+    </p>
+    <div class="row mt-3">
+      <div class="col">
+        <button mat-button mat-flat-button color="primary" [disabled]="adjustSubmitting" (click)="submitAdjust()">Save</button>
+        <button mat-button (click)="modalRef.hide()">Cancel</button>
+      </div>
+    </div>
   </div>
 </ng-template>
