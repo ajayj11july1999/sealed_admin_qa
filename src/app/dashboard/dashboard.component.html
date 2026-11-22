@@ -330,6 +330,16 @@
                     <td mat-cell *matCellDef="let element">{{element?.amountDetails?.finalAmount}} </td>
                   </ng-container>
 
+                  <ng-container matColumnDef="riderShare">
+                    <th mat-header-cell *matHeaderCellDef>Rider (80%)</th>
+                    <td mat-cell *matCellDef="let element">{{ riderShare(element) !== null ? '₹' + riderShare(element) : '-' }}</td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="companyShare">
+                    <th mat-header-cell *matHeaderCellDef>Company (20%)</th>
+                    <td mat-cell *matCellDef="let element">{{ companyShare(element) !== null ? '₹' + companyShare(element) : '-' }}</td>
+                  </ng-container>
+
                   <!-- Symbol Column -->
                   <ng-container matColumnDef="totalKms">
                     <th mat-header-cell *matHeaderCellDef>Total Kms</th>

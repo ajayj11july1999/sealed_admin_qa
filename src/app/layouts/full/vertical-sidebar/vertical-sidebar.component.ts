@@ -45,9 +45,9 @@ export class VerticalAppSidebarComponent implements OnDestroy {
     },
     {
       state: 'search',
-      name: 'Search',
+      name: 'All Orders',
       type: 'link',
-      icon: 'search',
+      icon: 'receipt_long',
     },
     // {
     //   state: 'b2b-trips',
@@ -296,9 +296,9 @@ export class VerticalAppSidebarComponent implements OnDestroy {
     },
     {
       state: 'search',
-      name: 'Search',
+      name: 'All Orders',
       type: 'link',
-      icon: 'search',
+      icon: 'receipt_long',
     },
     // {
     //   state: 'b2b-trips',
@@ -656,9 +656,9 @@ export class VerticalAppSidebarComponent implements OnDestroy {
         var Submenyarray: any = []
 
         Submenyarray = this.SUBMENUITEMS
-          .filter(aItem => dataAcces.some(b => b.page_name === aItem.name || (aItem.state === 'faq' && b.page_name === 'FAQ') || (aItem.state === 'reviews' && b.page_name === 'Review & Rating'))) // Filter only matching items
+          .filter(aItem => dataAcces.some(b => b.page_name === aItem.name || (aItem.state === 'faq' && b.page_name === 'FAQ') || (aItem.state === 'reviews' && b.page_name === 'Review & Rating') || (aItem.state === 'search' && b.name_type === 'search'))) // Filter only matching items
           .map(aItem => {
-            const bItem = dataAcces.find(b => b.page_name === aItem.name || (aItem.state === 'faq' && b.page_name === 'FAQ') || (aItem.state === 'reviews' && b.page_name === 'Review & Rating'));
+            const bItem = dataAcces.find(b => b.page_name === aItem.name || (aItem.state === 'faq' && b.page_name === 'FAQ') || (aItem.state === 'reviews' && b.page_name === 'Review & Rating') || (aItem.state === 'search' && b.name_type === 'search'));
             return bItem ? { ...aItem, ...bItem } : aItem;
           });
         Submenyarray.unshift({

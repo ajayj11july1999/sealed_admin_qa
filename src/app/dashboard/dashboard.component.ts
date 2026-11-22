@@ -92,9 +92,26 @@ export class DashboardComponent implements OnInit {
     this.tripdata();
     this.b2ctripdata();
     
-    this.displayedColumns = ['orderCode', 'finalAmount', 'totalKms', 'orderStatus'];
+    this.displayedColumns = ['orderCode', 'finalAmount', 'riderShare', 'companyShare', 'totalKms', 'orderStatus'];
 
     this.getOrderTableDetails();
+  }
+
+  // Mirrors backend deliveryManPayOutController: rider gets 80% of finalAmount, company keeps the rest.
+  // The wage is only credited when the order is delivered, so other statuses show '-'.
+  readonly RIDER_SHARE = 0.8;
+
+  riderShare(order: any): number | null {
+    if (order?.orderStatus !== 'delivered') return null;
+    const total = Number(order?.amountDetails?.finalAmount) || 0;
+    return Number((total * this.RIDER_SHARE).toFixed(2));
+  }
+
+  companyShare(order: any): number | null {
+    const rider = this.riderShare(order);
+    if (rider === null) return null;
+    const total = Number(order?.amountDetails?.finalAmount) || 0;
+    return Number((total - rider).toFixed(2));
   }
 
   @ViewChild(DaterangepickerDirective, { static: true })

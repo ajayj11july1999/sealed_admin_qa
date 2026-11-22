@@ -65,7 +65,7 @@
                     <h4>Display Pages</h4>
                     <div class="row pt-10" *ngFor="let page of displayDetailpages">
                       <div class="col-sm-12 col-md-2 form-label">
-                        <mat-label>{{page?.page_name}}</mat-label>
+                        <mat-label>{{page?.name_type === 'search' ? 'All Orders' : page?.page_name}}</mat-label>
                       </div>
                       <div class="col-sm-12 col-md-10">
                         <div class="d-flex" style="flex-wrap: wrap;">

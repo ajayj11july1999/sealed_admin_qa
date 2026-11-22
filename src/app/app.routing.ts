@@ -105,8 +105,8 @@ export const AppRoutes: Routes = [
         component: SearchComponent,
 
         data: {
-          title: 'Search',
-          urls: [{ title: 'Dashboard', url: '/   ' }, { title: 'search' }],
+          title: 'All Orders',
+          urls: [{ title: 'Dashboard', url: '/   ' }, { title: 'All Orders' }],
         },
       },
       {
